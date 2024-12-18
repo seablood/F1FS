@@ -9,7 +9,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "constructor_record_relation")
+@Table(name = "constructor_record_relation", indexes = {
+        @Index(name = "idx_CRR_constructor_id", columnList = "constructor_id")
+})
 public class ConstructorRecordRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
