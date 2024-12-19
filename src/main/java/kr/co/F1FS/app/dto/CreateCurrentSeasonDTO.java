@@ -1,6 +1,9 @@
 package kr.co.F1FS.app.dto;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import kr.co.F1FS.app.model.CurrentSeason;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +18,8 @@ public class CreateCurrentSeasonDTO {
     private Integer highestFinish;
     private Integer fastestLap;
     private Integer polePosition;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
 
     public static CurrentSeason toEntity(CreateCurrentSeasonDTO dto){
         return CurrentSeason.builder()
@@ -24,6 +29,7 @@ public class CreateCurrentSeasonDTO {
                 .highestFinish(dto.getHighestFinish())
                 .fastestLap(dto.getFastestLap())
                 .polePosition(dto.getPolePosition())
+                .racingClass(dto.getRacingClass())
                 .build();
     }
 }

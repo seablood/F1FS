@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.dto.CombinedDriverRequest;
 import kr.co.F1FS.app.dto.ResponseDriverDTO;
 import kr.co.F1FS.app.model.Driver;
-import kr.co.F1FS.app.model.DriverRecordRelation;
+import kr.co.F1FS.app.model.DriverDebutRelation;
 import kr.co.F1FS.app.service.ConstructorDriverRelationService;
-import kr.co.F1FS.app.service.DriverRecordRelationService;
+import kr.co.F1FS.app.service.DriverDebutRelationService;
 import kr.co.F1FS.app.service.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,7 +25,7 @@ import java.util.Map;
 public class DriverController {
     private final DriverService driverService;
     private final ConstructorDriverRelationService relationService;
-    private final DriverRecordRelationService recordRelationService;
+    private final DriverDebutRelationService debutRelationService;
 
     @PostMapping("/save")
     @Operation(summary = "드라이버 생성", description = "드라이버를 생성하고 컨스트럭터 소속을 저장한다.")
@@ -32,17 +33,23 @@ public class DriverController {
         return ResponseEntity.status(HttpStatus.CREATED).body(driverService.save(request));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/find/id")
     @Operation(summary = "드라이버 검색", description = "특정 id의 드라이버를 검색한다.")
-    public ResponseEntity<Map<String, Object>> findById(@PathVariable Long id){
+    public ResponseEntity<Map<String, Object>> findById(@RequestParam Long id){
         Map<String, Object> map = new HashMap<>();
         Driver driver = driverService.findById(id);
-        DriverRecordRelation relation = recordRelationService.findByDriver(driver);
+        DriverDebutRelation relation = debutRelationService.findByDriver(driver);
         map.put("driver", ResponseDriverDTO.toDto(driver));
-        map.put("currentSeason", recordRelationService.getCurrentSeason(relation));
-        map.put("sinceDebut", recordRelationService.getSinceDebut(relation));
+        map.put("sinceDebut", debutRelationService.getSinceDebut(relation));
 
         return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+
+    @GetMapping("/find/class")
+    @Operation(summary = "드라이버 검색(RacingClass)", description = "특정 클래스에 속한 드라이버들을 검색한다.")
+    public ResponseEntity<List<ResponseDriverDTO>> findByRacingClass(@RequestParam String racingClass){
+        List<ResponseDriverDTO> driverDTOList = driverService.findByRacingClass(racingClass);
+        return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
     }
 
     @PutMapping("/fire/{driverId}")

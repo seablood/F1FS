@@ -1,6 +1,9 @@
 package kr.co.F1FS.app.dto;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import kr.co.F1FS.app.model.Constructor;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +18,8 @@ public class CreateConstructorDTO {
     private String teamChief;
     private String chassis;
     private String powerUnit;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
 
     public static Constructor toEntity(CreateConstructorDTO dto){
         return Constructor.builder()
@@ -24,6 +29,7 @@ public class CreateConstructorDTO {
                 .teamChief(dto.getTeamChief())
                 .chassis(dto.getChassis())
                 .powerUnit(dto.getPowerUnit())
+                .racingClass(dto.getRacingClass())
                 .build();
     }
 }

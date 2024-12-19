@@ -5,9 +5,9 @@ import kr.co.F1FS.app.model.DriverRecordRelation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface DriverRecordRelationRepository extends JpaRepository<DriverRecordRelation, Long> {
-    Optional<DriverRecordRelation> findByDriverInfo(Driver driver);
+    List<DriverRecordRelation> findAllByDriverInfo(Driver driver);
 }

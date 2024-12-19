@@ -2,6 +2,7 @@ package kr.co.F1FS.app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -25,18 +26,22 @@ public class Constructor {
     private String teamChief;
     private String chassis;
     private String powerUnit;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
     //
     // 컨스트럭터 아이콘 이미지 제공 필요
     // 컨스트럭터 F1카 이미지 제공 필요
                              //
 
     @Builder
-    public Constructor(String name, Integer championships, String base, String teamChief, String chassis, String powerUnit){
+    public Constructor(String name, Integer championships, String base, String teamChief, String chassis,
+                       String powerUnit, RacingClass racingClass){
         this.name = name;
         this.championships = championships;
         this.base = base;
         this.teamChief = teamChief;
         this.chassis = chassis;
         this.powerUnit = powerUnit;
+        this.racingClass = racingClass;
     }
 }

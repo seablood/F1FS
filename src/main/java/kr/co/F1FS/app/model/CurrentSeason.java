@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 
 @Entity
@@ -18,15 +19,18 @@ public class CurrentSeason {
     private Integer highestFinish;
     private Integer fastestLap;
     private Integer polePosition;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
 
     @Builder
     public CurrentSeason(Integer championshipRank, Integer championshipPoint, Integer podiums, Integer highestFinish,
-                         Integer fastestLap, Integer polePosition){
+                         Integer fastestLap, Integer polePosition, RacingClass racingClass){
         this.championshipRank = championshipRank;
         this.championshipPoint = championshipPoint;
         this.podiums = podiums;
         this.highestFinish = highestFinish;
         this.fastestLap = fastestLap;
         this.polePosition = polePosition;
+        this.racingClass = racingClass;
     }
 }
