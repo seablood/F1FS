@@ -14,7 +14,7 @@ public class DriverRecordRelationService {
         DriverRecordRelation relation = DriverRecordRelation.builder()
                 .driver(driver)
                 .currentSeason(currentSeason)
-                .racingClass(currentSeason.getRacingClass())
+                .racingClass(driver.getRacingClass())
                 .build();
 
         relationRepository.save(relation);

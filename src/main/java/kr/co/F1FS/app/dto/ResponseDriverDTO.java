@@ -18,13 +18,12 @@ public class ResponseDriverDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth;
     private String constructorName;
-    private ResponseCurrentSeasonDTO currentSeasonDTO;
+    private ResponseCurrentSeasonDTO currentSeason;
+    private ResponseSinceDebutDTO sinceDebut;
 
-    public static ResponseDriverDTO toDto(Driver driver){
+    public static ResponseDriverDTO toDto(Driver driver, ResponseCurrentSeasonDTO seasonDTO,
+                                          ResponseSinceDebutDTO debutDTO){
         return new ResponseDriverDTO(driver.getName(), driver.getNumber(), driver.getChampionships(),
-                driver.getCountry(), driver.getBirth(), driver.getTeam(),
-                ResponseCurrentSeasonDTO.toDto(driver.getRecords().stream().filter(recordRelation ->
-                                recordRelation.getRacingClass() == driver.getRacingClass()).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("드라이버 정보 오류")).getCurrentSeason()));
+                driver.getCountry(), driver.getBirth(), driver.getTeam(), seasonDTO, debutDTO);
     }
 }

@@ -18,8 +18,6 @@ public class CreateCurrentSeasonDTO {
     private Integer highestFinish;
     private Integer fastestLap;
     private Integer polePosition;
-    @Enumerated(value = EnumType.STRING)
-    private RacingClass racingClass;
 
     public static CurrentSeason toEntity(CreateCurrentSeasonDTO dto){
         return CurrentSeason.builder()
@@ -29,7 +27,6 @@ public class CreateCurrentSeasonDTO {
                 .highestFinish(dto.getHighestFinish())
                 .fastestLap(dto.getFastestLap())
                 .polePosition(dto.getPolePosition())
-                .racingClass(dto.getRacingClass())
                 .build();
     }
 }

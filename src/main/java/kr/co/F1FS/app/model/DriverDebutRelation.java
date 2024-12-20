@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -9,13 +10,16 @@ import org.hibernate.annotations.OnDeleteAction;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "driver_debut_relation")
+@Table(name = "driver_debut_relation", indexes = {
+        @Index(name = "idx_DDR_driver_id", columnList = "driver_id"),
+        @Index(name = "idx_DDR_sinceDebut_id", columnList = "sinceDebut_id")
+})
 public class DriverDebutRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_DDR_driver_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Driver driverSinceInfo;
@@ -25,9 +29,13 @@ public class DriverDebutRelation {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private SinceDebut sinceDebut;
 
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
+
     @Builder
-    public DriverDebutRelation(Driver driver, SinceDebut sinceDebut){
+    public DriverDebutRelation(Driver driver, SinceDebut sinceDebut, RacingClass racingClass){
         this.driverSinceInfo = driver;
         this.sinceDebut = sinceDebut;
+        this.racingClass = racingClass;
     }
 }

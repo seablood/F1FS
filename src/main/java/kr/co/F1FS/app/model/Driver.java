@@ -27,6 +27,9 @@ public class Driver {
     @JsonIgnore
     @OneToMany(mappedBy = "driverInfo")
     private List<DriverRecordRelation> records = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "driverSinceInfo")
+    private List<DriverDebutRelation> debuts = new ArrayList<>();
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth;
     @Enumerated(value = EnumType.STRING)

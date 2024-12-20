@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.dto.CombinedDriverRequest;
 import kr.co.F1FS.app.dto.ResponseDriverDTO;
+import kr.co.F1FS.app.dto.ResponseSimpleDriverDTO;
 import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.model.DriverDebutRelation;
 import kr.co.F1FS.app.service.ConstructorDriverRelationService;
@@ -34,21 +35,16 @@ public class DriverController {
     }
 
     @GetMapping("/find/id")
-    @Operation(summary = "드라이버 검색", description = "특정 id의 드라이버를 검색한다.")
-    public ResponseEntity<Map<String, Object>> findById(@RequestParam Long id){
-        Map<String, Object> map = new HashMap<>();
-        Driver driver = driverService.findById(id);
-        DriverDebutRelation relation = debutRelationService.findByDriver(driver);
-        map.put("driver", ResponseDriverDTO.toDto(driver));
-        map.put("sinceDebut", debutRelationService.getSinceDebut(relation));
-
-        return ResponseEntity.status(HttpStatus.OK).body(map);
+    @Operation(summary = "드라이버 검색(상세 정보)", description = "특정 id의 드라이버를 검색(상세 정보)한다.")
+    public ResponseEntity<ResponseDriverDTO> findById(@RequestParam Long id){
+        ResponseDriverDTO driverDTO = driverService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(driverDTO);
     }
 
     @GetMapping("/find/class")
     @Operation(summary = "드라이버 검색(RacingClass)", description = "특정 클래스에 속한 드라이버들을 검색한다.")
-    public ResponseEntity<List<ResponseDriverDTO>> findByRacingClass(@RequestParam String racingClass){
-        List<ResponseDriverDTO> driverDTOList = driverService.findByRacingClass(racingClass);
+    public ResponseEntity<List<ResponseSimpleDriverDTO>> findByRacingClass(@RequestParam String racingClass){
+        List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByRacingClass(racingClass);
         return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
     }
 

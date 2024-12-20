@@ -11,7 +11,8 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "driver_record_relation", indexes = {
-        @Index(name = "idx_DRR_driver_id", columnList = "driver_id")
+        @Index(name = "idx_DRR_driver_id", columnList = "driver_id"),
+        @Index(name = "idx_DRR_currentSeason_id", columnList = "currentSeason_id")
 })
 public class DriverRecordRelation {
     @Id

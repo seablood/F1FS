@@ -10,7 +10,9 @@ import org.hibernate.annotations.OnDeleteAction;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "constructor_record_relation", indexes = {
-        @Index(name = "idx_CRR_constructor_id", columnList = "constructor_id")
+        @Index(name = "idx_CRR_constructor_id", columnList = "constructor_id"),
+        @Index(name = "idx_CRR_currentSeason_id", columnList = "currentSeason_id"),
+        @Index(name = "idx_CRR_sinceDebut_id", columnList = "sinceDebut_id")
 })
 public class ConstructorRecordRelation {
     @Id

@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 
 @Entity

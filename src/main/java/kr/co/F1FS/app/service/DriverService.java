@@ -35,23 +35,40 @@ public class DriverService {
 
         currentSeasonRepository.save(currentSeason);
         sinceDebutRepository.save(sinceDebut);
-
         return driverRepository.save(driver);
     }
 
-    public Driver findById(Long id){
+    public ResponseDriverDTO findById(Long id){
         Driver driver = driverRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
+        ResponseCurrentSeasonDTO currentSeasonDTO = getCurrentSeason(driver);
+        ResponseSinceDebutDTO sinceDebutDTO = getSinceDebut(driver);
 
-        return driver;
+        return ResponseDriverDTO.toDto(driver, currentSeasonDTO, sinceDebutDTO);
     }
 
-    public List<ResponseDriverDTO> findByRacingClass(String findClass){
+    public List<ResponseSimpleDriverDTO> findByRacingClass(String findClass){
         RacingClass racingClass= RacingClass.valueOf(findClass);
-        List<ResponseDriverDTO> driverDTOList = driverRepository.findAllByRacingClass(racingClass).stream()
-                .map(driver -> ResponseDriverDTO.toDto(driver))
+        List<ResponseSimpleDriverDTO> driverDTOList = driverRepository.findAllByRacingClass(racingClass).stream()
+                .map(driver -> ResponseSimpleDriverDTO.toDto(driver))
                 .toList();
 
         return driverDTOList;
+    }
+
+    public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
+        ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(driver.getRecords()
+                .stream().filter(recordRelation -> recordRelation.getRacingClass() == driver.getRacingClass())
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("드라이버 정보 오류")).getCurrentSeason());
+
+        return currentSeasonDTO;
+    }
+
+    public ResponseSinceDebutDTO getSinceDebut(Driver driver){
+        ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(driver.getDebuts().stream()
+                .filter(debutRelation -> debutRelation.getRacingClass() == driver.getRacingClass()).findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("드라이버 정보 오류")).getSinceDebut());
+
+        return sinceDebutDTO;
     }
 }
