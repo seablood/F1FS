@@ -1,9 +1,6 @@
 package kr.co.F1FS.app.dto;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import kr.co.F1FS.app.model.CurrentSeason;
-import kr.co.F1FS.app.util.RacingClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

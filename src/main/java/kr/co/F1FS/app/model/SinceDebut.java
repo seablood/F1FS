@@ -1,12 +1,11 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@NoArgsConstructor ** 임시 조치 **
 @AllArgsConstructor
 @Table(name = "since_debut")
 public class SinceDebut {
@@ -27,5 +26,13 @@ public class SinceDebut {
         this.fastestLap = fastestLap;
         this.polePosition = polePosition;
         this.enteredGP = enteredGP;
+    }
+
+    public SinceDebut() {
+        this.podiums = 0;
+        this.highestFinish = 0;
+        this.fastestLap = 0;
+        this.polePosition = 0;
+        this.enteredGP = 0;
     }
 }

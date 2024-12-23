@@ -1,11 +1,9 @@
 package kr.co.F1FS.app.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.co.F1FS.app.model.Driver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor

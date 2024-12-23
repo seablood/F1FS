@@ -1,24 +1,32 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.util.RacingClass;
 import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@NoArgsConstructor ** 임시 조치 **
 @AllArgsConstructor
 @Table(name = "current_season")
 public class CurrentSeason {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer championshipRank = 0;
-    private Integer championshipPoint = 0;
-    private Integer podiums = 0;
-    private Integer highestFinish = 0;
-    private Integer fastestLap = 0;
-    private Integer polePosition = 0;
+    private Integer championshipRank;
+    private Integer championshipPoint;
+    private Integer podiums;
+    private Integer highestFinish;
+    private Integer fastestLap;
+    private Integer polePosition;
+
+    public CurrentSeason() {
+        this.championshipRank = 0;
+        this.championshipPoint = 0;
+        this.podiums = 0;
+        this.highestFinish = 0;
+        this.fastestLap = 0;
+        this.polePosition = 0;
+    }
 
     @Builder
     public CurrentSeason(Integer championshipRank, Integer championshipPoint, Integer podiums, Integer highestFinish,

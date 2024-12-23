@@ -4,6 +4,7 @@ import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.model.DriverDebutRelation;
 import kr.co.F1FS.app.model.SinceDebut;
 import kr.co.F1FS.app.repository.DriverDebutRelationRepository;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +21,9 @@ public class DriverDebutRelationService {
                 .build();
 
         debutRelationRepository.save(debutRelation);
+    }
+
+    public boolean existsRelation(Driver driver, RacingClass racingClass){
+        return debutRelationRepository.existsDriverDebutRelationByDriverSinceInfoAndRacingClass(driver, racingClass);
     }
 }

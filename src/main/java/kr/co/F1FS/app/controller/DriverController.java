@@ -6,18 +6,15 @@ import kr.co.F1FS.app.dto.CombinedDriverRequest;
 import kr.co.F1FS.app.dto.ResponseDriverDTO;
 import kr.co.F1FS.app.dto.ResponseSimpleDriverDTO;
 import kr.co.F1FS.app.model.Driver;
-import kr.co.F1FS.app.model.DriverDebutRelation;
 import kr.co.F1FS.app.service.ConstructorDriverRelationService;
-import kr.co.F1FS.app.service.DriverDebutRelationService;
 import kr.co.F1FS.app.service.DriverService;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +23,6 @@ import java.util.Map;
 public class DriverController {
     private final DriverService driverService;
     private final ConstructorDriverRelationService relationService;
-    private final DriverDebutRelationService debutRelationService;
 
     @PostMapping("/save")
     @Operation(summary = "드라이버 생성", description = "드라이버를 생성하고 컨스트럭터 소속을 저장한다.")
@@ -46,6 +42,13 @@ public class DriverController {
     public ResponseEntity<List<ResponseSimpleDriverDTO>> findByRacingClass(@RequestParam String racingClass){
         List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByRacingClass(racingClass);
         return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
+    }
+
+    @PutMapping("/modify/racing-class/{id}/{racingClass}")
+    @Operation(summary = "드라이버 소속 클래스 변경", description = "특정 id의 드라이버의 racingClass를 변경한다.")
+    public ResponseEntity<ResponseDriverDTO> modifyRacingClass(@PathVariable Long id, @PathVariable String racingClass){
+        driverService.modifyRacingClass(id, racingClass);
+        return ResponseEntity.status(HttpStatus.OK).body(driverService.findById(id));
     }
 
     @PutMapping("/fire/{driverId}")

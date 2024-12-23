@@ -2,6 +2,7 @@ package kr.co.F1FS.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.F1FS.app.dto.CombinedConstructorRequest;
 import kr.co.F1FS.app.dto.CreateConstructorDTO;
 import kr.co.F1FS.app.dto.ResponseConstructorDTO;
 import kr.co.F1FS.app.model.Constructor;
@@ -20,8 +21,8 @@ public class ConstructorController {
 
     @PostMapping("/save")
     @Operation(summary = "컨스트럭터 생성", description = "컨스트럭터 정보를 입력받아(드라이버 제외) DB에 저장")
-    public ResponseEntity<Constructor> save(@RequestBody CreateConstructorDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(constructorService.save(dto));
+    public ResponseEntity<Constructor> save(@RequestBody CombinedConstructorRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(constructorService.save(request));
     }
 
     @GetMapping("/{id}")

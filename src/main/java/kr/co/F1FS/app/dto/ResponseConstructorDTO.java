@@ -1,11 +1,9 @@
 package kr.co.F1FS.app.dto;
 
 import kr.co.F1FS.app.model.Constructor;
-import kr.co.F1FS.app.model.Driver;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -18,9 +16,14 @@ public class ResponseConstructorDTO {
     private String teamChief;
     private String chassis;
     private String powerUnit;
+    private ResponseCurrentSeasonDTO currentSeason;
+    private ResponseSinceDebutDTO sinceDebut;
 
-    public static ResponseConstructorDTO toDto(Constructor constructor, List<String> drivers){
+    public static ResponseConstructorDTO toDto(Constructor constructor, List<String> drivers,
+                                               ResponseCurrentSeasonDTO currentSeason,
+                                               ResponseSinceDebutDTO sinceDebut){
         return new ResponseConstructorDTO(constructor.getName(), drivers, constructor.getChampionships(),
-                constructor.getBase(), constructor.getTeamChief(), constructor.getChassis(), constructor.getPowerUnit());
+                constructor.getBase(), constructor.getTeamChief(), constructor.getChassis(),
+                constructor.getPowerUnit(), currentSeason, sinceDebut);
     }
 }

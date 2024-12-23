@@ -42,6 +42,10 @@ public class Driver {
         this.team = team;
     }
 
+    public void updateRacingClass(RacingClass racingClass){
+        this.racingClass = racingClass;
+    }
+
     @Builder
     public Driver(String name, Integer number, String team, Integer championships, String country, LocalDate birth,
                   RacingClass racingClass){

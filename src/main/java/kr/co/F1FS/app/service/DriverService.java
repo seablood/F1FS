@@ -56,6 +56,25 @@ public class DriverService {
         return driverDTOList;
     }
 
+    @Transactional
+    public void modifyRacingClass(Long id, String modifyClass){
+        Driver driver = driverRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
+        RacingClass racingClass = RacingClass.valueOf(modifyClass);
+
+        driver.updateRacingClass(racingClass);
+
+        if(!debutRelationService.existsRelation(driver, racingClass)){
+            CurrentSeason currentSeason = new CurrentSeason();
+            SinceDebut sinceDebut = new SinceDebut();
+
+            recordRelationService.save(driver, currentSeason);
+            debutRelationService.save(driver, sinceDebut);
+            currentSeasonRepository.save(currentSeason);
+            sinceDebutRepository.save(sinceDebut);
+        }
+    }
+
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
         ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(driver.getRecords()
                 .stream().filter(recordRelation -> recordRelation.getRacingClass() == driver.getRacingClass())
