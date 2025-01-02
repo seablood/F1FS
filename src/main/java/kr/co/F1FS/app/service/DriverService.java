@@ -56,6 +56,15 @@ public class DriverService {
         return driverDTOList;
     }
 
+    public List<ResponseSimpleDriverDTO> findByName(String search){
+        List<ResponseSimpleDriverDTO> drivers = driverRepository
+                .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
+                .map(driver -> ResponseSimpleDriverDTO.toDto(driver))
+                .toList();
+
+        return drivers;
+    }
+
     @Transactional
     public void modifyRacingClass(Long id, String modifyClass){
         Driver driver = driverRepository.findById(id)

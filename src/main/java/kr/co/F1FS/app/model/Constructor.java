@@ -18,6 +18,7 @@ public class Constructor {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String engName;
     @JsonIgnore
     @OneToMany(mappedBy = "constructor")
     private List<ConstructorDriverRelation> drivers = new ArrayList<>();
@@ -34,9 +35,10 @@ public class Constructor {
                              //
 
     @Builder
-    public Constructor(String name, Integer championships, String base, String teamChief, String chassis,
+    public Constructor(String name, String engName, Integer championships, String base, String teamChief, String chassis,
                        String powerUnit, RacingClass racingClass){
         this.name = name;
+        this.engName = engName;
         this.championships = championships;
         this.base = base;
         this.teamChief = teamChief;

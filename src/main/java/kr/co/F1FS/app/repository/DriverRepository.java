@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     List<Driver> findAllByRacingClass(RacingClass racingClass);
+    List<Driver> findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(String name, String engName);
 }

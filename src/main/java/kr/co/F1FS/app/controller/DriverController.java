@@ -8,7 +8,6 @@ import kr.co.F1FS.app.dto.ResponseSimpleDriverDTO;
 import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.service.ConstructorDriverRelationService;
 import kr.co.F1FS.app.service.DriverService;
-import kr.co.F1FS.app.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +40,13 @@ public class DriverController {
     @Operation(summary = "드라이버 검색(RacingClass)", description = "특정 클래스에 속한 드라이버들을 검색한다.")
     public ResponseEntity<List<ResponseSimpleDriverDTO>> findByRacingClass(@RequestParam String racingClass){
         List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByRacingClass(racingClass);
+        return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
+    }
+
+    @GetMapping("/find/name")
+    @Operation(summary = "드라이버 검색(Name)", description = "특정 name의 드라이버들을 검색한다.")
+    public ResponseEntity<List<ResponseSimpleDriverDTO>> findByName(@RequestParam String search){
+        List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByName(search);
         return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
     }
 

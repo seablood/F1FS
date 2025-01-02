@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class ResponseDriverDTO {
     private String name;
+    private String engName;
     private Integer number;
     private Integer championships;
     private String country;
@@ -22,7 +23,7 @@ public class ResponseDriverDTO {
 
     public static ResponseDriverDTO toDto(Driver driver, ResponseCurrentSeasonDTO seasonDTO,
                                           ResponseSinceDebutDTO debutDTO){
-        return new ResponseDriverDTO(driver.getName(), driver.getNumber(), driver.getChampionships(),
+        return new ResponseDriverDTO(driver.getName(), driver.getEngName(), driver.getNumber(), driver.getChampionships(),
                 driver.getCountry(), driver.getBirth(), driver.getTeam(), seasonDTO, debutDTO);
     }
 }

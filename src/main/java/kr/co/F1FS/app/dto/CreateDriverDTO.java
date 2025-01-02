@@ -16,6 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class CreateDriverDTO {
     private String name;
+    private String engName;
     private Integer number;
     private Integer championships;
     private String country;
@@ -28,6 +29,7 @@ public class CreateDriverDTO {
     public static Driver toEntity(CreateDriverDTO dto){
         return Driver.builder()
                 .name(dto.getName())
+                .engName(dto.getEngName())
                 .number(dto.getNumber())
                 .team(dto.getConstructorName())
                 .championships(dto.getChampionships())

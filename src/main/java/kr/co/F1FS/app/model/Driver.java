@@ -20,6 +20,7 @@ public class Driver {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String engName;
     private Integer number;
     private String team;
     private Integer championships = 0;
@@ -47,9 +48,10 @@ public class Driver {
     }
 
     @Builder
-    public Driver(String name, Integer number, String team, Integer championships, String country, LocalDate birth,
+    public Driver(String name, String engName, Integer number, String team, Integer championships, String country, LocalDate birth,
                   RacingClass racingClass){
         this.name = name;
+        this.engName = engName;
         this.number = number;
         this.team = team;
         this.championships = championships;

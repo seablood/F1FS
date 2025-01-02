@@ -9,6 +9,7 @@ import kr.co.F1FS.app.model.SinceDebut;
 import kr.co.F1FS.app.repository.ConstructorRepository;
 import kr.co.F1FS.app.repository.CurrentSeasonRepository;
 import kr.co.F1FS.app.repository.SinceDebutRepository;
+import kr.co.F1FS.app.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,23 @@ public class ConstructorService {
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(relation.getSinceDebut());
 
         return ResponseConstructorDTO.toDto(constructor, getDrivers(constructor), currentSeasonDTO, sinceDebutDTO);
+    }
+
+    public List<ResponseSimpleConstructorDTO> findByName(String search){
+        List<ResponseSimpleConstructorDTO> constructorDTOList = constructorRepository
+                .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
+                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor))
+                .toList();
+
+        return constructorDTOList;
+    }
+
+    public List<ResponseSimpleConstructorDTO> findByRacingClass(String findClass){
+        RacingClass racingClass = RacingClass.valueOf(findClass);
+        List<ResponseSimpleConstructorDTO> constructorDTOList = constructorRepository.findAllByRacingClass(racingClass)
+                .stream().map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor)).toList();
+
+        return constructorDTOList;
     }
 
     public List<String> getDrivers(Constructor constructor){

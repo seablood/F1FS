@@ -10,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ResponseConstructorDTO {
     private String name;
+    private String engName;
     private List<String> drivers;
     private Integer championships;
     private String base;
@@ -22,8 +23,8 @@ public class ResponseConstructorDTO {
     public static ResponseConstructorDTO toDto(Constructor constructor, List<String> drivers,
                                                ResponseCurrentSeasonDTO currentSeason,
                                                ResponseSinceDebutDTO sinceDebut){
-        return new ResponseConstructorDTO(constructor.getName(), drivers, constructor.getChampionships(),
-                constructor.getBase(), constructor.getTeamChief(), constructor.getChassis(),
-                constructor.getPowerUnit(), currentSeason, sinceDebut);
+        return new ResponseConstructorDTO(constructor.getName(), constructor.getEngName(), drivers,
+                constructor.getChampionships(), constructor.getBase(), constructor.getTeamChief(),
+                constructor.getChassis(), constructor.getPowerUnit(), currentSeason, sinceDebut);
     }
 }

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateConstructorDTO {
     private String name;
+    private String engName;
     private Integer championships;
     private String base;
     private String teamChief;
@@ -24,6 +25,7 @@ public class CreateConstructorDTO {
     public static Constructor toEntity(CreateConstructorDTO dto){
         return Constructor.builder()
                 .name(dto.getName())
+                .engName(dto.getEngName())
                 .championships(dto.getChampionships())
                 .base(dto.getBase())
                 .teamChief(dto.getTeamChief())
