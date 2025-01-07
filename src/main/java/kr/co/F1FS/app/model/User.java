@@ -19,14 +19,24 @@ public class User {
     @Column(unique = true)
     private String nickname;
     private String email;
+    private String providerId;
+    private String provider;
     @Enumerated(value = EnumType.STRING)
     private Role role = Role.USER;
+    @Column(length = 400)
+    private String refreshToken;
+
+    public void updateRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
 
     @Builder
-    public User(String username, String password, String nickname, String email){
+    public User(String username, String password, String nickname, String email, String providerId, String provider){
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+        this.providerId = providerId;
+        this.provider = provider;
     }
 }

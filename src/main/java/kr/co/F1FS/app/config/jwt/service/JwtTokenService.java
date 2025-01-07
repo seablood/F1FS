@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -63,21 +64,17 @@ public class JwtTokenService {
     }
 
     // AccessToken 추출
-    public String resolveAccessToken(HttpServletRequest request){
-        String authorizationToken = request.getHeader(accessHeader);
-        if(authorizationToken != null && authorizationToken.startsWith(TOKEN_PREFIX)){
-            return authorizationToken.substring(TOKEN_PREFIX.length());
-        }
-        return null;
+    public Optional<String> resolveAccessToken(HttpServletRequest request){
+        return Optional.ofNullable(request.getHeader(accessHeader))
+                .filter(accessToken -> accessToken.startsWith(TOKEN_PREFIX))
+                .map(accessToken -> accessToken.replace(TOKEN_PREFIX, ""));
     }
 
     // RefreshToken 추출
-    public String resolveRefreshToken(HttpServletRequest request){
-        String authorizationToken = request.getHeader(refreshHeader);
-        if(authorizationToken != null && authorizationToken.startsWith(TOKEN_PREFIX)){
-            return authorizationToken.substring(TOKEN_PREFIX.length());
-        }
-        return null;
+    public Optional<String> resolveRefreshToken(HttpServletRequest request){
+        return Optional.ofNullable(request.getHeader(refreshHeader))
+                .filter(refreshToken -> refreshToken.startsWith(TOKEN_PREFIX))
+                .map(refreshToken -> refreshToken.replace(TOKEN_PREFIX, ""));
     }
 
     // 해당 토큰의 정보(Claim) 추출
@@ -85,8 +82,8 @@ public class JwtTokenService {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
-    public String getUsername(String token) {
-        return getClaims(token).get("username", String.class);
+    public Optional<String> getUsername(String token) {
+        return Optional.ofNullable(getClaims(token).get("username", String.class));
     }
 
     // 토큰 유효성 검사

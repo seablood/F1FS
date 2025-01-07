@@ -2,6 +2,7 @@ package kr.co.F1FS.app.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.dto.CreateUserDTO;
+import kr.co.F1FS.app.dto.ResponseUserDTO;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +21,12 @@ public class UserService {
         User user = CreateUserDTO.toEntity(userDTO);
 
         return userRepository.save(user);
+    }
+
+    public ResponseUserDTO findByUsername(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        return ResponseUserDTO.toDto(user);
     }
 }
