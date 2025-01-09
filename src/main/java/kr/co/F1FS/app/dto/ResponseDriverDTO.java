@@ -15,6 +15,7 @@ public class ResponseDriverDTO {
     private Integer number;
     private Integer championships;
     private String country;
+    private Integer followerNum;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth;
     private String constructorName;
@@ -24,6 +25,6 @@ public class ResponseDriverDTO {
     public static ResponseDriverDTO toDto(Driver driver, ResponseCurrentSeasonDTO seasonDTO,
                                           ResponseSinceDebutDTO debutDTO){
         return new ResponseDriverDTO(driver.getName(), driver.getEngName(), driver.getNumber(), driver.getChampionships(),
-                driver.getCountry(), driver.getBirth(), driver.getTeam(), seasonDTO, debutDTO);
+                driver.getCountry(), driver.getFollowerNum(), driver.getBirth(), driver.getTeam(), seasonDTO, debutDTO);
     }
 }

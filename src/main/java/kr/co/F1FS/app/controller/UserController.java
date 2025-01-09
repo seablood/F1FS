@@ -2,6 +2,7 @@ package kr.co.F1FS.app.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.co.F1FS.app.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.dto.CreateUserDTO;
 import kr.co.F1FS.app.dto.ResponseUserDTO;
@@ -22,7 +23,7 @@ public class UserController {
 
     @PostMapping("/save")
     @Operation(summary = "회원가입(자체 계정)", description = "자체 로그인 계정 생성")
-    public ResponseEntity<User> save(@RequestBody CreateUserDTO userDTO){
+    public ResponseEntity<User> save(@RequestBody @Valid CreateUserDTO userDTO){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(userDTO));
     }
 

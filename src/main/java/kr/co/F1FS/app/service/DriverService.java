@@ -5,6 +5,7 @@ import kr.co.F1FS.app.dto.*;
 import kr.co.F1FS.app.model.*;
 import kr.co.F1FS.app.repository.*;
 import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.util.ValidationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,16 +21,20 @@ public class DriverService {
     private final DriverDebutRelationService debutRelationService;
     private final CurrentSeasonRepository currentSeasonRepository;
     private final SinceDebutRepository sinceDebutRepository;
+    private final ValidationService validationService;
 
     @Transactional
     public Driver save(CombinedDriverRequest request){
         Driver driver = CreateDriverDTO.toEntity(request.getDriverDTO());
+        validationService.checkValid(driver);
         CurrentSeason currentSeason = CreateCurrentSeasonDTO.toEntity(request.getCurrentSeasonDTO());
         SinceDebut sinceDebut = CreateSinceDebutDTO.toEntity(request.getSinceDebutDTO());
-        Constructor constructor = constructorRepository.findByName(driver.getTeam())
-                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
+        if(!driver.getTeam().equals("FA")){
+            Constructor constructor = constructorRepository.findByName(driver.getTeam())
+                    .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
 
-        relationService.save(constructor, driver);
+            relationService.save(constructor, driver);
+        }
         recordRelationService.save(driver, currentSeason);
         debutRelationService.save(driver, sinceDebut);
 
@@ -56,13 +61,18 @@ public class DriverService {
         return driverDTOList;
     }
 
-    public List<ResponseSimpleDriverDTO> findByName(String search){
+    public List<ResponseSimpleDriverDTO> findByNameList(String search){
         List<ResponseSimpleDriverDTO> drivers = driverRepository
                 .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
                 .map(driver -> ResponseSimpleDriverDTO.toDto(driver))
                 .toList();
 
         return drivers;
+    }
+
+    public Driver findByName(String name){
+        return driverRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
     }
 
     @Transactional

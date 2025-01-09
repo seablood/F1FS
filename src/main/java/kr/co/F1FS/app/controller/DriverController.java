@@ -46,7 +46,7 @@ public class DriverController {
     @GetMapping("/find/name")
     @Operation(summary = "드라이버 검색(Name)", description = "특정 name의 드라이버들을 검색한다.")
     public ResponseEntity<List<ResponseSimpleDriverDTO>> findByName(@RequestParam String search){
-        List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByName(search);
+        List<ResponseSimpleDriverDTO> driverDTOList = driverService.findByNameList(search);
         return ResponseEntity.status(HttpStatus.OK).body(driverDTOList);
     }
 
@@ -55,6 +55,13 @@ public class DriverController {
     public ResponseEntity<ResponseDriverDTO> modifyRacingClass(@PathVariable Long id, @PathVariable String racingClass){
         driverService.modifyRacingClass(id, racingClass);
         return ResponseEntity.status(HttpStatus.OK).body(driverService.findById(id));
+    }
+
+    @PutMapping("/modify/constructor/{number}/{constructorName}")
+    @Operation(summary = "드라이버 소속 컨스트럭터 변경", description = "특정 드라이버의 소속 컨스트럭터를 변경한다.")
+    public ResponseEntity<Void> modifyConstructor(@PathVariable Integer number, @PathVariable String constructorName){
+        relationService.transfer(number, constructorName);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping("/fire/{driverId}")

@@ -38,7 +38,7 @@ public class ConstructorService {
 
     public ResponseConstructorDTO findById(Long id){
         Constructor constructor = constructorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Constructor를 찾지 못했습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
         ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
         ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(relation.getCurrentSeason());
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(relation.getSinceDebut());
@@ -46,13 +46,18 @@ public class ConstructorService {
         return ResponseConstructorDTO.toDto(constructor, getDrivers(constructor), currentSeasonDTO, sinceDebutDTO);
     }
 
-    public List<ResponseSimpleConstructorDTO> findByName(String search){
+    public List<ResponseSimpleConstructorDTO> findByNameList(String search){
         List<ResponseSimpleConstructorDTO> constructorDTOList = constructorRepository
                 .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
                 .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor))
                 .toList();
 
         return constructorDTOList;
+    }
+
+    public Constructor findByName(String name){
+        return constructorRepository.findByName(name)
+                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
     }
 
     public List<ResponseSimpleConstructorDTO> findByRacingClass(String findClass){

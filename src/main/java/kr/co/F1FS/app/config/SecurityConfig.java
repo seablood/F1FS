@@ -57,14 +57,14 @@ public class SecurityConfig {
 
         http.formLogin((formLogin) -> formLogin.disable());
         http.httpBasic((httpBasic) -> httpBasic.disable());
-        http.csrf((csrf) -> csrf.disable());
+        http.csrf((csrf) -> csrf.disable()); // dev 시, 비활성화
         http.headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.disable()));
 
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests((authorizeRequests) ->
             authorizeRequests
-                    .requestMatchers("/api/v1/user/user-info").authenticated()
+                    .requestMatchers("/api/v1/user/user-info", "/api/v1/follow-driver/**").authenticated()
                     .anyRequest().permitAll());
 
         http.oauth2Login((oauth2Login) ->

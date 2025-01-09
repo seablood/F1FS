@@ -36,7 +36,7 @@ public class ConstructorController {
     @GetMapping("/find/name")
     @Operation(summary = "컨스트럭터 검색(name)", description = "특정 name의 컨스트럭터를 검색한다.")
     public ResponseEntity<List<ResponseSimpleConstructorDTO>> findByName(@RequestParam String search){
-        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByName(search));
+        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByNameList(search));
     }
 
     @GetMapping("/find/class")

@@ -1,8 +1,13 @@
 package kr.co.F1FS.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import kr.co.F1FS.app.util.Role;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,8 +22,15 @@ public class User {
     private String username;
     private String password;
     @Column(unique = true)
+    @Size(min = 1, max = 20, message = "nickname은 20자 이하로 설정해주세요.")
     private String nickname;
     private String email;
+    @JsonIgnore
+    @OneToMany(mappedBy = "followerUser")
+    private List<FollowDriver> followingDriver = new ArrayList<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "followerUser")
+    private List<FollowConstructor> followingConstructor = new ArrayList<>();
     private String providerId;
     private String provider;
     @Enumerated(value = EnumType.STRING)

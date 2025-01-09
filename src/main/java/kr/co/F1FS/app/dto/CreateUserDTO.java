@@ -11,11 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUserDTO {
+    @NotBlank(message = "username은 필수 입력 항목입니다.")
     private String username;
+    @NotBlank(message = "password는 필수 입력 항목입니다.")
     private String password;
+    @NotBlank(message = "nickname은 필수 입력 항목입니다.")
     private String nickname;
-    @Email
-    @NotBlank
+    @Email(message = "올바른 email 형식을 입력해주세요")
+    @NotBlank(message = "email은 필수 입력 항목입니다.")
     private String email;
 
     public static User toEntity(CreateUserDTO userDTO){

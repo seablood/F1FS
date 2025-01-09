@@ -17,6 +17,7 @@ public class ResponseConstructorDTO {
     private String teamChief;
     private String chassis;
     private String powerUnit;
+    private Integer followerNum;
     private ResponseCurrentSeasonDTO currentSeason;
     private ResponseSinceDebutDTO sinceDebut;
 
@@ -25,6 +26,7 @@ public class ResponseConstructorDTO {
                                                ResponseSinceDebutDTO sinceDebut){
         return new ResponseConstructorDTO(constructor.getName(), constructor.getEngName(), drivers,
                 constructor.getChampionships(), constructor.getBase(), constructor.getTeamChief(),
-                constructor.getChassis(), constructor.getPowerUnit(), currentSeason, sinceDebut);
+                constructor.getChassis(), constructor.getPowerUnit(), constructor.getFollowerNum(),
+                currentSeason, sinceDebut);
     }
 }
