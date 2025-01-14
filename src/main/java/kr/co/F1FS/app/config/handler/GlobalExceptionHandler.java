@@ -2,7 +2,12 @@ package kr.co.F1FS.app.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import kr.co.F1FS.app.service.SlackService;
+import kr.co.F1FS.app.util.BaseException;
 import kr.co.F1FS.app.util.ErrorMessages;
+import kr.co.F1FS.app.util.ExceptionType;
+import kr.co.F1FS.app.util.post.PostException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,16 +17,21 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 @RestControllerAdvice
 @Slf4j
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    private final SlackService slackService;
+
     @ExceptionHandler({IllegalArgumentException.class,
                         HttpMessageNotReadableException.class})
     public ResponseEntity<String> handleIllegalArgumentException(Exception ex){
         String errorMessage = ex.getMessage();
+        sendMessage(ex, HttpStatus.NOT_FOUND);
         log.error(errorMessage);
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
@@ -35,6 +45,7 @@ public class GlobalExceptionHandler {
                 .toList();
 
         ErrorMessages errorMessages = new ErrorMessages(errorMessageList);
+        sendMessage(ex, HttpStatus.BAD_REQUEST);
         log.error(errorMessages.toString());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessages);
@@ -48,8 +59,30 @@ public class GlobalExceptionHandler {
                 .toList();
 
         ErrorMessages errorMessages = new ErrorMessages(errorMessageList);
+        sendMessage(ex, HttpStatus.BAD_REQUEST);
         log.error(errorMessages.toString());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessages);
+    }
+
+    @ExceptionHandler({PostException.class})
+    public ResponseEntity<String> handlePostException(BaseException ex){
+        ExceptionType exceptionType = ex.getExceptionType();
+        sendExceptionType(exceptionType);
+        log.error(exceptionType.getMessage());
+
+        return ResponseEntity.status(exceptionType.getHttpStatus()).body(exceptionType.getMessage());
+    }
+
+    public void sendExceptionType(ExceptionType exceptionType){
+        HashMap<String, String> data = new HashMap<>();
+        data.put("에러 로그", exceptionType.getMessage());
+        slackService.sendErrorMessage(exceptionType.getErrorName(), data);
+    }
+
+    public void sendMessage(Exception e, HttpStatus httpStatus){
+        HashMap<String, String> data = new HashMap<>();
+        data.put("에러 로그", e.getMessage());
+        slackService.sendErrorMessage(httpStatus.name(), data);
     }
 }

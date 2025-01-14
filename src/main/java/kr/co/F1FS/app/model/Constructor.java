@@ -22,7 +22,7 @@ public class Constructor {
     @JsonIgnore
     @OneToMany(mappedBy = "constructor")
     private List<ConstructorDriverRelation> drivers = new ArrayList<>();
-    private Integer championships = 0;
+    private Integer championships;
     private String base;
     private String teamChief;
     private String chassis;

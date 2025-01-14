@@ -5,12 +5,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import kr.co.F1FS.app.util.Role;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
@@ -37,9 +40,17 @@ public class User {
     private Role role = Role.USER;
     @Column(length = 400)
     private String refreshToken;
+    @CreationTimestamp
+    private Timestamp createDate;
+    private Date lastLoginDate;
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
+    }
+
+    public void updateLastLoginDate(){
+        Date now = new Date();
+        this.lastLoginDate = now;
     }
 
     @Builder

@@ -25,7 +25,7 @@ public class Driver {
     @Positive(message = "Driver Number를 확인해주세요.")
     private Integer number;
     private String team;
-    private Integer championships = 0;
+    private Integer championships;
     private String country;
     private Integer followerNum;
     @JsonIgnore

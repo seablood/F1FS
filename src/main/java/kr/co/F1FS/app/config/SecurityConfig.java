@@ -64,7 +64,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((authorizeRequests) ->
             authorizeRequests
-                    .requestMatchers("/api/v1/user/user-info", "/api/v1/follow-driver/**").authenticated()
+                    .requestMatchers("/api/v1/user/user-info",
+                            "/api/v1/follow-driver/**",
+                            "/api/v1/post/save").authenticated()
                     .anyRequest().permitAll());
 
         http.oauth2Login((oauth2Login) ->

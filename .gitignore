@@ -39,3 +39,4 @@ out/
 
 application-jwt.yml
 application-oauth2.yml
+application-slack.yml

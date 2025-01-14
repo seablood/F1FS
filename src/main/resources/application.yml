@@ -5,6 +5,7 @@ spring:
       dev:
         -jwt
         -oauth2
+        -slack
 
 ---
 

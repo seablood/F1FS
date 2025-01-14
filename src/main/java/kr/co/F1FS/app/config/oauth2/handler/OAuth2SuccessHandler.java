@@ -36,6 +36,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         jwtTokenService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
         user.updateRefreshToken(refreshToken);
+        user.updateLastLoginDate();
         userRepository.saveAndFlush(user);
 
         log.info("로그인 계정 : "+user.getUsername());
