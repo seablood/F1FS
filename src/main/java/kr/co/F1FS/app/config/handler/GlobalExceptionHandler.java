@@ -1,4 +1,4 @@
-package kr.co.F1FS.app.config.handler;
+/*package kr.co.F1FS.app.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -85,4 +85,4 @@ public class GlobalExceptionHandler {
         data.put("에러 로그", e.getMessage());
         slackService.sendErrorMessage(httpStatus.name(), data);
     }
-}
+}*/

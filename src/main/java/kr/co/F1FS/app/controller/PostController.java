@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.dto.CreatePostDTO;
+import kr.co.F1FS.app.dto.ModifyPostDTO;
 import kr.co.F1FS.app.dto.ResponsePostDTO;
 import kr.co.F1FS.app.model.Post;
 import kr.co.F1FS.app.model.User;
@@ -45,5 +46,11 @@ public class PostController {
     @Operation(summary = "게시글 검색(ID)", description = "특정 ID의 게시글을 반환")
     public ResponseEntity<ResponsePostDTO> findById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(postService.findById(id));
+    }
+
+    @PutMapping("/modify/{id}")
+    @Operation(summary = "게시글 수정", description = "특정 ID의 게시글 수정")
+    public ResponseEntity<ResponsePostDTO> modify(@PathVariable Long id, @RequestBody ModifyPostDTO dto){
+        return ResponseEntity.status(HttpStatus.OK).body(postService.modify(id, dto));
     }
 }

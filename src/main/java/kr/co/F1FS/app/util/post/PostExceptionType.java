@@ -1,11 +1,9 @@
 package kr.co.F1FS.app.util.post;
 
 import kr.co.F1FS.app.util.ExceptionType;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-@Getter
 @RequiredArgsConstructor
 public enum PostExceptionType implements ExceptionType {
     POST_NOT_FOUND("POST_NOT_FOUND", HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),

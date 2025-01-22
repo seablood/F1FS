@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.model;
 
 import jakarta.persistence.*;
+import kr.co.F1FS.app.dto.ModifyPostDTO;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
@@ -21,6 +22,7 @@ public class Post {
     @Column(nullable = false)
     private String title;
     @Lob
+    @Column(nullable = false)
     private String content;
     @ManyToOne
     @JoinColumn(name = "author_id")
@@ -32,6 +34,11 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "update_time")
     private Timestamp updatedAt;
+
+    public void modify(ModifyPostDTO dto){
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+    }
 
     @Builder
     public Post(String title, String content, User author){

@@ -2,6 +2,7 @@ package kr.co.F1FS.app.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.dto.CreatePostDTO;
+import kr.co.F1FS.app.dto.ModifyPostDTO;
 import kr.co.F1FS.app.dto.ResponsePostDTO;
 import kr.co.F1FS.app.model.Post;
 import kr.co.F1FS.app.model.User;
@@ -33,6 +34,20 @@ public class PostService {
     public ResponsePostDTO findById(Long id){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+        return ResponsePostDTO.toDto(post);
+    }
+
+    public Post findByIdNotDTO(Long id){
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+    }
+
+    @Transactional
+    public ResponsePostDTO modify(Long id, ModifyPostDTO dto){
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+        post.modify(dto);
+        postRepository.saveAndFlush(post);
         return ResponsePostDTO.toDto(post);
     }
 }

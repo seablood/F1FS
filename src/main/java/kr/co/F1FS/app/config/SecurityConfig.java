@@ -66,7 +66,8 @@ public class SecurityConfig {
             authorizeRequests
                     .requestMatchers("/api/v1/user/user-info",
                             "/api/v1/follow-driver/**",
-                            "/api/v1/post/save").authenticated()
+                            "/api/v1/post/save",
+                            "/api/v1/post/modify/**").authenticated()
                     .anyRequest().permitAll());
 
         http.oauth2Login((oauth2Login) ->
