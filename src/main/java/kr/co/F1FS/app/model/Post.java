@@ -34,10 +34,19 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "update_time")
     private Timestamp updatedAt;
+    private int likeNum;
 
     public void modify(ModifyPostDTO dto){
         this.title = dto.getTitle();
         this.content = dto.getContent();
+    }
+
+    public void increaseLike(){
+        this.likeNum++;
+    }
+
+    public void decreaseLike(){
+        this.likeNum--;
     }
 
     @Builder
@@ -45,5 +54,6 @@ public class Post {
         this.title = title;
         this.content = content;
         this.author = author;
+        this.likeNum = 0;
     }
 }

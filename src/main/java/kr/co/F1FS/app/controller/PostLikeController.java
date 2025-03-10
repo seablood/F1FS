@@ -23,7 +23,7 @@ public class PostLikeController {
     @PostMapping("/toggle/{id}")
     @Operation(summary = "좋아요 토글 기능", description = "특정 게시글에 대한 좋아요 추가/삭제")
     public ResponseEntity<Void> toggle(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails details){
-        relationService.toggle(details.getUser().getUsername(), id);
+        relationService.toggle(details.getUser(), id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

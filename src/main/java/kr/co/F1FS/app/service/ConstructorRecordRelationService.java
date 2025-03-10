@@ -5,6 +5,8 @@ import kr.co.F1FS.app.model.ConstructorRecordRelation;
 import kr.co.F1FS.app.model.CurrentSeason;
 import kr.co.F1FS.app.model.SinceDebut;
 import kr.co.F1FS.app.repository.ConstructorRecordRelationRepository;
+import kr.co.F1FS.app.util.constructor.ConstructorException;
+import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,6 @@ public class ConstructorRecordRelationService {
 
     public ConstructorRecordRelation findByConstructor(Constructor constructor){
         return relationRepository.findByConstructorInfo(constructor)
-                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터 정보 오류"));
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_RECORD_ERROR));
     }
 }

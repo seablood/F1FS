@@ -6,6 +6,10 @@ import kr.co.F1FS.app.model.*;
 import kr.co.F1FS.app.repository.*;
 import kr.co.F1FS.app.util.RacingClass;
 import kr.co.F1FS.app.util.ValidationService;
+import kr.co.F1FS.app.util.constructor.ConstructorException;
+import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
+import kr.co.F1FS.app.util.driver.DriverException;
+import kr.co.F1FS.app.util.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +35,7 @@ public class DriverService {
         SinceDebut sinceDebut = CreateSinceDebutDTO.toEntity(request.getSinceDebutDTO());
         if(!driver.getTeam().equals("FA")){
             Constructor constructor = constructorRepository.findByName(driver.getTeam())
-                    .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
+                    .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
 
             relationService.save(constructor, driver);
         }
@@ -45,7 +49,7 @@ public class DriverService {
 
     public ResponseDriverDTO findById(Long id){
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         ResponseCurrentSeasonDTO currentSeasonDTO = getCurrentSeason(driver);
         ResponseSinceDebutDTO sinceDebutDTO = getSinceDebut(driver);
 
@@ -72,13 +76,13 @@ public class DriverService {
 
     public Driver findByName(String name){
         return driverRepository.findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
 
     @Transactional
     public void modifyRacingClass(Long id, String modifyClass){
         Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("드라이버를 찾지 못했습니다."));
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         RacingClass racingClass = RacingClass.valueOf(modifyClass);
 
         driver.updateRacingClass(racingClass);
@@ -97,7 +101,8 @@ public class DriverService {
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
         ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(driver.getRecords()
                 .stream().filter(recordRelation -> recordRelation.getRacingClass() == driver.getRacingClass())
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("드라이버 정보 오류")).getCurrentSeason());
+                .findFirst().orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_RECORD_ERROR))
+                .getCurrentSeason());
 
         return currentSeasonDTO;
     }
@@ -105,7 +110,7 @@ public class DriverService {
     public ResponseSinceDebutDTO getSinceDebut(Driver driver){
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(driver.getDebuts().stream()
                 .filter(debutRelation -> debutRelation.getRacingClass() == driver.getRacingClass()).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("드라이버 정보 오류")).getSinceDebut());
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_DEBUT_ERROR)).getSinceDebut());
 
         return sinceDebutDTO;
     }

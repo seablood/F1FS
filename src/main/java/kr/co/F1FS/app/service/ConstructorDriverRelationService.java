@@ -7,6 +7,10 @@ import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.repository.ConstructorDriverRelationRepository;
 import kr.co.F1FS.app.repository.ConstructorRepository;
 import kr.co.F1FS.app.repository.DriverRepository;
+import kr.co.F1FS.app.util.constructor.ConstructorException;
+import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
+import kr.co.F1FS.app.util.driver.DriverException;
+import kr.co.F1FS.app.util.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,9 +32,9 @@ public class ConstructorDriverRelationService {
     @Transactional
     public void transfer(Integer number, String constructorName){
         Driver driver = driverRepository.findByNumber(number)
-                .orElseThrow(() -> new IllegalArgumentException("Driver를 찾지 못했습니다."));
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         Constructor constructor = constructorRepository.findByName(constructorName)
-                .orElseThrow(() -> new IllegalArgumentException("Constructor를 찾지 못했습니다."));
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
         ConstructorDriverRelation relation = ConstructorDriverRelation.builder()
                 .constructor(constructor)
                 .driver(driver)
@@ -43,7 +47,7 @@ public class ConstructorDriverRelationService {
     @Transactional
     public void delete(Long driverId){
         Driver driver = driverRepository.findById(driverId)
-                .orElseThrow(() -> new IllegalArgumentException("driver를 찾지 못했습니다."));
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         ConstructorDriverRelation relation = relationRepository.findConstructorDriverRelationByDriver(driver);
 
         driver.updateTeam("FA");

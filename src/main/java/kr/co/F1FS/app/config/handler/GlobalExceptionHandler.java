@@ -1,4 +1,4 @@
-/*package kr.co.F1FS.app.config.handler;
+package kr.co.F1FS.app.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -6,7 +6,11 @@ import kr.co.F1FS.app.service.SlackService;
 import kr.co.F1FS.app.util.BaseException;
 import kr.co.F1FS.app.util.ErrorMessages;
 import kr.co.F1FS.app.util.ExceptionType;
+import kr.co.F1FS.app.util.constructor.ConstructorException;
+import kr.co.F1FS.app.util.driver.DriverException;
 import kr.co.F1FS.app.util.post.PostException;
+import kr.co.F1FS.app.util.reply.ReplyException;
+import kr.co.F1FS.app.util.user.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -65,7 +69,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessages);
     }
 
-    @ExceptionHandler({PostException.class})
+    @ExceptionHandler({PostException.class,
+                        UserException.class,
+                        ReplyException.class,
+                        ConstructorException.class,
+                        DriverException.class})
     public ResponseEntity<String> handlePostException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
         sendExceptionType(exceptionType);
@@ -85,4 +93,4 @@ public class GlobalExceptionHandler {
         data.put("에러 로그", e.getMessage());
         slackService.sendErrorMessage(httpStatus.name(), data);
     }
-}*/
+}

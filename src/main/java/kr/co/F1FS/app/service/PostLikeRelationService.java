@@ -16,13 +16,13 @@ public class PostLikeRelationService {
     private final PostService postService;
 
     @Transactional
-    public void toggle(String username, Long id){
-        User user = userService.findByUsernameNotDTO(username);
+    public void toggle(User user, Long id){
         Post post = postService.findByIdNotDTO(id);
 
         if(isLiked(user, post)){
             PostLikeRelation relation = relationRepository.findPostLikeRelationByUserAndPost(user, post);
             relationRepository.delete(relation);
+            post.decreaseLike();
         }
         else {
             PostLikeRelation relation = PostLikeRelation.builder()
@@ -30,6 +30,7 @@ public class PostLikeRelationService {
                     .post(post)
                     .build();
             relationRepository.save(relation);
+            post.increaseLike();
         }
     }
 

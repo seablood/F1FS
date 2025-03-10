@@ -28,12 +28,8 @@ public class User {
     @Size(min = 1, max = 20, message = "nickname은 20자 이하로 설정해주세요.")
     private String nickname;
     private String email;
-    @JsonIgnore
-    @OneToMany(mappedBy = "followerUser")
-    private List<FollowDriver> followingDriver = new ArrayList<>();
-    @JsonIgnore
-    @OneToMany(mappedBy = "followerUser")
-    private List<FollowConstructor> followingConstructor = new ArrayList<>();
+    private Integer followerNum;
+    private Integer followingNum;
     private String providerId;
     private String provider;
     @Enumerated(value = EnumType.STRING)
@@ -53,6 +49,14 @@ public class User {
         this.lastLoginDate = now;
     }
 
+    public void changeFollowerNum(int i){
+        this.followerNum +=i;
+    }
+
+    public void changeFollowingNum(int i){
+        this.followingNum +=i;
+    }
+
     @Builder
     public User(String username, String password, String nickname, String email, String providerId, String provider){
         this.username = username;
@@ -61,5 +65,7 @@ public class User {
         this.email = email;
         this.providerId = providerId;
         this.provider = provider;
+        this.followerNum = 0;
+        this.followingNum = 0;
     }
 }

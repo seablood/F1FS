@@ -30,8 +30,8 @@ public class UserController {
     // 가장 기본적인 정보들만 반환 중 -> 추후 유저 정보에 변화가 있을 시, 같이 fix
     @GetMapping("/user-info")
     @Operation(summary = "유저 정보(로그인된 계정)", description = "로그인된 계정의 정보를 반환")
-    public ResponseEntity<ResponseUserDTO> getUserInfo(@AuthenticationPrincipal PrincipalDetails principal){
-        ResponseUserDTO userDTO = userService.findByUsername(principal.getUser().getUsername());
+    public ResponseEntity<ResponseUserDTO> getUserInfo(@AuthenticationPrincipal PrincipalDetails details){
+        ResponseUserDTO userDTO = ResponseUserDTO.toDto(details.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 }

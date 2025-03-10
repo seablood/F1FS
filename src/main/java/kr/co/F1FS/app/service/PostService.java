@@ -7,6 +7,8 @@ import kr.co.F1FS.app.dto.ResponsePostDTO;
 import kr.co.F1FS.app.model.Post;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.PostRepository;
+import kr.co.F1FS.app.util.AuthorCertification;
+import kr.co.F1FS.app.util.ValidationService;
 import kr.co.F1FS.app.util.post.PostException;
 import kr.co.F1FS.app.util.post.PostExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final ValidationService validationService;
 
     @Transactional
     public Post save(CreatePostDTO dto, User author){
         Post post = CreatePostDTO.toEntity(dto, author);
+        validationService.checkValid(post);
         return postRepository.save(post);
     }
 
@@ -43,11 +47,24 @@ public class PostService {
     }
 
     @Transactional
-    public ResponsePostDTO modify(Long id, ModifyPostDTO dto){
+    public ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+        if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
+            throw new PostException(PostExceptionType.NOT_AUTHORITY_UPDATE_POST);
+        }
         post.modify(dto);
         postRepository.saveAndFlush(post);
         return ResponsePostDTO.toDto(post);
+    }
+
+    @Transactional
+    public void delete(Long id, User user){
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+        if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
+            throw new PostException(PostExceptionType.NOT_AUTHORITY_DELETE_POST);
+        }
+        postRepository.delete(post);
     }
 }

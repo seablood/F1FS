@@ -31,8 +31,7 @@ public class PostController {
     @Operation(summary = "게시글(Post) 등록", description = "게시글(Post)을 작성하고 등록")
     public ResponseEntity<Post> save(@RequestBody @Valid CreatePostDTO dto,
                                      @AuthenticationPrincipal PrincipalDetails details){
-        User author = userService.findByUsernameNotDTO(details.getUser().getUsername());
-        Post post = postService.save(dto, author);
+        Post post = postService.save(dto, details.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
@@ -50,7 +49,15 @@ public class PostController {
 
     @PutMapping("/modify/{id}")
     @Operation(summary = "게시글 수정", description = "특정 ID의 게시글 수정")
-    public ResponseEntity<ResponsePostDTO> modify(@PathVariable Long id, @RequestBody ModifyPostDTO dto){
-        return ResponseEntity.status(HttpStatus.OK).body(postService.modify(id, dto));
+    public ResponseEntity<ResponsePostDTO> modify(@PathVariable Long id, @RequestBody @Valid ModifyPostDTO dto,
+                                                  @AuthenticationPrincipal PrincipalDetails details){
+        return ResponseEntity.status(HttpStatus.OK).body(postService.modify(id, dto, details.getUser()));
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "게시글 삭제", description = "특정 ID의 게시글 삭제")
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails details){
+        postService.delete(id, details.getUser());
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

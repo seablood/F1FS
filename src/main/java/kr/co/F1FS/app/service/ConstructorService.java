@@ -10,6 +10,8 @@ import kr.co.F1FS.app.repository.ConstructorRepository;
 import kr.co.F1FS.app.repository.CurrentSeasonRepository;
 import kr.co.F1FS.app.repository.SinceDebutRepository;
 import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.util.constructor.ConstructorException;
+import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,7 @@ public class ConstructorService {
 
     public ResponseConstructorDTO findById(Long id){
         Constructor constructor = constructorRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
         ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
         ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(relation.getCurrentSeason());
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(relation.getSinceDebut());
@@ -57,7 +59,7 @@ public class ConstructorService {
 
     public Constructor findByName(String name){
         return constructorRepository.findByName(name)
-                .orElseThrow(() -> new IllegalArgumentException("컨스트럭터를 찾지 못했습니다."));
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
     public List<ResponseSimpleConstructorDTO> findByRacingClass(String findClass){
