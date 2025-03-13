@@ -6,6 +6,7 @@ spring:
         -jwt
         -oauth2
         -slack
+        -redis
 
 ---
 

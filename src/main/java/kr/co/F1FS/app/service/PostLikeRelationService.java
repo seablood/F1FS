@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostLikeRelationService {
     private final PostLikeRelationRepository relationRepository;
-    private final UserService userService;
     private final PostService postService;
 
     @Transactional

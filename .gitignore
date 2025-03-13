@@ -36,7 +36,8 @@ out/
 ### VS Code ###
 .vscode/
 
-
+### yml setting ###
 application-jwt.yml
 application-oauth2.yml
 application-slack.yml
+application-redis.yml

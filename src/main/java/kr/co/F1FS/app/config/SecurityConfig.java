@@ -64,11 +64,12 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((authorizeRequests) ->
             authorizeRequests
-                    .requestMatchers("/api/v1/user/user-info",
-                            "/api/v1/follow-driver/**",
-                            "/api/v1/post/save",
-                            "/api/v1/post/modify/**").authenticated()
-                    .anyRequest().permitAll());
+                    .requestMatchers("/api/v1/user/save",
+                                    "/login",
+                                    "/api/v1/post/find-all",
+                                    "/api/v1/post/find/**",
+                                    "/api/v1/driver/find/**").permitAll()
+                    .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->
                 oauth2Login
