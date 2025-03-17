@@ -68,7 +68,8 @@ public class SecurityConfig {
                                     "/login",
                                     "/api/v1/post/find-all",
                                     "/api/v1/post/find/**",
-                                    "/api/v1/driver/find/**").permitAll()
+                                    "/api/v1/driver/find/**",
+                                    "/api/v1/constructor/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->

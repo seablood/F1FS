@@ -13,6 +13,7 @@ import kr.co.F1FS.app.util.RacingClass;
 import kr.co.F1FS.app.util.constructor.ConstructorException;
 import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +39,7 @@ public class ConstructorService {
         return constructorRepository.save(constructor);
     }
 
+    @Cacheable(value = "ConstructorDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseConstructorDTO findById(Long id){
         Constructor constructor = constructorRepository.findById(id)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
@@ -57,8 +59,9 @@ public class ConstructorService {
         return constructorDTOList;
     }
 
-    public Constructor findByName(String name){
-        return constructorRepository.findByName(name)
+    @Cacheable(value = "Constructor", key = "#id", cacheManager = "redisLongCacheManager")
+    public Constructor findByIdNotDTO(Long id){
+        return constructorRepository.findById(id)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
@@ -70,6 +73,7 @@ public class ConstructorService {
         return constructorDTOList;
     }
 
+    @Cacheable(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager")
     public List<String> getDrivers(Constructor constructor){
         return constructor.getDrivers().stream()
                 .map((relation) -> relation.getDriver().getName())

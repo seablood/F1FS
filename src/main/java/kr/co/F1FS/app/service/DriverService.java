@@ -11,6 +11,9 @@ import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import kr.co.F1FS.app.util.driver.DriverException;
 import kr.co.F1FS.app.util.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,13 +50,19 @@ public class DriverService {
         return driverRepository.save(driver);
     }
 
+    @Cacheable(value = "DriverDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseDriverDTO findById(Long id){
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
+        Driver driver = findByIdNotDTO(id);
         ResponseCurrentSeasonDTO currentSeasonDTO = getCurrentSeason(driver);
         ResponseSinceDebutDTO sinceDebutDTO = getSinceDebut(driver);
 
         return ResponseDriverDTO.toDto(driver, currentSeasonDTO, sinceDebutDTO);
+    }
+
+    @Cacheable(value = "Driver", key = "#id", cacheManager = "redisLongCacheManager")
+    public Driver findByIdNotDTO(Long id){
+        return driverRepository.findById(id)
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
 
     public List<ResponseSimpleDriverDTO> findByRacingClass(String findClass){
@@ -74,15 +83,14 @@ public class DriverService {
         return drivers;
     }
 
-    public Driver findByName(String name){
-        return driverRepository.findByName(name)
-                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
-    }
-
     @Transactional
-    public void modifyRacingClass(Long id, String modifyClass){
-        Driver driver = driverRepository.findById(id)
-                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
+    @Caching(evict = {
+            @CacheEvict(value = "DriverDTO", key = "#driver.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "Driver", key = "#driver.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
+    })
+    public void modifyRacingClass(Driver driver, String modifyClass){
         RacingClass racingClass = RacingClass.valueOf(modifyClass);
 
         driver.updateRacingClass(racingClass);
@@ -98,6 +106,7 @@ public class DriverService {
         }
     }
 
+    @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
         ResponseCurrentSeasonDTO currentSeasonDTO = ResponseCurrentSeasonDTO.toDto(driver.getRecords()
                 .stream().filter(recordRelation -> recordRelation.getRacingClass() == driver.getRacingClass())
@@ -107,6 +116,7 @@ public class DriverService {
         return currentSeasonDTO;
     }
 
+    @Cacheable(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseSinceDebutDTO getSinceDebut(Driver driver){
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(driver.getDebuts().stream()
                 .filter(debutRelation -> debutRelation.getRacingClass() == driver.getRacingClass()).findFirst()

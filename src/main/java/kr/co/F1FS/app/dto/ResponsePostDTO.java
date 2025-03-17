@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.co.F1FS.app.model.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class ResponsePostDTO {
     private String title;

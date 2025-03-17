@@ -20,10 +20,10 @@ import java.util.List;
 public class FollowDriverController {
     private final FollowDriverService followDriverService;
 
-    @PostMapping("/toggle/{name}")
+    @PostMapping("/toggle/{driverId}")
     @Operation(summary = "팔로우 토글 기능", description = "특정 드라이버를 팔로우 추가/취소")
-    public ResponseEntity<Void> toggle(@PathVariable String name, @AuthenticationPrincipal PrincipalDetails details){
-        followDriverService.toggle(details.getUser(), name);
+    public ResponseEntity<Void> toggle(@PathVariable Long driverId, @AuthenticationPrincipal PrincipalDetails details){
+        followDriverService.toggle(details.getUser(), driverId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

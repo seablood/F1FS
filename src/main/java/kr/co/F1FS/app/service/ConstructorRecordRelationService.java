@@ -8,6 +8,7 @@ import kr.co.F1FS.app.repository.ConstructorRecordRelationRepository;
 import kr.co.F1FS.app.util.constructor.ConstructorException;
 import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +26,7 @@ public class ConstructorRecordRelationService {
         relationRepository.save(relation);
     }
 
+    @Cacheable(value = "ConstructorRecord", key = "#constructor.id", cacheManager = "redisLongCacheManager")
     public ConstructorRecordRelation findByConstructor(Constructor constructor){
         return relationRepository.findByConstructorInfo(constructor)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_RECORD_ERROR));

@@ -12,6 +12,9 @@ import kr.co.F1FS.app.util.ValidationService;
 import kr.co.F1FS.app.util.post.PostException;
 import kr.co.F1FS.app.util.post.PostExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,18 +38,25 @@ public class PostService {
                 .toList();
     }
 
+    @Cacheable(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponsePostDTO findById(Long id){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
         return ResponsePostDTO.toDto(post);
     }
 
+    @Cacheable(value = "PostNotDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public Post findByIdNotDTO(Long id){
         return postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
     }
 
     @Transactional
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "PostNotDTO", key = "#id", cacheManager = "redisLongCacheManager"),
+                    @CacheEvict(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
+            })
     public ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
@@ -59,6 +69,10 @@ public class PostService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "PostNotDTO", key = "#id", cacheManager = "redisLongCacheManager")
+    })
     public void delete(Long id, User user){
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));

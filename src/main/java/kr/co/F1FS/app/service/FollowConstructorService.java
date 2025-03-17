@@ -19,8 +19,8 @@ public class FollowConstructorService {
     private final ConstructorService constructorService;
 
     @Transactional
-    public void toggle(User user, String name){
-        Constructor constructor = constructorService.findByName(name);
+    public void toggle(User user, Long id){
+        Constructor constructor = constructorService.findByIdNotDTO(id);
 
         if(isFollowed(user, constructor)){
             FollowConstructor followConstructor = followConstructorRepository.findByFollowerUserAndFolloweeConstructor(

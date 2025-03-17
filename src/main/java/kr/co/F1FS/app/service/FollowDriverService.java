@@ -19,8 +19,8 @@ public class FollowDriverService {
     private final DriverService driverService;
 
     @Transactional
-    public void toggle(User user, String name){
-        Driver driver = driverService.findByName(name);
+    public void toggle(User user, Long id){
+        Driver driver = driverService.findByIdNotDTO(id);
 
         if(isFollowed(user, driver)){
             FollowDriver followDriver = followDriverRepository.findByFollowerUserAndFolloweeDriver(user, driver);

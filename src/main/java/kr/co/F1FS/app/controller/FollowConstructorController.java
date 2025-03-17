@@ -20,10 +20,10 @@ import java.util.List;
 public class FollowConstructorController {
     private final FollowConstructorService followConstructorService;
 
-    @PostMapping("/toggle/{name}")
+    @PostMapping("/toggle/{constructorId}")
     @Operation(summary = "팔로우 토글 기능", description = "특정 컨스트럭터 팔로우 추가/취소")
-    public ResponseEntity<Void> toggle(@PathVariable String name, @AuthenticationPrincipal PrincipalDetails details){
-        followConstructorService.toggle(details.getUser(), name);
+    public ResponseEntity<Void> toggle(@PathVariable Long constructorId, @AuthenticationPrincipal PrincipalDetails details){
+        followConstructorService.toggle(details.getUser(), constructorId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

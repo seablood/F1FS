@@ -53,7 +53,8 @@ public class DriverController {
     @PutMapping("/modify/racing-class/{id}/{racingClass}")
     @Operation(summary = "드라이버 소속 클래스 변경", description = "특정 id의 드라이버의 racingClass를 변경한다.")
     public ResponseEntity<ResponseDriverDTO> modifyRacingClass(@PathVariable Long id, @PathVariable String racingClass){
-        driverService.modifyRacingClass(id, racingClass);
+        Driver driver = driverService.findByIdNotDTO(id);
+        driverService.modifyRacingClass(driver, racingClass);
         return ResponseEntity.status(HttpStatus.OK).body(driverService.findById(id));
     }
 
