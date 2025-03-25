@@ -14,9 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -65,22 +67,19 @@ public class DriverService {
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
 
-    public List<ResponseSimpleDriverDTO> findByRacingClass(String findClass){
+    public Page<ResponseSimpleDriverDTO> findByRacingClass(String findClass, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         RacingClass racingClass= RacingClass.valueOf(findClass);
-        List<ResponseSimpleDriverDTO> driverDTOList = driverRepository.findAllByRacingClass(racingClass).stream()
-                .map(driver -> ResponseSimpleDriverDTO.toDto(driver))
-                .toList();
 
-        return driverDTOList;
+        return driverRepository.findAllByRacingClass(racingClass, pageable)
+                .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
     }
 
-    public List<ResponseSimpleDriverDTO> findByNameList(String search){
-        List<ResponseSimpleDriverDTO> drivers = driverRepository
-                .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
-                .map(driver -> ResponseSimpleDriverDTO.toDto(driver))
-                .toList();
+    public Page<ResponseSimpleDriverDTO> findByNameList(String search, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
 
-        return drivers;
+        return driverRepository.findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search, pageable)
+                .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
     }
 
     @Transactional
@@ -117,7 +116,7 @@ public class DriverService {
     }
 
     @Cacheable(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
-    public ResponseSinceDebutDTO getSinceDebut(Driver driver){
+    public ResponseSinceDebutDTO getSinceDebut(Driver driver) {
         ResponseSinceDebutDTO sinceDebutDTO = ResponseSinceDebutDTO.toDto(driver.getDebuts().stream()
                 .filter(debutRelation -> debutRelation.getRacingClass() == driver.getRacingClass()).findFirst()
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_DEBUT_ERROR)).getSinceDebut());

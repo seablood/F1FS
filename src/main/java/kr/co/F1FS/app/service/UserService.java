@@ -2,12 +2,14 @@ package kr.co.F1FS.app.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.dto.CreateUserDTO;
+import kr.co.F1FS.app.dto.ResponseUserDTO;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.UserRepository;
 import kr.co.F1FS.app.util.ValidationService;
 import kr.co.F1FS.app.util.user.UserException;
 import kr.co.F1FS.app.util.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +29,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public User findByUsernameNotDTO(String username){
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+    @Cacheable(value = "UserDTO", key = "#nickname", cacheManager = "redisLongCacheManager")
+    public ResponseUserDTO findByNickname(String nickname){
+        User user = findByNicknameNotDTO(nickname);
+        return ResponseUserDTO.toDto(user);
     }
 
     public User findByNicknameNotDTO(String nickname){

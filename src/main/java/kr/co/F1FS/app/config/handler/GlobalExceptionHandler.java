@@ -1,4 +1,4 @@
-/*package kr.co.F1FS.app.config.handler;
+package kr.co.F1FS.app.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -9,6 +9,7 @@ import kr.co.F1FS.app.util.ExceptionType;
 import kr.co.F1FS.app.util.constructor.ConstructorException;
 import kr.co.F1FS.app.util.driver.DriverException;
 import kr.co.F1FS.app.util.post.PostException;
+import kr.co.F1FS.app.util.redis.RedisException;
 import kr.co.F1FS.app.util.reply.ReplyException;
 import kr.co.F1FS.app.util.user.UserException;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +74,8 @@ public class GlobalExceptionHandler {
                         UserException.class,
                         ReplyException.class,
                         ConstructorException.class,
-                        DriverException.class})
+                        DriverException.class,
+                        RedisException.class})
     public ResponseEntity<String> handlePostException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
         sendExceptionType(exceptionType);
@@ -93,4 +95,4 @@ public class GlobalExceptionHandler {
         data.put("에러 로그", e.getMessage());
         slackService.sendErrorMessage(httpStatus.name(), data);
     }
-}*/
+}

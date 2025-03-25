@@ -6,7 +6,10 @@ import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.model.FollowDriver;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.FollowDriverRepository;
+import kr.co.F1FS.app.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,12 +18,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowDriverService {
     private final FollowDriverRepository followDriverRepository;
-    private final UserService userService;
+    private final CacheEvictUtil cacheEvictUtil;
     private final DriverService driverService;
 
     @Transactional
+    @CacheEvict(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
     public void toggle(User user, Long id){
         Driver driver = driverService.findByIdNotDTO(id);
+        cacheEvictUtil.evictCachingDriver(driver);
 
         if(isFollowed(user, driver)){
             FollowDriver followDriver = followDriverRepository.findByFollowerUserAndFolloweeDriver(user, driver);
@@ -37,15 +42,8 @@ public class FollowDriverService {
         driver.increaseFollower();
     }
 
-    public List<SimpleResponseDriverDTO> getFollowingDriver(String nickname){
-        User user = userService.findByNicknameNotDTO(nickname);
-        return followDriverRepository.findByFollowerUser(user).stream()
-                .map(followDriver -> followDriver.getFolloweeDriver())
-                .map(followeeDriver -> SimpleResponseDriverDTO.toDto(followeeDriver))
-                .toList();
-    }
-
-    public List<SimpleResponseDriverDTO> getFollowingDriverAuth(User user){
+    @Cacheable(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
+    public List<SimpleResponseDriverDTO> getFollowingDriver(User user){
         return followDriverRepository.findByFollowerUser(user).stream()
                 .map(followDriver -> followDriver.getFolloweeDriver())
                 .map(followeeDriver -> SimpleResponseDriverDTO.toDto(followeeDriver))

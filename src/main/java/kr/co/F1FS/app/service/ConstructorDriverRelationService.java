@@ -7,13 +7,12 @@ import kr.co.F1FS.app.model.Driver;
 import kr.co.F1FS.app.repository.ConstructorDriverRelationRepository;
 import kr.co.F1FS.app.repository.ConstructorRepository;
 import kr.co.F1FS.app.repository.DriverRepository;
+import kr.co.F1FS.app.util.CacheEvictUtil;
 import kr.co.F1FS.app.util.constructor.ConstructorException;
 import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import kr.co.F1FS.app.util.driver.DriverException;
 import kr.co.F1FS.app.util.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,6 +21,7 @@ public class ConstructorDriverRelationService {
     private final ConstructorRepository constructorRepository;
     private final DriverRepository driverRepository;
     private final ConstructorDriverRelationRepository relationRepository;
+    private final CacheEvictUtil cacheEvictUtil;
 
     public void save(Constructor constructor, Driver driver){
         ConstructorDriverRelation relation = ConstructorDriverRelation.builder()
@@ -32,17 +32,14 @@ public class ConstructorDriverRelationService {
     }
 
     @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "DriverDTO", key = "#id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "Driver", key = "#id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "ConstructorDTO", key = "#id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager")
-    })
     public void transfer(Integer number, String constructorName){
         Driver driver = driverRepository.findByNumber(number)
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         Constructor constructor = constructorRepository.findByName(constructorName)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
+        cacheEvictUtil.evictCachingDriver(driver);
+        cacheEvictUtil.evictCachingConstructor(constructor);
+
         ConstructorDriverRelation relation = ConstructorDriverRelation.builder()
                 .constructor(constructor)
                 .driver(driver)
@@ -57,6 +54,8 @@ public class ConstructorDriverRelationService {
         Driver driver = driverRepository.findById(driverId)
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
         ConstructorDriverRelation relation = relationRepository.findConstructorDriverRelationByDriver(driver);
+        cacheEvictUtil.evictCachingDriver(driver);
+        cacheEvictUtil.evictCachingConstructor(relation.getConstructor());
 
         driver.updateTeam("FA");
 

@@ -35,13 +35,18 @@ public class ConstructorController {
 
     @GetMapping("/find/name")
     @Operation(summary = "컨스트럭터 검색(name)", description = "특정 name의 컨스트럭터를 검색한다.")
-    public ResponseEntity<List<ResponseSimpleConstructorDTO>> findByName(@RequestParam String search){
-        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByNameList(search));
+    public ResponseEntity<List<ResponseSimpleConstructorDTO>> findByName(@RequestParam String search,
+                                                                         @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                         @RequestParam(value = "size", defaultValue = "10") int size){
+        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByNameList(search, page, size).getContent());
     }
 
     @GetMapping("/find/class")
     @Operation(summary = "컨스트럭터 검색(class)", description = "특정 RacingClass의 컨스트럭터를 검색한다.")
-    public ResponseEntity<List<ResponseSimpleConstructorDTO>> findByRacingClass(@RequestParam String racingClass){
-        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByRacingClass(racingClass));
+    public ResponseEntity<List<ResponseSimpleConstructorDTO>> findByRacingClass(@RequestParam String racingClass,
+                                                                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "size", defaultValue = "10") int size){
+        return ResponseEntity.status(HttpStatus.OK).body(constructorService.findByRacingClass(racingClass, page, size)
+                .getContent());
     }
 }

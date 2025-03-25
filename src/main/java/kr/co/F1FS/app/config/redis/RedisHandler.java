@@ -1,5 +1,7 @@
 package kr.co.F1FS.app.config.redis;
 
+import kr.co.F1FS.app.util.redis.RedisException;
+import kr.co.F1FS.app.util.redis.RedisExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,7 @@ public class RedisHandler {
         try {
             operations.run();
         } catch (Exception e){
-            System.out.println("Redis 오류");
+            throw new RedisException(RedisExceptionType.REDIS_TEMPLATE_ERROR);
         }
     }
 }

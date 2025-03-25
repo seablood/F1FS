@@ -14,6 +14,10 @@ import kr.co.F1FS.app.util.constructor.ConstructorException;
 import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,13 +54,10 @@ public class ConstructorService {
         return ResponseConstructorDTO.toDto(constructor, getDrivers(constructor), currentSeasonDTO, sinceDebutDTO);
     }
 
-    public List<ResponseSimpleConstructorDTO> findByNameList(String search){
-        List<ResponseSimpleConstructorDTO> constructorDTOList = constructorRepository
-                .findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search).stream()
-                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor))
-                .toList();
-
-        return constructorDTOList;
+    public Page<ResponseSimpleConstructorDTO> findByNameList(String search, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+        return constructorRepository.findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search, pageable)
+                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor));
     }
 
     @Cacheable(value = "Constructor", key = "#id", cacheManager = "redisLongCacheManager")
@@ -65,12 +66,12 @@ public class ConstructorService {
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
-    public List<ResponseSimpleConstructorDTO> findByRacingClass(String findClass){
+    public Page<ResponseSimpleConstructorDTO> findByRacingClass(String findClass, int page, int size){
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
         RacingClass racingClass = RacingClass.valueOf(findClass);
-        List<ResponseSimpleConstructorDTO> constructorDTOList = constructorRepository.findAllByRacingClass(racingClass)
-                .stream().map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor)).toList();
 
-        return constructorDTOList;
+        return constructorRepository.findAllByRacingClass(racingClass, pageable)
+                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor));
     }
 
     @Cacheable(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager")

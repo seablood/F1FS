@@ -17,8 +17,7 @@ public class FollowUserService {
     private final UserService userService;
 
     @Transactional
-    public void toggle(String followerUsername, String followeeNickname){
-        User followerUser = userService.findByUsernameNotDTO(followerUsername);
+    public void toggle(User followerUser, String followeeNickname){
         User followeeUser = userService.findByNicknameNotDTO(followeeNickname);
 
         if(isFollowed(followerUser, followeeUser)){

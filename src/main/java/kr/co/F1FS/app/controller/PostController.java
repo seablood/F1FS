@@ -8,10 +8,9 @@ import kr.co.F1FS.app.dto.CreatePostDTO;
 import kr.co.F1FS.app.dto.ModifyPostDTO;
 import kr.co.F1FS.app.dto.ResponsePostDTO;
 import kr.co.F1FS.app.model.Post;
-import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.service.PostService;
-import kr.co.F1FS.app.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +24,6 @@ import java.util.List;
 @Tag(name = "게시글(Post) 시스템", description = "게시글(Post) 관련 기능")
 public class PostController {
     private final PostService postService;
-    private final UserService userService;
 
     @PostMapping("/save")
     @Operation(summary = "게시글(Post) 등록", description = "게시글(Post)을 작성하고 등록")
@@ -36,9 +34,25 @@ public class PostController {
     }
 
     @GetMapping("/find-all")
-    @Operation(summary = "모든 게시글 검색", description = "존재하는 모든 게시글을 반환")
-    public ResponseEntity<List<ResponsePostDTO>> findAll(){
-        return ResponseEntity.status(HttpStatus.OK).body(postService.findAll());
+    @Operation(summary = "모든 게시글 검색(정렬 포함)", description = "존재하는 모든 게시글을 반환")
+    public ResponseEntity<List<ResponsePostDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                         @RequestParam(value = "size", defaultValue = "10") int size,
+                                                         @RequestParam(value = "condition", defaultValue = "new") String condition){
+        Page<ResponsePostDTO> newPage = postService.findAll(page, size, condition);
+        return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
+    @GetMapping("/find-option")
+    @Operation(summary = "게시글 옵션 검색", description = "게시글을 제목 또는 내용 옵션으로 검색")
+    public ResponseEntity<List<ResponsePostDTO>> findByTitleOrContent(
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "option", defaultValue = "title") String option,
+            @RequestParam(value = "condition", defaultValue = "new") String condition){
+        return ResponseEntity.status(HttpStatus.OK).body(
+                postService.findByTitleOrContent(search, page, size, option, condition).getContent()
+        );
     }
 
     @GetMapping("/find/{id}")

@@ -24,7 +24,7 @@ public class FollowUserController {
     @Operation(summary = "팔로우 토글 기능", description = "특정 유저를 팔로우 추가/취소")
     public ResponseEntity<Void> toggle(@PathVariable String nickname,
                                        @AuthenticationPrincipal PrincipalDetails details){
-        followUserService.toggle(details.getUser().getUsername(), nickname);
+        followUserService.toggle(details.getUser(), nickname);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

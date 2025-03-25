@@ -9,10 +9,12 @@ import kr.co.F1FS.app.model.Reply;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.ReplyRepository;
 import kr.co.F1FS.app.util.AuthorCertification;
+import kr.co.F1FS.app.util.CacheEvictUtil;
 import kr.co.F1FS.app.util.ValidationService;
 import kr.co.F1FS.app.util.reply.ReplyException;
 import kr.co.F1FS.app.util.reply.ReplyExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +25,7 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final ValidationService validationService;
     private final PostService postService;
+    private final CacheEvictUtil cacheEvictUtil;
 
     @Transactional
     public Reply save(CreateReplyDTO dto, User user, Long id){
@@ -33,6 +36,7 @@ public class ReplyService {
         return replyRepository.save(reply);
     }
 
+    @Cacheable(value = "ReplyList", key = "#id", cacheManager = "redisLongCacheManager")
     public List<ResponseReplyDTO> findByPost(Long id){
         Post post = postService.findByIdNotDTO(id);
         List<ResponseReplyDTO> dtoList = replyRepository.findAllByPost(post).stream()
@@ -46,6 +50,8 @@ public class ReplyService {
     public ResponseReplyDTO modify(Long replyId, ModifyReplyDTO dto, User user){
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new ReplyException(ReplyExceptionType.REPLY_NOT_FOUND));
+        cacheEvictUtil.evictCachingReply(reply);
+
         if(!AuthorCertification.certification(user.getUsername(), reply.getUser().getUsername())){
             throw new ReplyException(ReplyExceptionType.NOT_AUTHORITY_UPDATE_POST);
         }
@@ -62,6 +68,7 @@ public class ReplyService {
         if(!AuthorCertification.certification(user.getUsername(), reply.getUser().getUsername())){
             throw new ReplyException(ReplyExceptionType.NOT_AUTHORITY_DELETE_POST);
         }
+        cacheEvictUtil.evictCachingReply(reply);
 
         replyRepository.delete(reply);
     }
