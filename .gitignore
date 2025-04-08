@@ -41,3 +41,4 @@ application-jwt.yml
 application-oauth2.yml
 application-slack.yml
 application-redis.yml
+application-email.yml

@@ -106,7 +106,10 @@ public class PostService {
                 return postRepository.findAllByContentContainsIgnoreCase(search, pageable)
                         .map(post -> ResponsePostDTO.toDto(post));
             case "titleOrContent" :
-                return postRepository.findAllByTitleContainsIgnoreCaseOrContentContainsIgnoreCase(search, option, pageable)
+                return postRepository.findAllByTitleContainsIgnoreCaseOrContentContainsIgnoreCase(search, search, pageable)
+                        .map(post -> ResponsePostDTO.toDto(post));
+            case "author" :
+                return postRepository.findByAuthorNicknameContainsIgnoreCase(search, pageable)
                         .map(post -> ResponsePostDTO.toDto(post));
             default:
                 throw new PostException(PostExceptionType.CONDITION_ERROR_POST);

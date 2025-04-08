@@ -10,6 +10,7 @@ import kr.co.F1FS.app.config.login.handler.LoginSuccessHandler;
 import kr.co.F1FS.app.config.oauth2.handler.OAuth2FailureHandler;
 import kr.co.F1FS.app.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.config.oauth2.service.CustomOAuth2UserService;
+import kr.co.F1FS.app.config.oauth2.util.OAuth2CookieRepository;
 import kr.co.F1FS.app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +42,7 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2CookieRepository oAuth2CookieRepository;
 
     @Bean
     public WebSecurityCustomizer configure() {
@@ -48,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers(toH2Console())
                 .requestMatchers("/v3/api-docs", "/swagger-resources/**",
                         "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception",
-                        "/static/**", "/favicon.ico");
+                        "/static/**", "/favicon.ico", "/swagger-ui/index.html");
     }
 
     @Bean
@@ -66,12 +68,21 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((authorizeRequests) ->
             authorizeRequests
-                    .requestMatchers("/api/v1/user/save",
+                    .requestMatchers("/api/v1/auth/user-save",
+                                    "/api/v1/auth/verify-code",
                                     "/login",
                                     "/api/v1/post/find-all",
                                     "/api/v1/post/find/**",
-                                    "/api/v1/driver/find/**",
-                                    "/api/v1/constructor/**").permitAll()
+                                    "/api/v1/driver/**",
+                                    "/api/v1/constructor/**",
+                                    "/swagger-ui/**",
+                                    "/api-docs/**",
+                                    "/v3/api-docs/**",
+                                    "/swagger-resources/**",
+                                    "/webjars/**",
+                                    "/swagger/**",
+                                    "/api/v1/email/**",
+                                    "/resources/templates/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->
@@ -79,6 +90,8 @@ public class SecurityConfig {
                         .loginPage("/")
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler)
+                        .authorizationEndpoint((endpoint) ->
+                                endpoint.authorizationRequestRepository(oAuth2CookieRepository))
                         .userInfoEndpoint((endpoint) -> endpoint.userService(customOAuth2UserService)));
 
         // 자체 필터 시큐리티 필터에 추가

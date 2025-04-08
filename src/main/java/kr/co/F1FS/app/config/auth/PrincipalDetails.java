@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.config.auth;
 
 import kr.co.F1FS.app.model.User;
+import kr.co.F1FS.app.util.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,6 +64,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User { // 자체 로
 
     @Override
     public boolean isEnabled() {
+        if(user.getRole().equals(Role.TEMPORARY)) return false;
         return true;
     }
 

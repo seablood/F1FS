@@ -27,13 +27,14 @@ public class User {
     @Column(unique = true)
     @Size(min = 1, max = 20, message = "nickname은 20자 이하로 설정해주세요.")
     private String nickname;
+    @Column(unique = true)
     private String email;
     private Integer followerNum;
     private Integer followingNum;
     private String providerId;
     private String provider;
     @Enumerated(value = EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role = Role.TEMPORARY;
     @Column(length = 400)
     private String refreshToken;
     @CreationTimestamp
@@ -47,6 +48,14 @@ public class User {
     public void updateLastLoginDate(){
         Date now = new Date();
         this.lastLoginDate = now;
+    }
+
+    public void updateRole(Role role){
+        this.role = role;
+    }
+
+    public void updatePassword(String password){
+        this.password = password;
     }
 
     public void changeFollowerNum(int i){

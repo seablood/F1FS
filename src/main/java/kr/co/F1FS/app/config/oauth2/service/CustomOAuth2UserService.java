@@ -7,6 +7,7 @@ import kr.co.F1FS.app.config.oauth2.provider.NaverUserInfo;
 import kr.co.F1FS.app.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.model.User;
 import kr.co.F1FS.app.repository.UserRepository;
+import kr.co.F1FS.app.util.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -50,6 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .provider(userInfo.getProvider())
                     .providerId(userInfo.getProviderId())
                     .build();
+            user.updateRole(Role.USER);
             userRepository.saveAndFlush(user);
         }
 

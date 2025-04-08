@@ -39,20 +39,7 @@ public class TokenFilter extends OncePerRequestFilter {
             return;
         }
 
-        String refreshToken = jwtTokenService.resolveRefreshToken(request)
-                .filter(jwtTokenService::validateToken)
-                .orElse(null);
-
-        if(refreshToken != null){
-            log.info("Access 토큰 재발급 진행");
-            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-            return;
-        }
-
-        if(refreshToken == null){
-            log.info("유저 인증 절차 진행");
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        }
+        checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
     // 액세스 토큰 추출 및 유효성 검사

@@ -17,17 +17,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final ValidationService validationService;
-
-    @Transactional
-    public User save(CreateUserDTO userDTO){
-        userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-        User user = CreateUserDTO.toEntity(userDTO);
-        validationService.checkValid(user);
-
-        return userRepository.save(user);
-    }
 
     @Cacheable(value = "UserDTO", key = "#nickname", cacheManager = "redisLongCacheManager")
     public ResponseUserDTO findByNickname(String nickname){

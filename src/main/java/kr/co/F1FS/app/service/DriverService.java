@@ -11,9 +11,7 @@ import kr.co.F1FS.app.util.constructor.ConstructorExceptionType;
 import kr.co.F1FS.app.util.driver.DriverException;
 import kr.co.F1FS.app.util.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,29 +78,6 @@ public class DriverService {
 
         return driverRepository.findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search, pageable)
                 .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
-    }
-
-    @Transactional
-    @Caching(evict = {
-            @CacheEvict(value = "DriverDTO", key = "#driver.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "Driver", key = "#driver.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
-    })
-    public void modifyRacingClass(Driver driver, String modifyClass){
-        RacingClass racingClass = RacingClass.valueOf(modifyClass);
-
-        driver.updateRacingClass(racingClass);
-
-        if(!debutRelationService.existsRelation(driver, racingClass)){
-            CurrentSeason currentSeason = new CurrentSeason();
-            SinceDebut sinceDebut = new SinceDebut();
-
-            recordRelationService.save(driver, currentSeason);
-            debutRelationService.save(driver, sinceDebut);
-            currentSeasonRepository.save(currentSeason);
-            sinceDebutRepository.save(sinceDebut);
-        }
     }
 
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")

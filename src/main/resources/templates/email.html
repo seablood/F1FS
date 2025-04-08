@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">이메일 제목</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000000;
+            padding: 20px;
+        }
+        .email-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        .content {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <span th:text="${title}">[[${title}]]</span>
+    </div>
+    <p>안녕하세요, <span th:text="${nickname}">[[${nickname}]]</span>님!</p>
+    <div class="content">
+        <p th:text="${content}">[[${content}]]</p>
+    </div>
+</div>
+</body>
+</html>
