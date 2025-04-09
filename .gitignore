@@ -42,3 +42,5 @@ application-oauth2.yml
 application-slack.yml
 application-redis.yml
 application-email.yml
+docker-compose.yml
+application-elastic.yml
