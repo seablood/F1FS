@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.config.auth;
 
-import kr.co.F1FS.app.model.User;
-import kr.co.F1FS.app.repository.UserRepository;
+import kr.co.F1FS.app.domain.model.rdb.User;
+import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

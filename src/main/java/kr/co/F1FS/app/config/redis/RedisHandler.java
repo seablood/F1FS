@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.config.redis;
 
-import kr.co.F1FS.app.util.redis.RedisException;
-import kr.co.F1FS.app.util.redis.RedisExceptionType;
+import kr.co.F1FS.app.util.exception.redis.RedisException;
+import kr.co.F1FS.app.util.exception.redis.RedisExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.config.auth;
 
-import kr.co.F1FS.app.model.User;
+import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.util.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

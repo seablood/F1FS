@@ -1,9 +1,9 @@
 package kr.co.F1FS.app.util;
 
-import kr.co.F1FS.app.model.Constructor;
-import kr.co.F1FS.app.model.Driver;
-import kr.co.F1FS.app.model.Post;
-import kr.co.F1FS.app.model.Reply;
+import kr.co.F1FS.app.domain.model.rdb.Constructor;
+import kr.co.F1FS.app.domain.model.rdb.Driver;
+import kr.co.F1FS.app.domain.model.rdb.Post;
+import kr.co.F1FS.app.domain.model.rdb.Reply;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;

@@ -1,18 +1,18 @@
-/*package kr.co.F1FS.app.config.handler;
+package kr.co.F1FS.app.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import kr.co.F1FS.app.service.SlackService;
+import kr.co.F1FS.app.application.SlackService;
 import kr.co.F1FS.app.util.BaseException;
 import kr.co.F1FS.app.util.ErrorMessages;
 import kr.co.F1FS.app.util.ExceptionType;
-import kr.co.F1FS.app.util.constructor.ConstructorException;
-import kr.co.F1FS.app.util.driver.DriverException;
-import kr.co.F1FS.app.util.email.EmailException;
-import kr.co.F1FS.app.util.post.PostException;
-import kr.co.F1FS.app.util.redis.RedisException;
-import kr.co.F1FS.app.util.reply.ReplyException;
-import kr.co.F1FS.app.util.user.UserException;
+import kr.co.F1FS.app.util.exception.constructor.ConstructorException;
+import kr.co.F1FS.app.util.exception.driver.DriverException;
+import kr.co.F1FS.app.util.exception.email.EmailException;
+import kr.co.F1FS.app.util.exception.post.PostException;
+import kr.co.F1FS.app.util.exception.redis.RedisException;
+import kr.co.F1FS.app.util.exception.reply.ReplyException;
+import kr.co.F1FS.app.util.exception.user.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -97,4 +97,4 @@ public class GlobalExceptionHandler {
         data.put("에러 로그", e.getMessage());
         slackService.sendErrorMessage(httpStatus.name(), data);
     }
-}*/
+}

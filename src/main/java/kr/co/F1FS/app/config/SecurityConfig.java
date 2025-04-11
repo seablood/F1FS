@@ -11,7 +11,7 @@ import kr.co.F1FS.app.config.oauth2.handler.OAuth2FailureHandler;
 import kr.co.F1FS.app.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.config.oauth2.service.CustomOAuth2UserService;
 import kr.co.F1FS.app.config.oauth2.util.OAuth2CookieRepository;
-import kr.co.F1FS.app.repository.UserRepository;
+import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers(toH2Console())
                 .requestMatchers("/v3/api-docs", "/swagger-resources/**",
                         "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception",
-                        "/static/**", "/favicon.ico", "/swagger-ui/index.html");
+                        "/static/**", "/favicon.ico", "/swagger-ui/index.html", "/elastic/**");
     }
 
     @Bean
@@ -82,7 +82,9 @@ public class SecurityConfig {
                                     "/webjars/**",
                                     "/swagger/**",
                                     "/api/v1/email/**",
-                                    "/resources/templates/**").permitAll()
+                                    "/resources/templates/**",
+                                    "/api/v1/search-driver/**",
+                                    "/elastic/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->
