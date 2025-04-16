@@ -5,7 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import kr.co.F1FS.app.domain.model.rdb.Driver;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

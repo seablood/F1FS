@@ -3,7 +3,7 @@ package kr.co.F1FS.app.application;
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
-import kr.co.F1FS.app.util.Color;
+import kr.co.F1FS.app.global.util.Color;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

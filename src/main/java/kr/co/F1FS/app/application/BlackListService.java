@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.application;
 
-import kr.co.F1FS.app.config.redis.RedisConfig;
-import kr.co.F1FS.app.config.redis.RedisHandler;
+import kr.co.F1FS.app.global.config.redis.RedisConfig;
+import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

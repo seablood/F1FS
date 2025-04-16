@@ -38,7 +38,7 @@ spring:
 email:
   templates:
     create_account:
-      subject: "회원가입 이메일 인증 코드"
+      subject: "F1FS 회원가입 이메일 인증 코드"
       content: "안녕하세요,\n회원가입을 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
 
     update_password:

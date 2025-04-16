@@ -5,7 +5,7 @@ import kr.co.F1FS.app.domain.model.rdb.Post;
 import kr.co.F1FS.app.domain.model.rdb.PostLikeRelation;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.post.PostLikeRelationRepository;
-import kr.co.F1FS.app.util.CacheEvictUtil;
+import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

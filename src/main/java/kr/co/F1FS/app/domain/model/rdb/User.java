@@ -1,16 +1,13 @@
 package kr.co.F1FS.app.domain.model.rdb;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import kr.co.F1FS.app.util.Role;
+import kr.co.F1FS.app.global.util.Role;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Getter

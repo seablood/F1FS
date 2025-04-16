@@ -3,7 +3,7 @@ package kr.co.F1FS.app.presentation.reply.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.config.auth.PrincipalDetails;
+import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.presentation.reply.dto.CreateReplyDTO;
 import kr.co.F1FS.app.presentation.reply.dto.ModifyReplyDTO;
 import kr.co.F1FS.app.presentation.reply.dto.ResponseReplyDTO;

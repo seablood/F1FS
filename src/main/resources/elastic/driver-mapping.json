@@ -3,7 +3,18 @@
     "korName": {
       "type": "text",
       "analyzer": "autocomplete_nori",
-      "search_analyzer": "nori_search"
+      "search_analyzer": "nori_search",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "autocomplete_nori",
+          "search_analyzer": "nori_search"
+        },
+        "ngram_search": {
+          "type": "text",
+          "analyzer": "ngram_analyzer"
+        }
+      }
     },
     "engName": {
       "type": "text",
@@ -11,7 +22,25 @@
       "search_analyzer": "standard"
     },
     "team": {
-      "type": "keyword"
+      "type": "text",
+      "analyzer": "autocomplete_nori",
+      "search_analyzer": "nori_search",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "autocomplete_nori",
+          "search_analyzer": "nori_search"
+        },
+        "ngram_search": {
+          "type": "text",
+          "analyzer": "ngram_analyzer"
+        }
+      }
+    },
+    "engTeam": {
+      "type": "text",
+      "analyzer": "autocomplete_standard",
+      "search_analyzer": "standard"
     }
   }
 }

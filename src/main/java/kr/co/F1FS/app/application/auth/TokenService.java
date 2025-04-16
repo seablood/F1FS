@@ -2,10 +2,10 @@ package kr.co.F1FS.app.application.auth;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import kr.co.F1FS.app.config.jwt.service.JwtTokenService;
+import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
-import kr.co.F1FS.app.util.exception.user.UserException;
-import kr.co.F1FS.app.util.exception.user.UserExceptionType;
+import kr.co.F1FS.app.global.util.exception.user.UserException;
+import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

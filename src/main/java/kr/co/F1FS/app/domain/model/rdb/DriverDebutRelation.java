@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.domain.model.rdb;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

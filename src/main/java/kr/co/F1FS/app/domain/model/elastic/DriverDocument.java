@@ -24,8 +24,11 @@ public class DriverDocument {
     @Field(type = FieldType.Text)
     private String engName;
 
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     private String team;
+
+    @Field(type = FieldType.Text)
+    private String engTeam;
 
     @Builder
     public DriverDocument(Driver driver){
@@ -33,5 +36,6 @@ public class DriverDocument {
         this.korName = driver.getName();
         this.engName = driver.getEngName();
         this.team = driver.getTeam();
+        this.engTeam = driver.getEngTeam();
     }
 }

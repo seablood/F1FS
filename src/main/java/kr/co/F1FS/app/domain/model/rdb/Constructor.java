@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.model.rdb;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 
 import java.util.ArrayList;

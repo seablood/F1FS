@@ -2,7 +2,7 @@ package kr.co.F1FS.app.presentation.follow.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.config.auth.PrincipalDetails;
+import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.presentation.constructor.dto.SimpleResponseConstructorDTO;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.application.follow.FollowConstructorService;

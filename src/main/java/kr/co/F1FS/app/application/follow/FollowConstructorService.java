@@ -7,7 +7,7 @@ import kr.co.F1FS.app.domain.model.rdb.Constructor;
 import kr.co.F1FS.app.domain.model.rdb.FollowConstructor;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.follow.FollowConstructorRepository;
-import kr.co.F1FS.app.util.CacheEvictUtil;
+import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

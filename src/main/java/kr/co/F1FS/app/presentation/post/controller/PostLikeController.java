@@ -2,7 +2,7 @@ package kr.co.F1FS.app.presentation.post.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.config.auth.PrincipalDetails;
+import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.application.post.PostLikeRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

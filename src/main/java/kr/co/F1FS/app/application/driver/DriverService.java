@@ -18,12 +18,12 @@ import kr.co.F1FS.app.presentation.record.dto.CreateCurrentSeasonDTO;
 import kr.co.F1FS.app.presentation.record.dto.CreateSinceDebutDTO;
 import kr.co.F1FS.app.presentation.record.dto.ResponseCurrentSeasonDTO;
 import kr.co.F1FS.app.presentation.record.dto.ResponseSinceDebutDTO;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.application.ValidationService;
-import kr.co.F1FS.app.util.exception.constructor.ConstructorException;
-import kr.co.F1FS.app.util.exception.constructor.ConstructorExceptionType;
-import kr.co.F1FS.app.util.exception.driver.DriverException;
-import kr.co.F1FS.app.util.exception.driver.DriverExceptionType;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
+import kr.co.F1FS.app.global.util.exception.driver.DriverException;
+import kr.co.F1FS.app.global.util.exception.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -54,6 +54,7 @@ public class DriverService {
         if(!driver.getTeam().equals("FA")){
             Constructor constructor = constructorRepository.findByName(driver.getTeam())
                     .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
+            driver.setEngTeam(constructor.getEngName());
 
             relationService.save(constructor, driver);
         }
@@ -62,6 +63,7 @@ public class DriverService {
 
         currentSeasonRepository.save(currentSeason);
         sinceDebutRepository.save(sinceDebut);
+        driverRepository.save(driver);
         driverSearchService.save(driver);
         return driverRepository.save(driver);
     }

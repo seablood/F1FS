@@ -4,7 +4,7 @@ import kr.co.F1FS.app.domain.model.rdb.Driver;
 import kr.co.F1FS.app.domain.model.rdb.DriverDebutRelation;
 import kr.co.F1FS.app.domain.model.rdb.SinceDebut;
 import kr.co.F1FS.app.domain.repository.rdb.driver.DriverDebutRelationRepository;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -2,14 +2,13 @@ package kr.co.F1FS.app.application.email;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import kr.co.F1FS.app.config.email.EmailQueueMemory;
-import kr.co.F1FS.app.config.email.EmailType;
-import kr.co.F1FS.app.util.exception.email.EmailException;
-import kr.co.F1FS.app.util.exception.email.EmailExceptionType;
+import kr.co.F1FS.app.global.config.email.EmailQueueMemory;
+import kr.co.F1FS.app.global.config.email.EmailType;
+import kr.co.F1FS.app.global.util.exception.email.EmailException;
+import kr.co.F1FS.app.global.util.exception.email.EmailExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -56,20 +55,6 @@ public class EmailAsyncService {
             if(!list.isEmpty()){
                 sendEmailList(list);
             }
-        } catch (Exception e){
-            throw new EmailException(EmailExceptionType.SEND_EMAIL_ERROR);
-        }
-    }
-
-    public void sendSimpleMailMessage(){
-        SimpleMailMessage message = new SimpleMailMessage();
-
-        try{
-            message.setTo("dudwnszero@naver.com");
-            message.setSubject("테스트 이메일");
-            message.setText("테스트 이메일");
-
-            javaMailSender.send(message);
         } catch (Exception e){
             throw new EmailException(EmailExceptionType.SEND_EMAIL_ERROR);
         }

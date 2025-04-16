@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.application.email;
 
-import kr.co.F1FS.app.config.email.EmailProperties;
-import kr.co.F1FS.app.config.email.EmailType;
+import kr.co.F1FS.app.global.config.email.EmailProperties;
+import kr.co.F1FS.app.global.config.email.EmailType;
 import kr.co.F1FS.app.presentation.email.dto.EmailDTO;
 import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.util.exception.email.EmailException;
-import kr.co.F1FS.app.util.exception.email.EmailExceptionType;
+import kr.co.F1FS.app.global.util.exception.email.EmailException;
+import kr.co.F1FS.app.global.util.exception.email.EmailExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;

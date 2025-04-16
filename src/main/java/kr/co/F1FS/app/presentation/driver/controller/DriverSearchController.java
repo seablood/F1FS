@@ -21,9 +21,19 @@ import java.util.List;
 public class DriverSearchController {
     private final DriverSearchService driverSearchService;
 
-    @GetMapping("/name")
-    @Operation(summary = "드라이버 이름 검색", description = "이름으로 드라이버 검색")
-    public ResponseEntity<List<DriverDocument>> findByName(@RequestParam(value = "search") String search){
-        return ResponseEntity.status(HttpStatus.OK).body(driverSearchService.searchByName(search));
+    @GetMapping("/page-search")
+    @Operation(summary = "드라이버 이름 검색(검색 페이지)", description = "이름으로 드라이버 검색")
+    public ResponseEntity<List<DriverDocument>> pageSearch(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                           @RequestParam(value = "size", defaultValue = "10") int size,
+                                                           @RequestParam(value = "condition", defaultValue = "nameASC") String condition,
+                                                           @RequestParam(value = "search") String search){
+        return ResponseEntity.status(HttpStatus.OK).body(driverSearchService.searchDriversWithPaging(
+                page, size, condition, search).getContent());
+    }
+
+    @GetMapping("/live-search")
+    @Operation(summary = "드라이버 이름 검색(실시간 추천)", description = "실시간 추천 검색")
+    public ResponseEntity<List<DriverDocument>> liveSearch(@RequestParam(value = "search") String search){
+        return ResponseEntity.status(HttpStatus.OK).body(driverSearchService.suggestDrivers(search));
     }
 }

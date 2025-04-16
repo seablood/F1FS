@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import kr.co.F1FS.app.util.RacingClass;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -25,6 +25,7 @@ public class Driver {
     @Positive(message = "Driver Number를 확인해주세요.")
     private Integer number;
     private String team;
+    private String engTeam;
     private Integer championships;
     private String country;
     private Integer followerNum;
@@ -48,6 +49,10 @@ public class Driver {
 
     public void updateRacingClass(RacingClass racingClass){
         this.racingClass = racingClass;
+    }
+
+    public void setEngTeam(String engTeam){
+        this.engTeam = engTeam;
     }
 
     public void increaseFollower(){
