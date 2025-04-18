@@ -82,7 +82,6 @@ public class DriverSearchService {
                                         .field("engTeam")
                                         .query(keyword)
                                         .fuzziness("AUTO")))))
-                .withMaxResults(10)
                 .build();
 
         return query;

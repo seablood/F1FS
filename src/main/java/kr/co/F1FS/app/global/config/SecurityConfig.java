@@ -84,6 +84,8 @@ public class SecurityConfig {
                                     "/api/v1/email/**",
                                     "/resources/templates/**",
                                     "/api/v1/search-driver/**",
+                                    "/api/v1/search-post/**",
+                                    "/api/v1/search-CD/**",
                                     "/elastic/**").permitAll()
                     .anyRequest().authenticated());
 

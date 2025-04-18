@@ -45,13 +45,6 @@ public class DriverController {
                 .getContent());
     }
 
-    @GetMapping("/find/name")
-    @Operation(summary = "드라이버 검색(Name)", description = "특정 name의 드라이버들을 검색한다.")
-    public ResponseEntity<List<ResponseSimpleDriverDTO>> findByName(@RequestParam String search,
-                                                                    @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                    @RequestParam(value = "size", defaultValue = "10") int size){
-        return ResponseEntity.status(HttpStatus.OK).body(driverService.findByNameList(search, page, size).getContent());
-    }
 
     @PutMapping("/modify/constructor/{number}/{constructorName}")
     @Operation(summary = "드라이버 소속 컨스트럭터 변경", description = "특정 드라이버의 소속 컨스트럭터를 변경한다.")

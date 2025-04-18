@@ -91,12 +91,6 @@ public class DriverService {
                 .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
     }
 
-    public Page<ResponseSimpleDriverDTO> findByNameList(String search, int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
-
-        return driverRepository.findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search, pageable)
-                .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
-    }
 
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){

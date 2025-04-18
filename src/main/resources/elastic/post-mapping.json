@@ -1,0 +1,56 @@
+{
+  "properties": {
+    "title": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "autocomplete_standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "content": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "autocomplete_standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "author": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "autocomplete_standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm||yyyy-MM-dd"
+    },
+    "likeNum": {
+      "type": "integer"
+    }
+  }
+}

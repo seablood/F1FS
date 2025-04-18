@@ -1,0 +1,58 @@
+package kr.co.F1FS.app.domain.model.elastic;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import kr.co.F1FS.app.domain.model.rdb.Post;
+import kr.co.F1FS.app.global.util.TimeUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.elasticsearch.annotations.*;
+
+import java.time.LocalDateTime;
+
+@Document(indexName = "posts")
+@Setting(settingPath = "/elastic/post-setting.json")
+@Mapping(mappingPath = "/elastic/post-mapping.json")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PostDocument {
+    @Id
+    private Long id;
+
+    @Field(type = FieldType.Text)
+    private String title;
+
+    @Field(type = FieldType.Text)
+    private String content;
+
+    @Field(type = FieldType.Text)
+    private String author;
+
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
+    private LocalDateTime createdAt;
+
+    @Field(type = FieldType.Integer)
+    private int likeNum;
+
+    public void increaseLikeNum(){
+        this.likeNum++;
+    }
+
+    public void decreaseLikeNum(){
+        this.likeNum--;
+    }
+
+    @Builder
+    public PostDocument(Post post){
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.content = post.getContent();
+        this.author = post.getAuthor().getNickname();
+        this.createdAt = TimeUtil.convertToKoreanTime(post.getCreatedAt());
+        this.likeNum = post.getLikeNum();
+    }
+}

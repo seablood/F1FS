@@ -21,27 +21,6 @@
       "analyzer": "autocomplete_standard",
       "search_analyzer": "standard"
     },
-    "team": {
-      "type": "text",
-      "analyzer": "autocomplete_nori",
-      "search_analyzer": "nori_search",
-      "fields": {
-        "ngram": {
-          "type": "text",
-          "analyzer": "autocomplete_nori",
-          "search_analyzer": "nori_search"
-        },
-        "ngram_search": {
-          "type": "text",
-          "analyzer": "ngram_analyzer"
-        }
-      }
-    },
-    "engTeam": {
-      "type": "text",
-      "analyzer": "autocomplete_standard",
-      "search_analyzer": "standard"
-    },
     "racingClass": {
       "type": "text",
       "analyzer": "autocomplete_standard",

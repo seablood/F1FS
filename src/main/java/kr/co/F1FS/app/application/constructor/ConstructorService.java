@@ -33,6 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConstructorService {
     private final ConstructorRecordRelationService recordRelationService;
+    private final kr.co.F1FS.app.application.search.CDSearchService CDSearchService;
     private final ConstructorRepository constructorRepository;
     private final CurrentSeasonRepository currentSeasonRepository;
     private final SinceDebutRepository sinceDebutRepository;
@@ -47,6 +48,8 @@ public class ConstructorService {
 
         currentSeasonRepository.save(currentSeason);
         sinceDebutRepository.save(sinceDebut);
+        constructorRepository.save(constructor);
+        CDSearchService.save(constructor);
         return constructorRepository.save(constructor);
     }
 

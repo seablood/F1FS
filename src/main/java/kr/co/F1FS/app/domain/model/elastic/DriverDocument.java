@@ -30,6 +30,9 @@ public class DriverDocument {
     @Field(type = FieldType.Text)
     private String engTeam;
 
+    @Field(type = FieldType.Text)
+    private String racingClass;
+
     @Builder
     public DriverDocument(Driver driver){
         this.id = driver.getId();
@@ -37,5 +40,6 @@ public class DriverDocument {
         this.engName = driver.getEngName();
         this.team = driver.getTeam();
         this.engTeam = driver.getEngTeam();
+        this.racingClass = driver.getRacingClass().toString();
     }
 }

@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.application.post;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.search.PostSearchService;
 import kr.co.F1FS.app.presentation.post.dto.CreatePostDTO;
 import kr.co.F1FS.app.presentation.post.dto.ModifyPostDTO;
 import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostSearchService postSearchService;
     private final ValidationService validationService;
     private final CacheEvictUtil cacheEvictUtil;
 
@@ -31,6 +33,8 @@ public class PostService {
     public Post save(CreatePostDTO dto, User author){
         Post post = CreatePostDTO.toEntity(dto, author);
         validationService.checkValid(post);
+        postRepository.save(post);
+        postSearchService.save(post);
         return postRepository.save(post);
     }
 
