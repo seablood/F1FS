@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -36,14 +37,14 @@ public class User {
     private String refreshToken;
     @CreationTimestamp
     private Timestamp createDate;
-    private Date lastLoginDate;
+    private LocalDateTime lastLoginDate;
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
 
     public void updateLastLoginDate(){
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
         this.lastLoginDate = now;
     }
 

@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.application.follow;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.presentation.user.dto.ResponseUserDTO;
 import kr.co.F1FS.app.domain.model.rdb.FollowUser;
 import kr.co.F1FS.app.domain.model.rdb.User;
@@ -16,10 +17,13 @@ import java.util.List;
 public class FollowUserService {
     private final FollowUserRepository followUserRepository;
     private final UserService userService;
+    private final CacheEvictUtil cacheEvictUtil;
 
     @Transactional
     public void toggle(User followerUser, String followeeNickname){
         User followeeUser = userService.findByNicknameNotDTO(followeeNickname);
+        cacheEvictUtil.evictCachingUser(followerUser);
+        cacheEvictUtil.evictCachingUser(followeeUser);
 
         if(isFollowed(followerUser, followeeUser)){
             FollowUser followUser = followUserRepository.findByFollowerUserAndFolloweeUser(followerUser, followeeUser);

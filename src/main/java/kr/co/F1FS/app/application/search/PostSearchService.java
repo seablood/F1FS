@@ -143,7 +143,7 @@ public class PostSearchService {
                         .toList();
                 return new PageImpl<>(list4, pageable, hits4.getTotalHits());
             default:
-                throw new RuntimeException("게시글 조회 오류");
+                throw new PostException(PostExceptionType.SEARCH_ERROR_POST);
         }
     }
 

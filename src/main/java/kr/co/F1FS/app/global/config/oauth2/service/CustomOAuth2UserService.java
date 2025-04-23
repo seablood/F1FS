@@ -7,6 +7,7 @@ import kr.co.F1FS.app.global.config.oauth2.provider.NaverUserInfo;
 import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.util.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -21,6 +22,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final UserRepository userRepository;
+    private final RedisConfig redisConfig;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -55,6 +57,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userRepository.saveAndFlush(user);
         }
 
-        return new PrincipalDetails(user, oAuth2User.getAttributes());
+        return new PrincipalDetails(user, oAuth2User.getAttributes(), redisConfig);
     }
 }

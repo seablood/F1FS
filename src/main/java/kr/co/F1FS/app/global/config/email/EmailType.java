@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum EmailType {
     CREATE_ACCOUNT("create_account", "계정 생성을 위한 인증", "email.html"),
-    UPDATE_PASSWORD("update_password", "비밀번호 변경을 위한 인증", "email.html");
+    UPDATE_PASSWORD("update_password", "비밀번호 변경을 위한 인증", "email.html"),
+    ACTIVE_ACCOUNT("active_account", "휴면 계정 활성화를 위한 인증", "email.html");
 
     private final String key;
     private final String description;

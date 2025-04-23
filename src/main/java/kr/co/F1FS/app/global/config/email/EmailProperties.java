@@ -20,6 +20,10 @@ public class EmailProperties {
     private String updatePasswordSubject;
     @Value("${email.templates.update_password.content}")
     private String updatePasswordContent;
+    @Value("${email.templates.active_account.subject}")
+    private String activeAccountSubject;
+    @Value("${email.templates.active_account.content}")
+    private String activeAccountContent;
 
     private Map<String, Template> templateMap = new HashMap<>();
 
@@ -27,6 +31,7 @@ public class EmailProperties {
     public void init() {
         templateMap.put("create_account", new Template(createAccountSubject, createAccountContent));
         templateMap.put("update_password", new Template(updatePasswordSubject, updatePasswordContent));
+        templateMap.put("active_account", new Template(activeAccountSubject, activeAccountContent));
     }
 
     public Template getTemplate(EmailType emailType){

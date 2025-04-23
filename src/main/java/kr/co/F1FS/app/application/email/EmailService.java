@@ -46,7 +46,23 @@ public class EmailService {
                 .to(user.getEmail())
                 .subject(subject)
                 .content(content)
-                .emailType(EmailType.CREATE_ACCOUNT)
+                .emailType(EmailType.UPDATE_PASSWORD)
+                .build();
+
+        sendEmail(emailDTO, user);
+    }
+
+    public void sendActiveAccountEmail(User user, String code){
+        EmailProperties.Template template = emailProperties.getTemplate(EmailType.ACTIVE_ACCOUNT);
+
+        String subject = template.getSubject();
+        String content = template.getContent().replace("{{code}}", code);
+
+        EmailDTO emailDTO = EmailDTO.builder()
+                .to(user.getEmail())
+                .subject(subject)
+                .content(content)
+                .emailType(EmailType.ACTIVE_ACCOUNT)
                 .build();
 
         sendEmail(emailDTO, user);

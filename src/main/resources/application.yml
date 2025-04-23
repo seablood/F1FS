@@ -42,5 +42,9 @@ email:
       content: "안녕하세요,\n회원가입을 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
 
     update_password:
-      subject: "비밀번호 변경 인증 코드"
+      subject: "F1FS 비밀번호 변경 인증 코드"
       content: "안녕하세요,\n비밀번호 변경을 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
+
+    active_account:
+      subject: "F1FS 계정 활성화 이메일 인증 코드"
+      content: "안녕하세요,\n계정 활성화를 위한 인증 코드는 {{code}} 입니다.\n감사합니다."

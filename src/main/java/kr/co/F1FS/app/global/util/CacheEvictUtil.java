@@ -1,9 +1,6 @@
 package kr.co.F1FS.app.global.util;
 
-import kr.co.F1FS.app.domain.model.rdb.Constructor;
-import kr.co.F1FS.app.domain.model.rdb.Driver;
-import kr.co.F1FS.app.domain.model.rdb.Post;
-import kr.co.F1FS.app.domain.model.rdb.Reply;
+import kr.co.F1FS.app.domain.model.rdb.*;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
@@ -32,5 +29,9 @@ public class CacheEvictUtil {
     @Caching(evict = @CacheEvict(value = "ReplyList", key = "#reply.post.id", cacheManager = "redisLongCacheManager"))
     public void evictCachingReply(Reply reply){}
 
-
+    @Caching(evict = {
+            @CacheEvict(value = "UserDTO", key = "#user.nickname", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "User", key = "#user.nickname", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingUser(User user){}
 }

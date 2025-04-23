@@ -4,6 +4,8 @@ import kr.co.F1FS.app.domain.model.elastic.ConstructorDocument;
 import kr.co.F1FS.app.domain.model.elastic.DriverDocument;
 import kr.co.F1FS.app.domain.model.rdb.Constructor;
 import kr.co.F1FS.app.domain.repository.elastic.ConstructorSearchRepository;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
 import kr.co.F1FS.app.presentation.search.dto.CDSearchSuggestionDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -139,7 +141,7 @@ public class CDSearchService {
             case "type" :
                 return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "type"));
             default:
-                throw new RuntimeException("condition 오류");
+                throw new CDSearchException(CDSearchExceptionType.CONDITION_ERROR_CD);
         }
     }
 
@@ -148,9 +150,9 @@ public class CDSearchService {
             return Comparator.comparing(CDSearchSuggestionDTO::getKorName); // 기본값
         }
 
-        Sort.Order order = pageable.getSort().iterator().next();
-        String property = order.getProperty();
-        boolean ascending = order.getDirection().isAscending();
+        Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
+        String property = order.getProperty(); // 정렬 필드
+        boolean ascending = order.getDirection().isAscending(); // 정렬 오름차순 여부
 
         return switch (property) {
             case "korName" -> ascending

@@ -6,6 +6,7 @@ import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +24,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private static final Duration REFRESH_DURATION = Duration.ofDays(7);
 
     private final JwtTokenService jwtTokenService;
-
     private final UserRepository userRepository;
+    private final RedisConfig redisConfig;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -36,6 +37,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         jwtTokenService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         saveRefreshToken(user, refreshToken);
         addRefreshTokenCookie(request, response, refreshToken);
+
+        if(redisConfig.redisTemplate().hasKey("login:fail:"+user.getUsername())){
+            redisConfig.redisTemplate().delete("login:fail:"+user.getUsername());
+        }
 
         log.info("로그인 계정 : "+user.getUsername());
         log.info("Access Token : "+accessToken);

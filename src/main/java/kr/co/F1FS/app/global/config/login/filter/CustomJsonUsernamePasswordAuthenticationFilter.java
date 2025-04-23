@@ -42,6 +42,7 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
         Map<String, String> requestMap = objectMapper.readValue(requestMessage, Map.class);
 
         String username = requestMap.get(USERNAME_KEY);
+        request.setAttribute("username", username);
         String password = requestMap.get(PASSWORD_KEY);
 
         // AuthenticationManager가 인증 시 사용할 인증 대상 객체

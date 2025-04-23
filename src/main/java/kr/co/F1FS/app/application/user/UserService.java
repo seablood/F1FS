@@ -20,6 +20,7 @@ public class UserService {
         return ResponseUserDTO.toDto(user);
     }
 
+    @Cacheable(value = "User", key = "#nickname", cacheManager = "redisLongCacheManager")
     public User findByNicknameNotDTO(String nickname){
         return userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
