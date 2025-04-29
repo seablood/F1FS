@@ -43,6 +43,7 @@ public class AuthService {
     private final EmailService emailService;
     private final BlackListService blackListService;
     private final JwtTokenService jwtTokenService;
+    private final FCMService fcmService;
 
     @Transactional
     public User save(CreateUserDTO userDTO){
@@ -132,6 +133,7 @@ public class AuthService {
             setBlackList(refreshToken);
             CookieUtil.deleteCookie(request, response, "refresh_token");
             user.updateRefreshToken("");
+            fcmService.deleteToken(user.getId());
             userRepository.saveAndFlush(user);
         } catch (Exception e) {
             throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);

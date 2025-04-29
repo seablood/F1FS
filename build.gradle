@@ -59,6 +59,10 @@ dependencies {
 	// elasticsearch
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 	implementation 'org.elasticsearch.client:elasticsearch-rest-high-level-client:7.17.18'
+
+	// Firebase
+	implementation 'com.google.firebase:firebase-admin:9.2.0'
+	implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
 
 tasks.named('test') {
