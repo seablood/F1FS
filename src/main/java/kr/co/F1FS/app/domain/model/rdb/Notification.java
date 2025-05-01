@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.model.rdb;
 
 import jakarta.persistence.*;
+import kr.co.F1FS.app.domain.model.redis.NotificationRedis;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -17,13 +18,15 @@ public class Notification {
 
     private String title;
     private String content;
+    private String topic;
 
     private LocalDateTime createdAt;
 
     @Builder
-    public Notification(String title, String content){
-        this.title = title;
-        this.content = content;
-        this.createdAt = LocalDateTime.now();
+    public Notification(NotificationRedis redis){
+        this.title = redis.getTitle();
+        this.content = redis.getContent();
+        this.topic = redis.getTopic();
+        this.createdAt = redis.getCreatedAt();
     }
 }

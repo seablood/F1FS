@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.application.BlackListService;
+import kr.co.F1FS.app.application.notification.FCMGroupService;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.presentation.user.dto.AuthorizationUserDTO;
 import kr.co.F1FS.app.presentation.user.dto.CreateUserDTO;
@@ -43,7 +44,7 @@ public class AuthService {
     private final EmailService emailService;
     private final BlackListService blackListService;
     private final JwtTokenService jwtTokenService;
-    private final FCMService fcmService;
+    private final FCMGroupService fcmGroupService;
 
     @Transactional
     public User save(CreateUserDTO userDTO){
@@ -133,7 +134,7 @@ public class AuthService {
             setBlackList(refreshToken);
             CookieUtil.deleteCookie(request, response, "refresh_token");
             user.updateRefreshToken("");
-            fcmService.deleteToken(user.getId());
+            fcmGroupService.deleteToken(user.getId());
             userRepository.saveAndFlush(user);
         } catch (Exception e) {
             throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);

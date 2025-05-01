@@ -90,7 +90,8 @@ public class SecurityConfig {
                                     "/api/v1/search-driver/**",
                                     "/api/v1/search-post/**",
                                     "/api/v1/search-CD/**",
-                                    "/elastic/**").permitAll()
+                                    "/elastic/**",
+                                    "/api/v1/fcm/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->
