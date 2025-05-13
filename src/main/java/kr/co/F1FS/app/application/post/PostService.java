@@ -1,7 +1,12 @@
 package kr.co.F1FS.app.application.post;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.notification.FCMLiveService;
+import kr.co.F1FS.app.application.notification.NotificationRedisService;
 import kr.co.F1FS.app.application.search.PostSearchService;
+import kr.co.F1FS.app.domain.model.rdb.FCMNotification;
+import kr.co.F1FS.app.global.util.FCMUtil;
+import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
 import kr.co.F1FS.app.presentation.post.dto.CreatePostDTO;
 import kr.co.F1FS.app.presentation.post.dto.ModifyPostDTO;
 import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
@@ -21,13 +26,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
     private final PostSearchService postSearchService;
     private final ValidationService validationService;
+    private final FCMLiveService fcmLiveService;
+    private final NotificationRedisService redisService;
     private final CacheEvictUtil cacheEvictUtil;
+    private final FCMUtil fcmUtil;
 
     @Transactional
     public Post save(CreatePostDTO dto, User author){
@@ -35,6 +45,12 @@ public class PostService {
         validationService.checkValid(post);
         postRepository.save(post);
         postSearchService.save(post);
+
+        FCMPushDTO pushDTO = fcmUtil.sendPushForPost(author, post.getTitle());
+        List<FCMNotification> tokens = fcmUtil.getFollowerToken(author).stream()
+                        .filter(token -> redisService.isSubscribe(token.getUserId(), pushDTO.getTopic()))
+                        .toList();
+        fcmLiveService.sendPushForFollow(pushDTO, tokens, post.getId());
         return postRepository.save(post);
     }
 
@@ -44,10 +60,6 @@ public class PostService {
         return postRepository.findAll(pageable).map(post -> ResponsePostDTO.toDto(post));
     }
 
-    public Page<ResponsePostDTO> findByTitleOrContent(String search, int page, int size, String option, String condition){
-        Pageable pageable = conditionSwitch(page, size, condition);
-        return optionSwitch(search, option, pageable);
-    }
 
     @Cacheable(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponsePostDTO findById(Long id){
@@ -96,25 +108,6 @@ public class PostService {
                 return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
             case "like" :
                 return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "likeNum"));
-            default:
-                throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
-        }
-    }
-
-    public Page<ResponsePostDTO> optionSwitch(String search, String option, Pageable pageable){
-        switch (option){
-            case "title" :
-                return postRepository.findAllByTitleContainsIgnoreCase(search, pageable)
-                        .map(post -> ResponsePostDTO.toDto(post));
-            case "content" :
-                return postRepository.findAllByContentContainsIgnoreCase(search, pageable)
-                        .map(post -> ResponsePostDTO.toDto(post));
-            case "titleOrContent" :
-                return postRepository.findAllByTitleContainsIgnoreCaseOrContentContainsIgnoreCase(search, search, pageable)
-                        .map(post -> ResponsePostDTO.toDto(post));
-            case "author" :
-                return postRepository.findByAuthorNicknameContainsIgnoreCase(search, pageable)
-                        .map(post -> ResponsePostDTO.toDto(post));
             default:
                 throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
         }

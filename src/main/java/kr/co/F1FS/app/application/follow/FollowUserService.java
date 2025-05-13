@@ -72,6 +72,12 @@ public class FollowUserService {
                 .toList();
     }
 
+    public List<User> findFollowersNotDTO(User user){
+        return followUserRepository.findByFolloweeUser(user).stream()
+                .map(followUser -> followUser.getFollowerUser())
+                .toList();
+    }
+
     public boolean isFollowed(User followerUser, User followeeUser){
         return followUserRepository.existsFollowUserByFollowerUserAndFolloweeUser(followerUser, followeeUser);
     }

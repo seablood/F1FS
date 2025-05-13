@@ -42,19 +42,6 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
-    @GetMapping("/find-option")
-    @Operation(summary = "게시글 옵션 검색", description = "게시글을 제목 또는 내용 옵션으로 검색")
-    public ResponseEntity<List<ResponsePostDTO>> findByTitleOrContent(
-            @RequestParam(value = "search", defaultValue = "") String search,
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "option", defaultValue = "title") String option,
-            @RequestParam(value = "condition", defaultValue = "new") String condition){
-        return ResponseEntity.status(HttpStatus.OK).body(
-                postService.findByTitleOrContent(search, page, size, option, condition).getContent()
-        );
-    }
-
     @GetMapping("/find/{id}")
     @Operation(summary = "게시글 검색(ID)", description = "특정 ID의 게시글을 반환")
     public ResponseEntity<ResponsePostDTO> findById(@PathVariable Long id){

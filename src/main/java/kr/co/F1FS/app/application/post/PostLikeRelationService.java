@@ -1,13 +1,18 @@
 package kr.co.F1FS.app.application.post;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.notification.FCMLiveService;
+import kr.co.F1FS.app.application.notification.NotificationRedisService;
 import kr.co.F1FS.app.domain.model.elastic.PostDocument;
+import kr.co.F1FS.app.domain.model.rdb.FCMNotification;
 import kr.co.F1FS.app.domain.model.rdb.Post;
 import kr.co.F1FS.app.domain.model.rdb.PostLikeRelation;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.elastic.PostSearchRepository;
 import kr.co.F1FS.app.domain.repository.rdb.post.PostLikeRelationRepository;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
+import kr.co.F1FS.app.global.util.FCMUtil;
+import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +22,10 @@ public class PostLikeRelationService {
     private final PostLikeRelationRepository relationRepository;
     private final PostSearchRepository postSearchRepository;
     private final PostService postService;
+    private final FCMLiveService fcmLiveService;
+    private final NotificationRedisService redisService;
     private final CacheEvictUtil cacheEvictUtil;
+    private final FCMUtil fcmUtil;
 
     @Transactional
     public void toggle(User user, Long id){
@@ -41,6 +49,12 @@ public class PostLikeRelationService {
             relationRepository.save(relation);
             post.increaseLike();
             postDocument.increaseLikeNum();
+
+            if(redisService.isSubscribe(post.getAuthor().getId(), "like")){
+                FCMPushDTO pushDTO = fcmUtil.sendPushForLike(user);
+                FCMNotification token = fcmUtil.getAuthorToken(post.getAuthor());
+                fcmLiveService.sendPushForAuthor(pushDTO, token, id);
+            }
         }
 
         postSearchRepository.save(postDocument);

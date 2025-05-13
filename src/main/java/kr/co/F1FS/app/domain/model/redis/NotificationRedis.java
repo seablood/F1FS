@@ -15,6 +15,7 @@ public class NotificationRedis {
     private String title;
     private String content;
     private String topic;
+    private Long contentId;
     private LocalDateTime createdAt;
 
     @Builder

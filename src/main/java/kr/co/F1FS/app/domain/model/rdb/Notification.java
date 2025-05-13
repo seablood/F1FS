@@ -15,11 +15,11 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
+    @Lob
     private String content;
     private String topic;
-
+    private Long contentId;
     private LocalDateTime createdAt;
 
     @Builder
@@ -27,6 +27,7 @@ public class Notification {
         this.title = redis.getTitle();
         this.content = redis.getContent();
         this.topic = redis.getTopic();
+        this.contentId = redis.getContentId();
         this.createdAt = redis.getCreatedAt();
     }
 }

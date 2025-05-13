@@ -39,9 +39,9 @@ public class FCMGroupService {
     }
 
     @Async
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Seoul")
     public void sendPush(){
-        log.info("푸시 알림 전송 중...");
+        log.info("그룹 푸시 알림 전송 중...");
         List<FCMPushDTO> list = new ArrayList<>();
         FCMPushDTO dto;
 
@@ -61,7 +61,7 @@ public class FCMGroupService {
             }
         }
 
-        log.info("푸시 알림 전송 완료");
+        log.info("그룹 푸시 알림 전송 완료");
     }
 
     @Transactional
@@ -126,5 +126,9 @@ public class FCMGroupService {
                 .orElseThrow(() -> new IllegalArgumentException("FCM 토큰이 없습니다."));
 
         fcmNotificationRepository.delete(notification);
+    }
+
+    public AtomicLong getSequence(){
+        return this.sequence;
     }
 }

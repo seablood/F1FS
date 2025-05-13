@@ -1,7 +1,12 @@
 package kr.co.F1FS.app.application.reply;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.notification.FCMLiveService;
+import kr.co.F1FS.app.application.notification.NotificationRedisService;
 import kr.co.F1FS.app.application.post.PostService;
+import kr.co.F1FS.app.domain.model.rdb.FCMNotification;
+import kr.co.F1FS.app.global.util.FCMUtil;
+import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
 import kr.co.F1FS.app.presentation.reply.dto.CreateReplyDTO;
 import kr.co.F1FS.app.presentation.reply.dto.ModifyReplyDTO;
 import kr.co.F1FS.app.presentation.reply.dto.ResponseReplyDTO;
@@ -26,7 +31,10 @@ public class ReplyService {
     private final ReplyRepository replyRepository;
     private final ValidationService validationService;
     private final PostService postService;
+    private final FCMLiveService fcmLiveService;
+    private final NotificationRedisService redisService;
     private final CacheEvictUtil cacheEvictUtil;
+    private final FCMUtil fcmUtil;
 
     @Transactional
     public Reply save(CreateReplyDTO dto, User user, Long id){
@@ -34,6 +42,11 @@ public class ReplyService {
         Reply reply = CreateReplyDTO.toEntity(dto, post, user);
         validationService.checkValid(reply);
 
+        if(redisService.isSubscribe(post.getAuthor().getId(), "reply")){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForReply(user, reply.getContent());
+            FCMNotification token = fcmUtil.getAuthorToken(post.getAuthor());
+            fcmLiveService.sendPushForAuthor(pushDTO, token, id);
+        }
         return replyRepository.save(reply);
     }
 

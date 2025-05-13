@@ -24,8 +24,28 @@ public class NotificationRedisService {
             Long userId = Long.valueOf(obj.toString());
             redisHandler.executeOperations(() -> redisHandler.getNotificationRedisListOperations()
                     .leftPush("notification:"+userId, redis));
-            redisConfig.notificationRedisTemplate().expire("notification:"+userId, Duration.ofDays(7));
+            redisConfig.notificationRedisTemplate().expire("notification:"+userId, Duration.ofDays(3));
         }
+    }
+
+    public void saveNotificationForPersonal(NotificationRedis redis, Long userId){
+        if(redis.getTopic().equals("like")){
+            NotificationRedis likeRedis = getNotificationList(userId).stream()
+                    .filter(redis1 -> redis1.getTopic().equals("like") && redis1.getContentId().equals(redis.getContentId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if(likeRedis != null){
+                redis.setContent(redis.getContent()+"님 외 많은 분들이 게시글을 좋아합니다!");
+                deleteNotification(userId, likeRedis);
+            } else {
+                redis.setContent(redis.getContent()+"님이 게시글을 좋아합니다!");
+            }
+        }
+
+        redisHandler.executeOperations(() -> redisHandler.getNotificationRedisListOperations()
+                .leftPush("notification:"+userId, redis));
+        redisConfig.notificationRedisTemplate().expire("notification:"+userId, Duration.ofDays(3));
     }
 
     public void saveSubscribe(User user, String key){
@@ -42,7 +62,25 @@ public class NotificationRedisService {
         return redisHandler.getNotificationRedisListOperations().range(key, 0, -1);
     }
 
-    public boolean isSubscribe(User user, String topic){
-        return redisHandler.getSetOperations().isMember("topic:"+topic, user.getId());
+    public void deleteNotification(User user, NotificationRedis redis){
+        String key = "notification:"+user.getId();
+
+        redisHandler.getNotificationRedisListOperations().remove(key, 1, redis);
+    }
+
+    public boolean isSubscribe(Long userId, String topic){
+        return redisHandler.getSetOperations().isMember("topic:"+topic, userId);
+    }
+
+    public List<NotificationRedis> getNotificationList(Long userId){
+        String key = "notification:"+userId;
+
+        return redisHandler.getNotificationRedisListOperations().range(key, 0, -1);
+    }
+
+    public void deleteNotification(Long userId, NotificationRedis redis){
+        String key = "notification:"+userId;
+
+        redisHandler.getNotificationRedisListOperations().remove(key, 1, redis);
     }
 }
