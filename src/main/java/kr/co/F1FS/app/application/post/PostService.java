@@ -19,6 +19,7 @@ import kr.co.F1FS.app.application.ValidationService;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
     private final PostRepository postRepository;
     private final PostSearchService postSearchService;
@@ -46,11 +48,15 @@ public class PostService {
         postRepository.save(post);
         postSearchService.save(post);
 
-        FCMPushDTO pushDTO = fcmUtil.sendPushForPost(author, post.getTitle());
         List<FCMNotification> tokens = fcmUtil.getFollowerToken(author).stream()
-                        .filter(token -> redisService.isSubscribe(token.getUserId(), pushDTO.getTopic()))
-                        .toList();
-        fcmLiveService.sendPushForFollow(pushDTO, tokens, post.getId());
+                .filter(token -> redisService.isSubscribe(token.getUserId(), "post"))
+                .toList();
+        if(!tokens.isEmpty()){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForPost(author, post.getTitle());
+            fcmLiveService.sendPushForFollow(pushDTO, tokens, post.getId());
+            log.info("팔로워 푸시 알림 전송 완료");
+        }
+
         return postRepository.save(post);
     }
 

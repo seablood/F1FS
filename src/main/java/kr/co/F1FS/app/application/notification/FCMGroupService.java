@@ -34,8 +34,8 @@ public class FCMGroupService {
     private AtomicLong sequence = new AtomicLong(1L);
 
     @Async
-    public void addPushDTO(String topic, String title, String content){
-        QUEUE.add(new FCMPushDTO(topic, title, content));
+    public void addPushDTO(FCMPushDTO pushDTO){
+        QUEUE.add(pushDTO);
     }
 
     @Async

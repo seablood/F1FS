@@ -8,8 +8,6 @@ import kr.co.F1FS.app.domain.repository.rdb.notification.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
@@ -20,14 +18,15 @@ public class NotificationService {
 
     @Transactional
     public void saveNotification(User user, Long notificationId){
-        List<NotificationRedis> redisList = redisService.getNotificationList(user);
+        NotificationRedis redis = redisService.getNotificationList(user).stream()
+                .filter(redis1 -> notificationId.equals(redis1.getId()))
+                .findFirst()
+                .orElse(null);
 
-        for(NotificationRedis redis : redisList){
-            if(redis.getId().equals(notificationId)){
-                Notification notification = Notification.builder().redis(redis).build();
-                redisService.deleteNotification(user, redis);
-                notificationRepository.save(notification);
-            }
+        if(redis != null){
+            Notification notification = Notification.builder().redis(redis).build();
+            redisService.deleteNotification(user, redis);
+            notificationRepository.save(notification);
         }
     }
 
