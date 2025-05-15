@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -55,6 +52,13 @@ public class FCMController {
                                                      @RequestBody FCMTopicRequestDTO dto){
         fcmGroupService.unsubscribeFromTopic(dto);
         notificationService.saveUnSubscribeTopic(principalDetails.getUser(), dto.getTopic());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/token/delete")
+    @Operation(summary = "FCM 토큰 삭제", description = "DB 상에서 FCM 토큰을 삭제")
+    public ResponseEntity<Void> delete(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        fcmGroupService.deleteToken(principalDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

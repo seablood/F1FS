@@ -8,6 +8,8 @@ import kr.co.F1FS.app.domain.model.rdb.FCMNotification;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.model.redis.NotificationRedis;
 import kr.co.F1FS.app.domain.repository.rdb.fcm.FCMNotificationRepository;
+import kr.co.F1FS.app.global.util.exception.user.UserException;
+import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
 import kr.co.F1FS.app.presentation.fcm.dto.FCMTopicRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -121,11 +123,11 @@ public class FCMGroupService {
     }
 
     @Transactional
-    public void deleteToken(Long userId){
-        FCMNotification notification = fcmNotificationRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("FCM 토큰이 없습니다."));
+    public void deleteToken(User user){
+        FCMNotification fcmNotification = fcmNotificationRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
 
-        fcmNotificationRepository.delete(notification);
+        fcmNotificationRepository.delete(fcmNotification);
     }
 
     public AtomicLong getSequence(){

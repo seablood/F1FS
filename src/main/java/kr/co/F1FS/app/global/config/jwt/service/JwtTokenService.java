@@ -72,12 +72,12 @@ public class JwtTokenService {
                 .map(accessToken -> accessToken.replace(TOKEN_PREFIX, ""));
     }
 
-    // RefreshToken 추출
+    /*// RefreshToken 추출
     public Optional<String> resolveRefreshToken(HttpServletRequest request){
         return Optional.ofNullable(request.getHeader(refreshHeader))
                 .filter(refreshToken -> refreshToken.startsWith(TOKEN_PREFIX))
                 .map(refreshToken -> refreshToken.replace(TOKEN_PREFIX, ""));
-    }
+    }*/
 
     // 해당 토큰의 정보(Claim) 추출
     public Claims getClaims(String token) {

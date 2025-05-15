@@ -61,7 +61,7 @@ public class TokenFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    // 리프레시 토큰을 이용해 유저 검색 및 액세스 토큰 재발급
+    /*// 리프레시 토큰을 이용해 유저 검색 및 액세스 토큰 재발급
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken){
         userRepository.findByRefreshToken(refreshToken)
                 .ifPresent(user -> {
@@ -78,5 +78,5 @@ public class TokenFilter extends OncePerRequestFilter {
         userRepository.saveAndFlush(user);
 
         return reIssueRefreshToken;
-    }
+    }*/
 }

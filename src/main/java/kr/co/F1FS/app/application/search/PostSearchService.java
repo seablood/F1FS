@@ -14,6 +14,7 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -112,36 +113,16 @@ public class PostSearchService {
         switch (option){
             case "title" :
                 NativeQuery query = setQueryTitle(keyword);
-                SearchHits<PostDocument> hits = elasticsearchTemplate.search(query, PostDocument.class);
-                List<ResponsePostDocumentDTO> list = hits.stream()
-                        .map(hit -> hit.getContent())
-                        .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
-                        .toList();
-                return new PageImpl<>(list, pageable, hits.getTotalHits());
+                return getPageImpl(query, pageable);
             case "content" :
                 NativeQuery query2 = setQueryContent(keyword);
-                SearchHits<PostDocument> hits2 = elasticsearchTemplate.search(query2, PostDocument.class);
-                List<ResponsePostDocumentDTO> list2 = hits2.stream()
-                        .map(hit -> hit.getContent())
-                        .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
-                        .toList();
-                return new PageImpl<>(list2, pageable, hits2.getTotalHits());
+                return getPageImpl(query2, pageable);
             case "titleOrContent" :
                 NativeQuery query3 = setQueryTitleOrContent(keyword);
-                SearchHits<PostDocument> hits3 = elasticsearchTemplate.search(query3, PostDocument.class);
-                List<ResponsePostDocumentDTO> list3 = hits3.stream()
-                        .map(hit -> hit.getContent())
-                        .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
-                        .toList();
-                return new PageImpl<>(list3, pageable, hits3.getTotalHits());
+                return getPageImpl(query3, pageable);
             case "author" :
                 NativeQuery query4 = setQueryAuthor(keyword);
-                SearchHits<PostDocument> hits4 = elasticsearchTemplate.search(query4, PostDocument.class);
-                List<ResponsePostDocumentDTO> list4 = hits4.stream()
-                        .map(hit -> hit.getContent())
-                        .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
-                        .toList();
-                return new PageImpl<>(list4, pageable, hits4.getTotalHits());
+                return getPageImpl(query4, pageable);
             default:
                 throw new PostException(PostExceptionType.SEARCH_ERROR_POST);
         }
@@ -158,5 +139,44 @@ public class PostSearchService {
             default:
                 throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
         }
+    }
+
+    public Comparator<ResponsePostDocumentDTO> getComparatorFromPageable(Pageable pageable){
+        if(pageable.getSort().isEmpty()){
+            return Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt);
+        }
+
+        Sort.Order order = pageable.getSort().iterator().next();
+        String property = order.getProperty();
+        boolean ascending = order.getDirection().isAscending();
+
+        return switch (property) {
+            case "createdAt" -> ascending
+                    ? Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt)
+                    : Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt).reversed();
+            case "likeNum" -> ascending
+                    ? Comparator.comparing(ResponsePostDocumentDTO::getLikeNum)
+                    : Comparator.comparing(ResponsePostDocumentDTO::getLikeNum).reversed();
+            default -> Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt);
+        };
+    }
+
+    public PageImpl getPageImpl(NativeQuery query, Pageable pageable){
+        SearchHits<PostDocument> hits = elasticsearchTemplate.search(query, PostDocument.class);
+        List<ResponsePostDocumentDTO> list = hits.stream()
+                .map(hit -> hit.getContent())
+                .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
+                .toList();
+
+        Comparator<ResponsePostDocumentDTO> comparator = getComparatorFromPageable(pageable);
+        List<ResponsePostDocumentDTO> sorted = list.stream()
+                .sorted(comparator)
+                .toList();
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), sorted.size());
+        List<ResponsePostDocumentDTO> paged = sorted.subList(start, end);
+
+        return new PageImpl<>(paged, pageable, sorted.size());
     }
 }
