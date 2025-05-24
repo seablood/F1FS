@@ -143,12 +143,12 @@ public class PostSearchService {
 
     public Comparator<ResponsePostDocumentDTO> getComparatorFromPageable(Pageable pageable){
         if(pageable.getSort().isEmpty()){
-            return Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt);
+            return Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt); // 기본값
         }
 
-        Sort.Order order = pageable.getSort().iterator().next();
-        String property = order.getProperty();
-        boolean ascending = order.getDirection().isAscending();
+        Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
+        String property = order.getProperty(); // 정렬 필드
+        boolean ascending = order.getDirection().isAscending(); // 정렬 오름차순 여부
 
         return switch (property) {
             case "createdAt" -> ascending
@@ -157,7 +157,7 @@ public class PostSearchService {
             case "likeNum" -> ascending
                     ? Comparator.comparing(ResponsePostDocumentDTO::getLikeNum)
                     : Comparator.comparing(ResponsePostDocumentDTO::getLikeNum).reversed();
-            default -> Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt);
+            default -> Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt); // fallback
         };
     }
 

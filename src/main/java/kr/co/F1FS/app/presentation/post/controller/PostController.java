@@ -43,7 +43,7 @@ public class PostController {
     }
 
     @GetMapping("/find/{id}")
-    @Operation(summary = "게시글 검색(ID)", description = "특정 ID의 게시글을 반환")
+    @Operation(summary = "게시글 상세 페이지(ID)", description = "특정 ID의 게시글을 반환")
     public ResponseEntity<ResponsePostDTO> findById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(postService.findById(id));
     }

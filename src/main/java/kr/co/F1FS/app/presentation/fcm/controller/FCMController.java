@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.application.notification.FCMGroupService;
 import kr.co.F1FS.app.application.notification.NotificationService;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
-import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
 import kr.co.F1FS.app.presentation.fcm.dto.FCMTopicRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,14 +25,6 @@ public class FCMController {
     public ResponseEntity<Void> save(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                      @RequestBody String token){
         fcmGroupService.save(principalDetails.getUser(), token);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    @PostMapping("/push/public-notify")
-    @Operation(summary = "오피셜 공지/알림 저장", description = "오피셜 공지/알림을 작성해 저장")
-    public ResponseEntity<Void> savePublicNotify(@RequestBody FCMPushDTO pushDTO){
-        fcmGroupService.addPushDTO(pushDTO);
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

@@ -34,6 +34,22 @@ public class SlackService {
         }
     }
 
+    public void sendUserComplainMessage(String title, HashMap<String, String> data){
+        try{
+            slackClient.send(SLACK_WEBHOOK_URL, payload(p -> p
+                    .text(title)
+                    .attachments(List.of(
+                            Attachment.builder().color(Color.YELLOW.getCode())
+                                    .fields(
+                                            data.keySet().stream().map(key -> generateSlackField(key, data.get(key)))
+                                                    .toList()
+                                    ).build()
+                    ))));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public Field generateSlackField(String title, String value){
         return Field.builder()
                 .title(title)

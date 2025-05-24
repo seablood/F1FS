@@ -28,13 +28,15 @@ public class TokenFilter extends OncePerRequestFilter {
 
     private final PrincipalDetailsService detailsService;
 
-    private static final String NOT_CHECK_URL = "/login"; // /login으로 들어오는 요청 필터링 제외
+    private static final String LOGIN_CHECK_URL = "/login"; // /login으로 들어오는 요청 필터링 제외
+
+    private static final String ADMIN_LOGIN_CHECK_URL = "/admin/login"; // /admin/login으로 들어오는 요청 필터링 제외
 
     //필터 적용 시작
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getRequestURI().equals(NOT_CHECK_URL)){ // 로그인 요청 시, 해당 필터를 무시하고 다음 필터로 진행
-            log.info("일반(자체) 로그인 요청");
+        if(request.getRequestURI().equals(LOGIN_CHECK_URL) || request.getRequestURI().equals(ADMIN_LOGIN_CHECK_URL)){ // 로그인 요청 시, 해당 필터를 무시하고 다음 필터로 진행
+            log.info("일반(관리자) 로그인 요청");
             filterChain.doFilter(request, response);
             return;
         }

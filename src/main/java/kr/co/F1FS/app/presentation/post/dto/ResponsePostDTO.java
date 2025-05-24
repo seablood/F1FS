@@ -19,9 +19,10 @@ public class ResponsePostDTO {
     private Timestamp createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Timestamp updatedAt;
+    private int likeNum;
 
     public static ResponsePostDTO toDto(Post post){
         return new ResponsePostDTO(post.getTitle(), post.getContent(), post.getAuthor().getNickname(),
-                post.getCreatedAt(), post.getUpdatedAt());
+                post.getCreatedAt(), post.getUpdatedAt(), post.getLikeNum());
     }
 }

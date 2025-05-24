@@ -39,6 +39,9 @@ public class User {
     private Timestamp createDate;
     private LocalDateTime lastLoginDate;
 
+    // 유저 징계 관련 필드(정지 사유 저장 방식은 아직 구상 중)
+    private LocalDateTime suspendUntil;
+
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
@@ -46,6 +49,14 @@ public class User {
     public void updateLastLoginDate(){
         LocalDateTime now = LocalDateTime.now();
         this.lastLoginDate = now;
+    }
+
+    public void setSuspendUntil(Integer durationDays){
+        this.suspendUntil = LocalDateTime.now().plusDays(durationDays);
+    }
+
+    public boolean isSuspendUntil(){
+        return LocalDateTime.now().isBefore(suspendUntil);
     }
 
     public void updateRole(Role role){

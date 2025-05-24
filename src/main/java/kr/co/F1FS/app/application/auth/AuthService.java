@@ -155,33 +155,4 @@ public class AuthService {
         return userRepository.findByEmailAndPassword(dto.getEmail(), dto.getPassword())
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
     }
-
-    // 5분에 한번씩 만료된 인증 코드 삭제
-    @Transactional
-    @Scheduled(fixedRate = 300000)
-    public void deleteVerificationCode(){
-        log.info("만료 인증코드 삭제");
-
-        verificationCodeRepository.findAll().stream()
-                .filter(verificationCode -> verificationCode.isExpired())
-                .forEach(verificationCode -> verificationCodeRepository.delete(verificationCode));
-    }
-
-    @Transactional
-    @Scheduled(cron = "0 0 3 * * *")
-    public void markDormantAccounts(){
-        log.info("6개월 이상 비로그인 자 휴면 계정 전환");
-
-        LocalDateTime sixMonthAgo = LocalDateTime.now().minusMonths(6);
-
-        List<User> list = userRepository.findAllByLastLoginDateBeforeOrLastLoginDateIsNull(sixMonthAgo);
-
-        for (User user : list){
-            user.updateRole(Role.DORMANT);
-        }
-
-        userRepository.saveAllAndFlush(list);
-
-        log.info("휴면 전환 완료: {}명", list.size());
-    }
 }

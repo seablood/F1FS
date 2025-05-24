@@ -2,7 +2,9 @@ package kr.co.F1FS.app.presentation.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
+import kr.co.F1FS.app.presentation.user.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.presentation.user.dto.ResponseUserDTO;
 import kr.co.F1FS.app.application.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +32,13 @@ public class UserController {
     @Operation(summary = "유저 정보", description = "특정 유저의 정보를 반환")
     public ResponseEntity<ResponseUserDTO> getUserInfo(@RequestParam(value = "nickname") String nickname){
         return ResponseEntity.status(HttpStatus.OK).body(userService.findByNickname(nickname));
+    }
+
+    @PostMapping("/user-complain")
+    @Operation(summary = "유저 신고", description = "특정 유저를 신고")
+    public ResponseEntity<Void> userComplain(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                             @Valid @RequestBody CreateUserComplainDTO dto){
+        userService.userComplain(principalDetails.getUser(), dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

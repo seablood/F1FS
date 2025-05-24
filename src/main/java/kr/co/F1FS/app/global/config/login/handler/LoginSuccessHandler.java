@@ -8,6 +8,8 @@ import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
 import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.util.CookieUtil;
+import kr.co.F1FS.app.global.util.exception.user.UserException;
+import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         User user = userRepository.findByUsername(getUsername(authentication))
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
         String accessToken = jwtTokenService.createToken(user, ACCESS_DURATION);
         String refreshToken = jwtTokenService.createToken(user, REFRESH_DURATION);
 
@@ -61,7 +63,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     public String getUsername(Authentication authentication){
-        PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
+        User principalDetails = (User) authentication.getPrincipal();
 
         return principalDetails.getUsername();
     }

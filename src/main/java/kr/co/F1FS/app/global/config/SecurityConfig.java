@@ -1,12 +1,16 @@
 package kr.co.F1FS.app.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.F1FS.app.global.config.admin.filter.AdminJsonUsernamePasswordAuthenticationFilter;
+import kr.co.F1FS.app.global.config.admin.handler.AdminLoginFailureHandler;
+import kr.co.F1FS.app.global.config.admin.handler.AdminLoginSuccessHandler;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.config.jwt.filter.TokenFilter;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.global.config.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import kr.co.F1FS.app.global.config.login.handler.LoginFailureHandler;
 import kr.co.F1FS.app.global.config.login.handler.LoginSuccessHandler;
+import kr.co.F1FS.app.global.config.login.provider.CustomAuthenticationProvider;
 import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2FailureHandler;
 import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.global.config.oauth2.service.CustomOAuth2UserService;
@@ -41,6 +45,7 @@ public class SecurityConfig {
     private final JwtTokenService jwtTokenService;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
+    private final CustomAuthenticationProvider customAuthenticationProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -105,7 +110,8 @@ public class SecurityConfig {
 
         // 자체 필터 시큐리티 필터에 추가
         http.addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
-        http.addFilterBefore(tokenFilter(), CustomJsonUsernamePasswordAuthenticationFilter.class);
+        http.addFilterAfter(adminJsonUsernamePasswordAuthenticationFilter(), LogoutFilter.class);
+        http.addFilterBefore(tokenFilter(), AdminJsonUsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -118,6 +124,10 @@ public class SecurityConfig {
         return new ProviderManager(provider);
     }
 
+    @Bean AuthenticationManager customAuthenticationManager(){
+        return new ProviderManager(customAuthenticationProvider);
+    }
+
     @Bean
     public LoginSuccessHandler loginSuccessHandler(){
         return new LoginSuccessHandler(jwtTokenService, userRepository, redisConfig);
@@ -125,16 +135,36 @@ public class SecurityConfig {
 
     @Bean
     public LoginFailureHandler loginFailureHandler(){
-        return new LoginFailureHandler(redisConfig, redisHandler);
+        return new LoginFailureHandler(redisConfig, redisHandler, objectMapper);
+    }
+
+    @Bean
+    public AdminLoginSuccessHandler adminLoginSuccessHandler(){
+        return new AdminLoginSuccessHandler(jwtTokenService, userRepository, redisConfig);
+    }
+
+    @Bean
+    public AdminLoginFailureHandler adminLoginFailureHandler(){
+        return new AdminLoginFailureHandler(redisConfig, redisHandler);
     }
 
     @Bean
     public CustomJsonUsernamePasswordAuthenticationFilter customJsonUsernamePasswordAuthenticationFilter(){
         CustomJsonUsernamePasswordAuthenticationFilter filter = new CustomJsonUsernamePasswordAuthenticationFilter(
                 objectMapper);
-        filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationManager(customAuthenticationManager());
         filter.setAuthenticationSuccessHandler(loginSuccessHandler());
         filter.setAuthenticationFailureHandler(loginFailureHandler());
+        return filter;
+    }
+
+    @Bean
+    public AdminJsonUsernamePasswordAuthenticationFilter adminJsonUsernamePasswordAuthenticationFilter(){
+        AdminJsonUsernamePasswordAuthenticationFilter filter = new AdminJsonUsernamePasswordAuthenticationFilter(
+                objectMapper);
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setAuthenticationSuccessHandler(adminLoginSuccessHandler());
+        filter.setAuthenticationFailureHandler(adminLoginFailureHandler());
         return filter;
     }
 
