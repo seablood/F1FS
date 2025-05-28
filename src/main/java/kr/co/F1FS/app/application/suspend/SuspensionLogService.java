@@ -22,4 +22,11 @@ public class SuspensionLogService {
 
         return ResponseSuspensionLogDTO.toDto(log);
     }
+
+    public void deleteSuspensionLog(User user){
+        SuspensionLog log = suspensionLogRepository.findBySuspendUser(user)
+                .orElseThrow(() -> new IllegalArgumentException("징계 이력이 없습니다."));
+
+        suspensionLogRepository.delete(log);
+    }
 }

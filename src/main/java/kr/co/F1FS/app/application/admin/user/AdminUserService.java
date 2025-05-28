@@ -44,6 +44,7 @@ public class AdminUserService {
         User suspendUser = userService.findByNicknameNotDTO(dto.getNickname());
         suspendUser.setSuspendUntil(dto.getDurationDays());
         suspendUser.updateRole(Role.DISCIPLINE);
+        suspendUser.updateSuspendNum();
 
         SuspensionLog log = SuspensionLog.builder()
                         .suspendUser(suspendUser)

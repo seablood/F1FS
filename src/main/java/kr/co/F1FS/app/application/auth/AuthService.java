@@ -139,6 +139,19 @@ public class AuthService {
         }
     }
 
+    @Transactional
+    public void secession(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response,
+                          User user){
+        try {
+            setBlackList(accessToken);
+            setBlackList(refreshToken);
+            CookieUtil.deleteCookie(request, response, "refresh_token");
+            userRepository.delete(user);
+        } catch (Exception e) {
+            throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);
+        }
+    }
+
     public void setBlackList(String token){
         Claims claims = jwtTokenService.getClaims(token);
 

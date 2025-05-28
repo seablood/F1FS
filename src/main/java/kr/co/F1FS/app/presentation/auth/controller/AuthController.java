@@ -66,4 +66,20 @@ public class AuthController {
 
         return ResponseEntity.ok("로그아웃 완료");
     }
+
+    @DeleteMapping("/secession")
+    @Operation(summary = "회원 탈퇴", description = "화원 탈퇴 및 토큰 블랙리스트 추가")
+    public ResponseEntity<String> secession(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                            HttpServletRequest request, HttpServletResponse response){
+        String accessToken = jwtTokenService.resolveAccessToken(request)
+                .orElse(null);
+        String refreshToken = CookieUtil.getCookie(request, "refresh_token");
+
+        if(accessToken == null || refreshToken == null)
+            throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);
+
+        authService.secession(accessToken, refreshToken, request, response, principalDetails.getUser());
+
+        return ResponseEntity.ok("회원 탈퇴 완료");
+    }
 }

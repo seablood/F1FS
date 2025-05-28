@@ -39,8 +39,9 @@ public class User {
     private Timestamp createDate;
     private LocalDateTime lastLoginDate;
 
-    // 유저 징계 관련 필드(정지 사유 저장 방식은 아직 구상 중)
+    // 유저 징계 관련 필드
     private LocalDateTime suspendUntil;
+    private Integer suspendNum;
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
@@ -67,12 +68,20 @@ public class User {
         this.password = password;
     }
 
+    public void updateNickname(String nickname){
+        this.nickname = nickname;
+    }
+
     public void changeFollowerNum(int i){
         this.followerNum +=i;
     }
 
     public void changeFollowingNum(int i){
         this.followingNum +=i;
+    }
+
+    public void updateSuspendNum(){
+        this.suspendNum += 1;
     }
 
     @Builder
@@ -85,5 +94,6 @@ public class User {
         this.provider = provider;
         this.followerNum = 0;
         this.followingNum = 0;
+        this.suspendNum = 0;
     }
 }

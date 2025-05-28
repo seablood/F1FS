@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.presentation.user.dto.CreateUserComplainDTO;
+import kr.co.F1FS.app.presentation.user.dto.ModifyNicknameDTO;
 import kr.co.F1FS.app.presentation.user.dto.ResponseUserDTO;
 import kr.co.F1FS.app.application.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +41,12 @@ public class UserController {
                                              @Valid @RequestBody CreateUserComplainDTO dto){
         userService.userComplain(principalDetails.getUser(), dto);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/modify-nickname")
+    @Operation(summary = "유저 닉네임 변경", description = "로그인한 유저의 닉네임 변경")
+    public ResponseEntity<ResponseUserDTO> modify(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                  @Valid @RequestBody ModifyNicknameDTO dto){
+        return ResponseEntity.status(HttpStatus.OK).body(userService.modify(principalDetails.getUser(), dto));
     }
 }

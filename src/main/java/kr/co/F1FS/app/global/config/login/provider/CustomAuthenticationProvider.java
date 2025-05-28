@@ -49,12 +49,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
+            ResponseSuspensionLogDTO dto = logService.getSuspensionLog(principalDetails.getUser());
+
             if(principalDetails.getUser().isSuspendUntil()) {
-                ResponseSuspensionLogDTO dto = logService.getSuspensionLog(principalDetails.getUser());
                 throw new AccountSuspendException("이용이 정지된 계정입니다.", dto);
             }
             else {
                 principalDetails.getUser().updateRole(Role.USER);
+                logService.deleteSuspensionLog(principalDetails.getUser());
                 userRepository.saveAndFlush(principalDetails.getUser());
             }
         }

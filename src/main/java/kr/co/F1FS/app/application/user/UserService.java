@@ -5,6 +5,7 @@ import kr.co.F1FS.app.application.SlackService;
 import kr.co.F1FS.app.application.complain.user.UserComplainService;
 import kr.co.F1FS.app.domain.model.rdb.UserComplain;
 import kr.co.F1FS.app.presentation.user.dto.CreateUserComplainDTO;
+import kr.co.F1FS.app.presentation.user.dto.ModifyNicknameDTO;
 import kr.co.F1FS.app.presentation.user.dto.ResponseUserDTO;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
@@ -56,6 +57,13 @@ public class UserService {
     public User findByUsernameNotDTO(String username){
         return userRepository.findByUsername(username)
                 .orElse(null);
+    }
+
+    @Transactional
+    public ResponseUserDTO modify(User user, ModifyNicknameDTO dto){
+        user.updateNickname(dto.getNewNickname());
+        userRepository.saveAndFlush(user);
+        return ResponseUserDTO.toDto(user);
     }
 
     public void sendMessage(UserComplain complain){
