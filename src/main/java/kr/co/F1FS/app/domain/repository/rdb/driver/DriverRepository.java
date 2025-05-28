@@ -12,6 +12,5 @@ import java.util.Optional;
 @Repository
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     Optional<Driver> findByNumber(Integer number);
-    Page<Driver> findAllByRacingClass(RacingClass racingClass, Pageable pageable);
-    Page<Driver> findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(String name, String engName, Pageable pageable);
+    Page<Driver> findAll(Pageable pageable);
 }

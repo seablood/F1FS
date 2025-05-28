@@ -2,15 +2,11 @@ package kr.co.F1FS.app.global.config.login.provider;
 
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.application.suspend.SuspensionLogService;
-import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.util.Role;
-import kr.co.F1FS.app.global.util.exception.authentication.AccountPasswordException;
-import kr.co.F1FS.app.global.util.exception.authentication.AccountSuspendException;
-import kr.co.F1FS.app.global.util.exception.user.UserException;
-import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
+import kr.co.F1FS.app.global.util.exception.authentication.*;
 import kr.co.F1FS.app.presentation.suspend.dto.ResponseSuspensionLogDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -34,26 +30,36 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String rawPassword = authentication.getCredentials().toString();
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
         PrincipalDetails principalDetails = (PrincipalDetails) detailsService.loadUserByUsername(username);
 
-        if(!passwordEncoder.matches(rawPassword, user.getPassword())){
+        if(!passwordEncoder.matches(rawPassword, principalDetails.getPassword())){
             throw new AccountPasswordException("패스워드가 일치하지 않습니다. 다시 로그인해주세요.");
         }
 
-        if(user.getRole().equals(Role.DISCIPLINE)){
-            if(user.isSuspendUntil()) {
-                ResponseSuspensionLogDTO dto = logService.getSuspensionLog(user);
+        if(!principalDetails.isAccountNonExpired()){
+            throw new AccountDormantException("휴면으로 전환된 계정입니다. 인증 절차를 진행해주세요.");
+        }
+
+        if(!principalDetails.isEnabled()){
+            throw new AccountTemporaryException("계정 인증이 완료되지 않았습니다. 인증 절차를 완료해주세요.");
+        }
+
+        if(!principalDetails.isAccountNonLocked()){
+            throw new AccountLockedException("로그인 시도 횟 초과로 계정이 잠겨 있습니다. 5분 후 다시 시도해주세요.");
+        }
+
+        if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
+            if(principalDetails.getUser().isSuspendUntil()) {
+                ResponseSuspensionLogDTO dto = logService.getSuspensionLog(principalDetails.getUser());
                 throw new AccountSuspendException("이용이 정지된 계정입니다.", dto);
             }
             else {
-                user.updateRole(Role.USER);
-                userRepository.saveAndFlush(user);
+                principalDetails.getUser().updateRole(Role.USER);
+                userRepository.saveAndFlush(principalDetails.getUser());
             }
         }
 
-        return new UsernamePasswordAuthenticationToken(user, null,
+        return new UsernamePasswordAuthenticationToken(principalDetails.getUser(), null,
                 principalDetails.getAuthorities());
     }
 

@@ -7,12 +7,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ResponseUserComplainDTO {
+    private Long id;
     private String toUserNickname;
     private String fromUserNickname;
     private String description;
+    private String paraphrase;
 
     public static ResponseUserComplainDTO toDto(UserComplain complain){
-        return new ResponseUserComplainDTO(complain.getToUser().getNickname(), complain.getFromUser().getNickname(),
-                complain.getDescription());
+        return new ResponseUserComplainDTO(complain.getId(), complain.getToUser().getNickname(),
+                complain.getFromUser().getNickname(), complain.getDescription(), complain.getParaphrase());
     }
 }

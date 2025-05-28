@@ -16,7 +16,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 public class EmailService {
     private final EmailProperties emailProperties;
     private final SpringTemplateEngine springTemplateEngine;
-    private final EmailAsyncService emailAsyncService;
+    private final EmailSendService emailSendService;
 
     // 계정 생성 인증 메일
     public void sendCreateAccountEmail(User user, String code){
@@ -71,7 +71,7 @@ public class EmailService {
     public void sendEmail(EmailDTO emailDTO, User user){
         try{
             String emailContext = getContext(emailDTO, user.getNickname());
-            emailAsyncService.addEmail(emailDTO.getTo(), emailDTO.getSubject(), emailContext, emailDTO.getEmailType());
+            emailSendService.addEmail(emailDTO.getTo(), emailDTO.getSubject(), emailContext, emailDTO.getEmailType());
         } catch (Exception e){
             throw new EmailException(EmailExceptionType.SEND_EMAIL_ERROR);
         }

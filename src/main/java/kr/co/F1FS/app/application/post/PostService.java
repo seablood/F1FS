@@ -1,15 +1,16 @@
 package kr.co.F1FS.app.application.post;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.SlackService;
+import kr.co.F1FS.app.application.complain.post.PostComplainService;
 import kr.co.F1FS.app.application.notification.FCMLiveService;
 import kr.co.F1FS.app.application.notification.NotificationRedisService;
 import kr.co.F1FS.app.application.search.PostSearchService;
 import kr.co.F1FS.app.domain.model.rdb.FCMNotification;
+import kr.co.F1FS.app.domain.model.rdb.PostComplain;
 import kr.co.F1FS.app.global.util.FCMUtil;
 import kr.co.F1FS.app.presentation.fcm.dto.FCMPushDTO;
-import kr.co.F1FS.app.presentation.post.dto.CreatePostDTO;
-import kr.co.F1FS.app.presentation.post.dto.ModifyPostDTO;
-import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
+import kr.co.F1FS.app.presentation.post.dto.*;
 import kr.co.F1FS.app.domain.model.rdb.Post;
 import kr.co.F1FS.app.domain.model.rdb.User;
 import kr.co.F1FS.app.domain.repository.rdb.post.PostRepository;
@@ -27,7 +28,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,8 @@ public class PostService {
     private final ValidationService validationService;
     private final FCMLiveService fcmLiveService;
     private final NotificationRedisService redisService;
+    private final PostComplainService complainService;
+    private final SlackService slackService;
     private final CacheEvictUtil cacheEvictUtil;
     private final FCMUtil fcmUtil;
 
@@ -60,10 +65,25 @@ public class PostService {
         return postRepository.save(post);
     }
 
-    public Page<ResponsePostDTO> findAll(int page, int size, String condition){
+    @Transactional
+    public void postComplain(Long id, User user, CreatePostComplainDTO dto){
+        Post post = findByIdNotDTO(id);
+        PostComplain complain = PostComplain.builder()
+                .toPost(post)
+                .fromUser(user)
+                .description(dto.getDescription())
+                .paraphrase(dto.getParaphrase())
+                .build();
+
+        complainService.save(complain);
+        sendMessage(complain);
+        log.info("게시글 신고 완료 : {}", post.getTitle());
+    }
+
+    public Page<ResponseSimplePostDTO> findAll(int page, int size, String condition){
         Pageable pageable = conditionSwitch(page, size, condition);
 
-        return postRepository.findAll(pageable).map(post -> ResponsePostDTO.toDto(post));
+        return postRepository.findAll(pageable).map(post -> ResponseSimplePostDTO.toDto(post));
     }
 
 
@@ -117,5 +137,15 @@ public class PostService {
             default:
                 throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
         }
+    }
+
+    public void sendMessage(PostComplain complain){
+        String title = "게시글 신고가 접수되었습니다.";
+        HashMap<String, String> data = new HashMap<>();
+        data.put("신고자", complain.getFromUser().getNickname());
+        data.put("신고된 게시글", complain.getToPost().getTitle());
+        data.put("신고 사유", complain.getDescription());
+
+        slackService.sendComplainMessage(title, data);
     }
 }

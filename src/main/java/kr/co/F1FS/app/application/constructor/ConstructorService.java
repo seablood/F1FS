@@ -8,15 +8,16 @@ import kr.co.F1FS.app.domain.model.rdb.SinceDebut;
 import kr.co.F1FS.app.domain.repository.rdb.constructor.ConstructorRepository;
 import kr.co.F1FS.app.domain.repository.rdb.record.CurrentSeasonRepository;
 import kr.co.F1FS.app.domain.repository.rdb.record.SinceDebutRepository;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
 import kr.co.F1FS.app.presentation.constructor.dto.CombinedConstructorRequest;
 import kr.co.F1FS.app.presentation.constructor.dto.CreateConstructorDTO;
 import kr.co.F1FS.app.presentation.constructor.dto.ResponseConstructorDTO;
-import kr.co.F1FS.app.presentation.constructor.dto.ResponseSimpleConstructorDTO;
+import kr.co.F1FS.app.presentation.constructor.dto.SimpleResponseConstructorDTO;
 import kr.co.F1FS.app.presentation.record.dto.CreateCurrentSeasonDTO;
 import kr.co.F1FS.app.presentation.record.dto.CreateSinceDebutDTO;
 import kr.co.F1FS.app.presentation.record.dto.ResponseCurrentSeasonDTO;
 import kr.co.F1FS.app.presentation.record.dto.ResponseSinceDebutDTO;
-import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,12 @@ public class ConstructorService {
         return constructorRepository.save(constructor);
     }
 
+    public Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition){
+        Pageable pageable = switchCondition(page, size, condition);
+
+        return constructorRepository.findAll(pageable).map(constructor -> SimpleResponseConstructorDTO.toDto(constructor));
+    }
+
     @Cacheable(value = "ConstructorDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseConstructorDTO findById(Long id){
         Constructor constructor = constructorRepository.findById(id)
@@ -64,24 +71,10 @@ public class ConstructorService {
         return ResponseConstructorDTO.toDto(constructor, getDrivers(constructor), currentSeasonDTO, sinceDebutDTO);
     }
 
-    public Page<ResponseSimpleConstructorDTO> findByNameList(String search, int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
-        return constructorRepository.findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(search, search, pageable)
-                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor));
-    }
-
     @Cacheable(value = "Constructor", key = "#id", cacheManager = "redisLongCacheManager")
     public Constructor findByIdNotDTO(Long id){
         return constructorRepository.findById(id)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
-    }
-
-    public Page<ResponseSimpleConstructorDTO> findByRacingClass(String findClass, int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
-        RacingClass racingClass = RacingClass.valueOf(findClass);
-
-        return constructorRepository.findAllByRacingClass(racingClass, pageable)
-                .map(constructor -> ResponseSimpleConstructorDTO.toDto(constructor));
     }
 
     @Cacheable(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager")
@@ -89,5 +82,18 @@ public class ConstructorService {
         return constructor.getDrivers().stream()
                 .map((relation) -> relation.getDriver().getName())
                 .toList();
+    }
+
+    public Pageable switchCondition(int page, int size, String condition){
+        switch (condition){
+            case "nameASC" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "korName"));
+            case "nameDESC" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "korName"));
+            case "racingClass" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "racingClass"));
+            default:
+                throw new CDSearchException(CDSearchExceptionType.CONDITION_ERROR_CD);
+        }
     }
 }

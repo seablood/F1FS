@@ -32,6 +32,18 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
+    @GetMapping("/complain/{search}")
+    @Operation(summary = "유저 신고 이력", description = "특정 유저의 신고 당한 이력 반환")
+    public ResponseEntity<List<ResponseUserComplainDTO>> findComplainByUser(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "condition", defaultValue = "new") String condition,
+            @PathVariable String search
+    ){
+        Page<ResponseUserComplainDTO> newPage = adminUserService.getComplainByUser(page, size, condition, search);
+        return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
     @PutMapping("/suspend")
     @Operation(summary = "유저 징계", description = "신고가 접수된 유저를 징계 부여")
     public ResponseEntity<Void> suspendUser(@Valid @RequestBody SuspendRequestDTO dto){

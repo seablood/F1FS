@@ -25,7 +25,7 @@ public class PostSearchController {
     @Operation(summary = "게시글 검색", description = "제목, 내용, 작성자를 통해 게시 검색")
     public ResponseEntity<List<ResponsePostDocumentDTO>> pageSearch(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                     @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                    @RequestParam(value = "condition", defaultValue = "nameASC") String condition,
+                                                                    @RequestParam(value = "condition", defaultValue = "new") String condition,
                                                                     @RequestParam(value = "option", defaultValue = "title") String option,
                                                                     @RequestParam(value = "search") String search){
         return ResponseEntity.status(HttpStatus.OK).body(postSearchService.getPostList(

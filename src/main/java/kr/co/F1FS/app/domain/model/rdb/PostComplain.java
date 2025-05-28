@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(name = "user_complain")
-public class UserComplain {
+@Table(name = "post_complain")
+public class PostComplain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name = "to_user_id")
+    @JoinColumn(name = "to_post_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private User toUser;
+    private Post toPost;
     @ManyToOne
     @JoinColumn(name = "from_user_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
@@ -37,8 +37,8 @@ public class UserComplain {
     private LocalDateTime createdAt;
 
     @Builder
-    public UserComplain(User toUser, User fromUser, String description, String paraphrase){
-        this.toUser = toUser;
+    public PostComplain(Post toPost, User fromUser, String description, String paraphrase){
+        this.toPost = toPost;
         this.fromUser = fromUser;
         this.description = description;
         this.paraphrase = paraphrase;

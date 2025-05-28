@@ -3,6 +3,7 @@ package kr.co.F1FS.app.presentation.admin.post.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.application.admin.post.AdminPostService;
+import kr.co.F1FS.app.presentation.admin.post.dto.ResponsePostComplainDTO;
 import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,15 @@ public class AdminPostController {
                                                                @RequestParam(value = "nickname", defaultValue = "") String nickname){
         return ResponseEntity.status(HttpStatus.OK).body(adminPostService.getPostByUser(
                 page, size, condition, nickname).getContent());
+    }
+
+    @GetMapping("/post-complain-list")
+    @Operation(summary = "게시글 신고 목록", description = "게시글 신고 목록 반환")
+    public ResponseEntity<List<ResponsePostComplainDTO>> findAllByComplain(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                           @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                           @RequestParam(value = "condition", defaultValue = "new") String condition){
+        return ResponseEntity.status(HttpStatus.OK).body(adminPostService.getAllComplain(
+                page, size, condition).getContent());
     }
 
     @DeleteMapping("/delete/{id}")

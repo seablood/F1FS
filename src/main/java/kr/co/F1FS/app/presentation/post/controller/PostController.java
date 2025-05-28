@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
-import kr.co.F1FS.app.presentation.post.dto.CreatePostDTO;
-import kr.co.F1FS.app.presentation.post.dto.ModifyPostDTO;
-import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
+import kr.co.F1FS.app.presentation.post.dto.*;
 import kr.co.F1FS.app.domain.model.rdb.Post;
 import kr.co.F1FS.app.application.post.PostService;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +31,21 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
+    @PostMapping("/post-complain/{id}")
+    @Operation(summary = "게시글 신고", description = "특정 게시글을 신고")
+    public ResponseEntity<Void> postComplain(@RequestBody @Valid CreatePostComplainDTO dto,
+                                             @AuthenticationPrincipal PrincipalDetails principalDetails,
+                                             @PathVariable Long id){
+        postService.postComplain(id, principalDetails.getUser(), dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping("/find-all")
     @Operation(summary = "모든 게시글 검색(정렬 포함)", description = "존재하는 모든 게시글을 반환")
-    public ResponseEntity<List<ResponsePostDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                         @RequestParam(value = "size", defaultValue = "10") int size,
-                                                         @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<ResponsePostDTO> newPage = postService.findAll(page, size, condition);
+    public ResponseEntity<List<ResponseSimplePostDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                               @RequestParam(value = "size", defaultValue = "10") int size,
+                                                               @RequestParam(value = "condition", defaultValue = "new") String condition){
+        Page<ResponseSimplePostDTO> newPage = postService.findAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 

@@ -3,7 +3,6 @@ package kr.co.F1FS.app.presentation.driver.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.presentation.driver.dto.ResponseDriverDTO;
-import kr.co.F1FS.app.presentation.driver.dto.ResponseSimpleDriverDTO;
 import kr.co.F1FS.app.application.driver.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,14 +23,5 @@ public class DriverController {
     public ResponseEntity<ResponseDriverDTO> findById(@RequestParam Long id){
         ResponseDriverDTO driverDTO = driverService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(driverDTO);
-    }
-
-    @GetMapping("/find/class")
-    @Operation(summary = "드라이버 검색(RacingClass)", description = "특정 클래스에 속한 드라이버들을 검색한다.")
-    public ResponseEntity<List<ResponseSimpleDriverDTO>> findByRacingClass(@RequestParam String racingClass,
-                                                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                           @RequestParam(value = "size", defaultValue = "10") int size){
-        return ResponseEntity.status(HttpStatus.OK).body(driverService.findByRacingClass(racingClass, page, size)
-                .getContent());
     }
 }

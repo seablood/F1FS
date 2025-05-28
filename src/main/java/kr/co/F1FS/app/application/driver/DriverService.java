@@ -10,10 +10,9 @@ import kr.co.F1FS.app.domain.repository.rdb.constructor.ConstructorRepository;
 import kr.co.F1FS.app.domain.repository.rdb.driver.DriverRepository;
 import kr.co.F1FS.app.domain.repository.rdb.record.CurrentSeasonRepository;
 import kr.co.F1FS.app.domain.repository.rdb.record.SinceDebutRepository;
-import kr.co.F1FS.app.presentation.driver.dto.CombinedDriverRequest;
-import kr.co.F1FS.app.presentation.driver.dto.CreateDriverDTO;
-import kr.co.F1FS.app.presentation.driver.dto.ResponseDriverDTO;
-import kr.co.F1FS.app.presentation.driver.dto.ResponseSimpleDriverDTO;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
+import kr.co.F1FS.app.presentation.driver.dto.*;
 import kr.co.F1FS.app.presentation.record.dto.CreateCurrentSeasonDTO;
 import kr.co.F1FS.app.presentation.record.dto.CreateSinceDebutDTO;
 import kr.co.F1FS.app.presentation.record.dto.ResponseCurrentSeasonDTO;
@@ -68,6 +67,12 @@ public class DriverService {
         return driverRepository.save(driver);
     }
 
+    public Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition){
+        Pageable pageable = switchCondition(page, size, condition);
+
+        return driverRepository.findAll(pageable).map(driver -> SimpleResponseDriverDTO.toDto(driver));
+    }
+
     @Cacheable(value = "DriverDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseDriverDTO findById(Long id){
         Driver driver = findByIdNotDTO(id);
@@ -82,15 +87,6 @@ public class DriverService {
         return driverRepository.findById(id)
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
-
-    public Page<ResponseSimpleDriverDTO> findByRacingClass(String findClass, int page, int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
-        RacingClass racingClass= RacingClass.valueOf(findClass);
-
-        return driverRepository.findAllByRacingClass(racingClass, pageable)
-                .map(driver -> ResponseSimpleDriverDTO.toDto(driver));
-    }
-
 
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
@@ -109,5 +105,18 @@ public class DriverService {
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_DEBUT_ERROR)).getSinceDebut());
 
         return sinceDebutDTO;
+    }
+
+    public Pageable switchCondition(int page, int size, String condition){
+        switch (condition){
+            case "nameASC" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "name"));
+            case "nameDESC" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "name"));
+            case "racingClass" :
+                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "racingClass"));
+            default:
+                throw new CDSearchException(CDSearchExceptionType.CONDITION_ERROR_CD);
+        }
     }
 }

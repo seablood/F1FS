@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.application.admin.user;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.complain.user.UserComplainService;
+import kr.co.F1FS.app.application.suspend.SuspensionLogService;
 import kr.co.F1FS.app.application.user.UserService;
 import kr.co.F1FS.app.domain.model.rdb.SuspensionLog;
 import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.domain.repository.rdb.suspend.SuspensionLogRepository;
-import kr.co.F1FS.app.domain.repository.rdb.user.UserComplainRepository;
 import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
 import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.presentation.admin.user.dto.ResponseUserComplainDTO;
@@ -21,14 +21,22 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminUserService {
     private final UserService userService;
+    private final SuspensionLogService suspensionLogService;
+    private final UserComplainService complainService;
     private final UserRepository userRepository;
-    private final SuspensionLogRepository suspensionLogRepository;
-    private final UserComplainRepository complainRepository;
 
     public Page<ResponseUserComplainDTO> findAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
-        return complainRepository.findAll(pageable).map(complain -> ResponseUserComplainDTO.toDto(complain));
+        return complainService.findAll(pageable);
+    }
+
+    public Page<ResponseUserComplainDTO> getComplainByUser(int page, int size, String condition, String search){
+        Pageable pageable = switchCondition(page, size, condition);
+        User toUser = userService.findByUsernameNotDTO(search);
+        if(toUser == null) toUser = userService.findByNicknameNotDTO(search);
+
+        return complainService.getComplainByUser(toUser, pageable);
     }
 
     @Transactional
@@ -44,8 +52,9 @@ public class AdminUserService {
                         .description(dto.getDescription())
                         .paraphrase(dto.getParaphrase())
                         .build();
-        suspensionLogRepository.save(log);
+        suspensionLogService.save(log);
 
+        complainService.deleteComplainByUser(suspendUser);
         userRepository.saveAndFlush(suspendUser);
     }
 

@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponsePostDocumentDTO {
-    private String title;
+    private Long id;
 
-    private String content;
+    private String title;
 
     private String author;
 
@@ -21,7 +21,7 @@ public class ResponsePostDocumentDTO {
     private int likeNum;
 
     public static ResponsePostDocumentDTO toDto(PostDocument postDocument){
-        return new ResponsePostDocumentDTO(postDocument.getTitle(), postDocument.getContent(), postDocument.getAuthor(),
+        return new ResponsePostDocumentDTO(postDocument.getId(), postDocument.getTitle(), postDocument.getAuthor(),
                 TimeUtil.formatPostTime(postDocument.getCreatedAt()), postDocument.getLikeNum());
     }
 }

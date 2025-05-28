@@ -23,13 +23,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmailAsyncService {
+public class EmailSendService {
     @Value("${spring.mail.username}")
     private String from;
 
     private final JavaMailSender javaMailSender;
     private static final BlockingQueue<EmailQueueMemory> QUEUE = new LinkedBlockingQueue<>();
-    private static final int MAX_SIZE = 10;
+    private static final int MAX = 10;
 
     @Async
     public void addEmail(String to, String subject, String content, EmailType emailType) throws MessagingException{
@@ -37,7 +37,7 @@ public class EmailAsyncService {
     }
 
     @Async
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 5000)
     public void pickSendingEmail(){
         try{
             List<EmailQueueMemory> list = new ArrayList<>();
@@ -47,7 +47,7 @@ public class EmailAsyncService {
                 memory = QUEUE.poll();
                 list.add(memory);
 
-                if(list.size() >= MAX_SIZE){
+                if(list.size() >= MAX){
                     sendEmailList(list);
                     list.clear();
                 }

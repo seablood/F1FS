@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 public class SuspensionLogService {
     private final SuspensionLogRepository suspensionLogRepository;
 
+    public void save(SuspensionLog log){
+        suspensionLogRepository.save(log);
+    }
+
     public ResponseSuspensionLogDTO getSuspensionLog(User user){
         SuspensionLog log = suspensionLogRepository.findBySuspendUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("징계 이력이 없습니다."));

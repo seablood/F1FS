@@ -141,9 +141,9 @@ public class PostSearchService {
         }
     }
 
-    public Comparator<ResponsePostDocumentDTO> getComparatorFromPageable(Pageable pageable){
+    public Comparator<PostDocument> getComparatorFromPageable(Pageable pageable){
         if(pageable.getSort().isEmpty()){
-            return Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt); // 기본값
+            return Comparator.comparing(PostDocument::getCreatedAt); // 기본값
         }
 
         Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
@@ -152,25 +152,25 @@ public class PostSearchService {
 
         return switch (property) {
             case "createdAt" -> ascending
-                    ? Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt)
-                    : Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt).reversed();
+                    ? Comparator.comparing(PostDocument::getCreatedAt)
+                    : Comparator.comparing(PostDocument::getCreatedAt).reversed();
             case "likeNum" -> ascending
-                    ? Comparator.comparing(ResponsePostDocumentDTO::getLikeNum)
-                    : Comparator.comparing(ResponsePostDocumentDTO::getLikeNum).reversed();
-            default -> Comparator.comparing(ResponsePostDocumentDTO::getCreatedAt); // fallback
+                    ? Comparator.comparing(PostDocument::getLikeNum)
+                    : Comparator.comparing(PostDocument::getLikeNum).reversed();
+            default -> Comparator.comparing(PostDocument::getCreatedAt); // fallback
         };
     }
 
     public PageImpl getPageImpl(NativeQuery query, Pageable pageable){
         SearchHits<PostDocument> hits = elasticsearchTemplate.search(query, PostDocument.class);
-        List<ResponsePostDocumentDTO> list = hits.stream()
+        List<PostDocument> list = hits.stream()
                 .map(hit -> hit.getContent())
-                .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
                 .toList();
 
-        Comparator<ResponsePostDocumentDTO> comparator = getComparatorFromPageable(pageable);
+        Comparator<PostDocument> comparator = getComparatorFromPageable(pageable);
         List<ResponsePostDocumentDTO> sorted = list.stream()
                 .sorted(comparator)
+                .map(postDocument -> ResponsePostDocumentDTO.toDto(postDocument))
                 .toList();
 
         int start = (int) pageable.getOffset();

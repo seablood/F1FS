@@ -7,10 +7,16 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class SimpleResponseConstructorDTO {
-    private String name;
+    private Long id;
+
+    private String korName;
+
     private String engName;
 
+    private String racingClass;
+
     public static SimpleResponseConstructorDTO toDto(Constructor constructor){
-        return new SimpleResponseConstructorDTO(constructor.getName(), constructor.getEngName());
+        return new SimpleResponseConstructorDTO(constructor.getId(), constructor.getName(), constructor.getEngName(),
+                constructor.getRacingClass().toString());
     }
 }

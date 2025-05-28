@@ -31,8 +31,8 @@ public class PostDocument {
     @Field(type = FieldType.Text)
     private String author;
 
-    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute, pattern = "yyyy-MM-dd'T'HH:mm")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
+    @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
     @Field(type = FieldType.Integer)

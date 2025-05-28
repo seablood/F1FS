@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponsePostDTO {
+    private Long id;
     private String title;
     private String content;
     private String author;
@@ -22,7 +23,7 @@ public class ResponsePostDTO {
     private int likeNum;
 
     public static ResponsePostDTO toDto(Post post){
-        return new ResponsePostDTO(post.getTitle(), post.getContent(), post.getAuthor().getNickname(),
+        return new ResponsePostDTO(post.getId(), post.getTitle(), post.getContent(), post.getAuthor().getNickname(),
                 post.getCreatedAt(), post.getUpdatedAt(), post.getLikeNum());
     }
 }

@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.application.admin.post;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.application.complain.post.PostComplainService;
 import kr.co.F1FS.app.application.user.UserService;
 import kr.co.F1FS.app.domain.model.rdb.Post;
 import kr.co.F1FS.app.domain.model.rdb.User;
@@ -8,6 +9,7 @@ import kr.co.F1FS.app.domain.repository.rdb.post.PostRepository;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
+import kr.co.F1FS.app.presentation.admin.post.dto.ResponsePostComplainDTO;
 import kr.co.F1FS.app.presentation.post.dto.ResponsePostDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class AdminPostService {
     private final UserService userService;
+    private final PostComplainService complainService;
     private final PostRepository postRepository;
     private final CacheEvictUtil cacheEvictUtil;
 
@@ -31,6 +34,12 @@ public class AdminPostService {
         Page<Post> postPage = postRepository.findAllByAuthor(user, pageable);
 
         return postPage.map(post -> ResponsePostDTO.toDto(post));
+    }
+
+    public Page<ResponsePostComplainDTO> getAllComplain(int page, int size, String condition){
+        Pageable pageable = switchCondition(page, size, condition);
+
+        return complainService.findAll(pageable);
     }
 
     @Transactional

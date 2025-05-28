@@ -34,7 +34,7 @@ public class SlackService {
         }
     }
 
-    public void sendUserComplainMessage(String title, HashMap<String, String> data){
+    public void sendComplainMessage(String title, HashMap<String, String> data){
         try{
             slackClient.send(SLACK_WEBHOOK_URL, payload(p -> p
                     .text(title)

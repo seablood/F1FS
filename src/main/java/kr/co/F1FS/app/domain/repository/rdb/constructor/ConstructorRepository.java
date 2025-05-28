@@ -12,7 +12,5 @@ import java.util.Optional;
 @Repository
 public interface ConstructorRepository extends JpaRepository<Constructor, Long> {
     Optional<Constructor> findByName(String name);
-    Page<Constructor> findAllByRacingClass(RacingClass racingClass, Pageable pageable);
-    Page<Constructor> findAllByNameContainsIgnoreCaseOrEngNameContainsIgnoreCase(String name, String engName,
-                                                                                 Pageable pageable);
+    Page<Constructor> findAll(Pageable pageable);
 }

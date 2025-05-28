@@ -32,7 +32,7 @@ public class FCMGroupService {
     private final FCMNotificationRepository fcmNotificationRepository;
 
     private static final BlockingQueue<FCMPushDTO> QUEUE = new LinkedBlockingQueue<>();
-    private static final int MAX_SIZE = 5;
+    private static final int MAX = 5;
     private AtomicLong sequence = new AtomicLong(1L);
 
     @Async
@@ -51,7 +51,7 @@ public class FCMGroupService {
             dto = QUEUE.poll();
             list.add(dto);
 
-            if(list.size() >= MAX_SIZE){
+            if(list.size() >= MAX){
                 break;
             }
         }

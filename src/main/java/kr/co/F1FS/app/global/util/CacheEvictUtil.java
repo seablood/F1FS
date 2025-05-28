@@ -31,7 +31,8 @@ public class CacheEvictUtil {
 
     @Caching(evict = {
             @CacheEvict(value = "UserDTO", key = "#user.nickname", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "User", key = "#user.nickname", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "User", key = "#user.nickname", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "Username", key = "#user.username", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingUser(User user){}
 }
