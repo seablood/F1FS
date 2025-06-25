@@ -15,7 +15,7 @@ import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2FailureHandler;
 import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.global.config.oauth2.service.CustomOAuth2UserService;
 import kr.co.F1FS.app.global.config.oauth2.util.OAuth2CookieRepository;
-import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,6 @@ public class SecurityConfig {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2CookieRepository oAuth2CookieRepository;
-    private final RedisConfig redisConfig;
     private final RedisHandler redisHandler;
 
     @Bean
@@ -96,7 +95,9 @@ public class SecurityConfig {
                                     "/api/v1/search-post/**",
                                     "/api/v1/search-CD/**",
                                     "/elastic/**",
-                                    "/api/v1/fcm/**").permitAll()
+                                    "/api/v1/fcm/**",
+                                    "/api/v1/admin/**",
+                                    "/api/v1/suggest/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->
@@ -130,22 +131,22 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler(){
-        return new LoginSuccessHandler(jwtTokenService, userRepository, redisConfig);
+        return new LoginSuccessHandler(jwtTokenService, userRepository, redisHandler);
     }
 
     @Bean
     public LoginFailureHandler loginFailureHandler(){
-        return new LoginFailureHandler(redisConfig, redisHandler, objectMapper);
+        return new LoginFailureHandler(redisHandler, objectMapper);
     }
 
     @Bean
     public AdminLoginSuccessHandler adminLoginSuccessHandler(){
-        return new AdminLoginSuccessHandler(jwtTokenService, userRepository, redisConfig);
+        return new AdminLoginSuccessHandler(jwtTokenService, userRepository, redisHandler);
     }
 
     @Bean
     public AdminLoginFailureHandler adminLoginFailureHandler(){
-        return new AdminLoginFailureHandler(redisConfig, redisHandler);
+        return new AdminLoginFailureHandler(redisHandler);
     }
 
     @Bean

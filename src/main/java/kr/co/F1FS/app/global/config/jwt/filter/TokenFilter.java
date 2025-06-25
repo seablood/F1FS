@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
-import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.time.Duration;
 
 @RequiredArgsConstructor
 @Slf4j

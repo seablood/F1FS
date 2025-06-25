@@ -15,7 +15,6 @@ import java.time.Duration;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminLoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    private final RedisConfig redisConfig;
     private final RedisHandler redisHandler;
 
     @Override
@@ -25,14 +24,14 @@ public class AdminLoginFailureHandler extends SimpleUrlAuthenticationFailureHand
         String failKey = "login:fail:"+username;
         String lockKey = "login:lock:"+username;
 
-        if(!redisConfig.redisTemplate().hasKey(lockKey)){
+        if(!redisHandler.getRedisTemplate().hasKey(lockKey)){
             Long failCount = redisHandler.getValueOperations().increment(failKey);
-            redisConfig.redisTemplate().expire(failKey, Duration.ofMinutes(5));
+            redisHandler.getRedisTemplate().expire(failKey, Duration.ofMinutes(5));
 
             if(failCount >= 3){
                 redisHandler.executeOperations(() -> redisHandler.getValueOperations()
                         .set(lockKey, "locked", Duration.ofMinutes(5)));
-                redisConfig.redisTemplate().delete(failKey);
+                redisHandler.getRedisTemplate().delete(failKey);
                 log.warn("관리자 [{}] 계정이 5분간 잠김", username);
             }
         }

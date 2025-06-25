@@ -42,6 +42,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.14.3'											// HTML Sanitization(게시물 첨부파일 처리를 위한 라이브러리)
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'		// Redis 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-cache'				// Cache 라이브러리
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 	// Slack 관련 기능
 	implementation 'com.slack.api:slack-api-client:1.44.2'

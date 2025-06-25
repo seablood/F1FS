@@ -6,8 +6,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.application.BlackListService;
+import kr.co.F1FS.app.domain.auth.application.port.in.BlackListUseCase;
+import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.auth.application.service.BlackListService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class JwtTokenService {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    private final BlackListService blackListService;
+    private final BlackListUseCase blackListUseCase;
     private final static String TOKEN_PREFIX = "Bearer ";
 
     // AccessToken 및 RefreshToken 생성
@@ -91,7 +92,7 @@ public class JwtTokenService {
     // 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
-            return (!getClaims(token).getExpiration().before(new Date())) && !blackListService.isBlacklisted(token);
+            return (!getClaims(token).getExpiration().before(new Date())) && !blackListUseCase.isBlacklisted(token);
         } catch (Exception e) {
             return false;
         }

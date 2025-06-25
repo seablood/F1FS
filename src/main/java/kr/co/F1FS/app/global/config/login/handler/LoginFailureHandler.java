@@ -3,10 +3,9 @@ package kr.co.F1FS.app.global.config.login.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.exception.authentication.*;
-import kr.co.F1FS.app.presentation.suspend.dto.ResponseSuspensionLogDTO;
+import kr.co.F1FS.app.global.presentation.dto.suspend.ResponseSuspensionLogDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
@@ -20,7 +19,6 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    private final RedisConfig redisConfig;
     private final RedisHandler redisHandler;
     private final ObjectMapper objectMapper;
 
@@ -38,14 +36,14 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
             String failKey = "login:fail:"+username;
             String lockKey = "login:lock:"+username;
 
-            if(!redisConfig.redisTemplate().hasKey(lockKey)){
+            if(!redisHandler.getRedisTemplate().hasKey(lockKey)){
                 Long failCount = redisHandler.getValueOperations().increment(failKey);
-                redisConfig.redisTemplate().expire(failKey, Duration.ofMinutes(5));
+                redisHandler.getRedisTemplate().expire(failKey, Duration.ofMinutes(5));
 
                 if(failCount >= 5){
                     redisHandler.executeOperations(() -> redisHandler.getValueOperations()
                             .set(lockKey, "locked", Duration.ofMinutes(5)));
-                    redisConfig.redisTemplate().delete(failKey);
+                    redisHandler.getRedisTemplate().delete(failKey);
                     log.warn("사용자 [{}] 계정이 5분간 잠김", username);
                 }
             }

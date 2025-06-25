@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.global.config.auth;
 
-import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.global.config.redis.RedisConfig;
+import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,16 +17,16 @@ import java.util.Map;
 public class PrincipalDetails implements UserDetails, OAuth2User { // 자체 로그인 & OAuth2 로그인 상세 정보
     private User user;
     private Map<String, Object> attributes;
-    private final RedisConfig redisConfig;
+    private final RedisHandler redisHandler;
 
-    public PrincipalDetails(User user, RedisConfig redisConfig){
+    public PrincipalDetails(User user, RedisHandler redisHandler){
         this.user = user;
-        this.redisConfig = redisConfig;
+        this.redisHandler = redisHandler;
     } // 자체 로그인
-    public PrincipalDetails(User user, Map<String, Object> attributes, RedisConfig redisConfig){ // OAuth2 로그인
+    public PrincipalDetails(User user, Map<String, Object> attributes, RedisHandler redisHandler){ // OAuth2 로그인
         this.user = user;
         this.attributes = attributes;
-        this.redisConfig = redisConfig;
+        this.redisHandler = redisHandler;
     }
 
     public User getUser(){
@@ -61,7 +61,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User { // 자체 로
 
     @Override
     public boolean isAccountNonLocked() {
-        if(redisConfig.redisTemplate().hasKey("login:lock:"+getUsername())) return false;
+        if(redisHandler.getRedisTemplate().hasKey("login:lock:"+getUsername())) return false;
         return true;
     }
 

@@ -1,13 +1,13 @@
 package kr.co.F1FS.app.global.config.login.provider;
 
 import jakarta.transaction.Transactional;
-import kr.co.F1FS.app.application.suspend.SuspensionLogService;
-import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
+import kr.co.F1FS.app.global.application.port.out.AuthenticationProviderSuspensionLogPort;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.global.util.exception.authentication.*;
-import kr.co.F1FS.app.presentation.suspend.dto.ResponseSuspensionLogDTO;
+import kr.co.F1FS.app.global.presentation.dto.suspend.ResponseSuspensionLogDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +22,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PrincipalDetailsService detailsService;
-    private final SuspensionLogService logService;
+    private final AuthenticationProviderSuspensionLogPort suspensionLogPort;
 
     @Override
     @Transactional
@@ -49,14 +49,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
-            ResponseSuspensionLogDTO dto = logService.getSuspensionLog(principalDetails.getUser());
+            ResponseSuspensionLogDTO dto = suspensionLogPort.getSuspensionLog(principalDetails.getUser());
 
             if(principalDetails.getUser().isSuspendUntil()) {
                 throw new AccountSuspendException("이용이 정지된 계정입니다.", dto);
             }
             else {
                 principalDetails.getUser().updateRole(Role.USER);
-                logService.deleteSuspensionLog(principalDetails.getUser());
+                suspensionLogPort.deleteSuspensionLog(principalDetails.getUser());
                 userRepository.saveAndFlush(principalDetails.getUser());
             }
         }

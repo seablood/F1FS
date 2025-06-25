@@ -2,11 +2,11 @@ package kr.co.F1FS.app.global.config.admin.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.F1FS.app.domain.model.rdb.User;
-import kr.co.F1FS.app.domain.repository.rdb.user.UserRepository;
+import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
-import kr.co.F1FS.app.global.config.redis.RedisConfig;
+import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.CookieUtil;
 import kr.co.F1FS.app.global.util.exception.user.UserException;
 import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
@@ -27,7 +27,7 @@ public class AdminLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
 
     private final JwtTokenService jwtTokenService;
     private final UserRepository userRepository;
-    private final RedisConfig redisConfig;
+    private final RedisHandler redisHandler;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
@@ -40,8 +40,8 @@ public class AdminLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHand
         saveRefreshToken(user, refreshToken);
         addRefreshTokenCookie(request, response, refreshToken);
 
-        if(redisConfig.redisTemplate().hasKey("login:fail:"+user.getUsername())){
-            redisConfig.redisTemplate().delete("login:fail:"+user.getUsername());
+        if(redisHandler.getRedisTemplate().hasKey("login:fail:"+user.getUsername())){
+            redisHandler.getRedisTemplate().delete("login:fail:"+user.getUsername());
         }
 
         log.info("로그인 계정 : "+user.getUsername());

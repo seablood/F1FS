@@ -1,14 +1,16 @@
-/*package kr.co.F1FS.app.config.handler;
+/*package kr.co.F1FS.app.global.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import kr.co.F1FS.app.application.SlackService;
+import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.util.BaseException;
 import kr.co.F1FS.app.global.util.ErrorMessages;
 import kr.co.F1FS.app.global.util.ExceptionType;
+import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.driver.DriverException;
 import kr.co.F1FS.app.global.util.exception.email.EmailException;
+import kr.co.F1FS.app.global.util.exception.notification.NotificationException;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyException;
@@ -77,7 +79,9 @@ public class GlobalExceptionHandler {
                         ConstructorException.class,
                         DriverException.class,
                         RedisException.class,
-                        EmailException.class})
+                        EmailException.class,
+                        CDSearchException.class,
+                        NotificationException.class})
     public ResponseEntity<String> handlePostException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
         sendExceptionType(exceptionType);

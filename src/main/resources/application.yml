@@ -13,6 +13,10 @@ spring:
 ---
 
 spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
   config:
     activate:
       on-profile: dev
