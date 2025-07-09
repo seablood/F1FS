@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.domain.admin.constructor.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.constructor.application.port.in.AdminConstructorUseCase;
 import kr.co.F1FS.app.domain.admin.constructor.application.port.out.AdminConstructorCDSearchPort;
 import kr.co.F1FS.app.domain.admin.constructor.application.port.out.AdminConstructorPort;
@@ -12,6 +11,7 @@ import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.elastic.application.port.in.CDSearchUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

@@ -3,15 +3,11 @@ package kr.co.F1FS.app.domain.notification.application.service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMGroupUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
-import kr.co.F1FS.app.domain.notification.infrastructure.repository.FCMTokenRepository;
-import kr.co.F1FS.app.global.util.exception.user.UserException;
-import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMTopicRequestDTO;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +28,7 @@ public class FCMGroupService implements FCMGroupUseCase {
     private final NotificationMapper notificationMapper;
     private final NotificationRedisService redisService;
     private final NotificationService notificationService;
-    private final FCMTokenRepository fcmTokenRepository;
+    private final FCMTokenService fcmTokenService;
 
     private static final BlockingQueue<FCMPushDTO> QUEUE = new LinkedBlockingQueue<>();
     private static final int MAX = 5;
@@ -70,13 +66,6 @@ public class FCMGroupService implements FCMGroupUseCase {
         log.info("그룹 푸시 알림 전송 완료");
     }
 
-    @Transactional
-    public void save(User user, String token){
-        FCMToken fcmToken = notificationMapper.toFCMToken(user, token);
-
-        fcmTokenRepository.save(fcmToken);
-    }
-
     public NotificationRedis sendPushToTopic(FCMPushDTO dto){ // 토픽 구독자 전체에게 푸시 알림 발송
         Notification notification = Notification.builder()
                 .setTitle(dto.getTitle())
@@ -103,36 +92,34 @@ public class FCMGroupService implements FCMGroupUseCase {
 
     public void subscribeToTopic(FCMTopicRequestDTO dto, User user){
         String key = TOPIC_PREFIX+dto.getTopic();
-        FCMToken token = fcmTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
+        FCMToken token = fcmTokenService.findByUserIdOrNull(user.getId());
 
-        try{
-            FirebaseMessaging.getInstance().subscribeToTopic(List.of(token.getToken()), dto.getTopic());
+        if(token != null){
+            try{
+                FirebaseMessaging.getInstance().subscribeToTopic(List.of(token.getToken()), dto.getTopic());
+                redisService.saveSubscribe(user, key);
+                log.info("토픽 구독 지정 성공");
+            } catch (Exception e){
+                log.error("토픽 구독 지정 실패");
+            }
+        }else {
             redisService.saveSubscribe(user, key);
-            log.info("토픽 구독 지정 성공");
-        } catch (Exception e){
-            log.error("토픽 구독 지정 실패");
         }
     }
 
     public void unsubscribeFromTopic(FCMTopicRequestDTO dto, User user){
         String key = TOPIC_PREFIX+dto.getTopic();
-        FCMToken token = fcmTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
+        FCMToken token = fcmTokenService.findByUserIdOrNull(user.getId());
 
-        try{
-            FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(token.getToken()), dto.getTopic());
+        if(token != null){
+            try{
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(token.getToken()), dto.getTopic());
+                redisService.saveUnsubscribe(user, key);
+            } catch (Exception e){
+                log.error("토픽 구독 해제 실패");
+            }
+        }else {
             redisService.saveUnsubscribe(user, key);
-        } catch (Exception e){
-            log.error("토픽 구독 해제 실패");
         }
-    }
-
-    @Transactional
-    public void deleteToken(User user) {
-        FCMToken fcmToken = fcmTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
-
-        fcmTokenRepository.delete(fcmToken);
     }
 }

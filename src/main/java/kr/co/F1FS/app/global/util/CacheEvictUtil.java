@@ -1,7 +1,9 @@
 package kr.co.F1FS.app.global.util;
 
+import kr.co.F1FS.app.domain.circuit.domain.Circuit;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
+import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
@@ -28,19 +30,16 @@ public class CacheEvictUtil {
 
     @Caching(evict = {
             @CacheEvict(value = "ConstructorDTO", key = "#constructor.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "Constructor", key = "#constructor.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "ConstructorByName", key = "#constructor.name", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "Constructor", key = "#constructor.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingConstructor(Constructor constructor){}
 
-    @Caching(evict = @CacheEvict(value = "PostReplyList", key = "#reply.post.id", cacheManager = "redisLongCacheManager"))
-    public void evictCachingReply(Reply reply){}
+    @Caching(evict = @CacheEvict(value = "PostReplyList", key = "#post.id", cacheManager = "redisLongCacheManager"))
+    public void evictCachingReply(Post post){}
 
     @Caching(evict = {
             @CacheEvict(value = "UserDTO", key = "#user.nickname", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "User", key = "#user.nickname", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "Username", key = "#user.username", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "User", key = "#user.nickname", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingUser(User user){}
 
@@ -55,4 +54,16 @@ public class CacheEvictUtil {
             @CacheEvict(value = "Notification", key = "#notification.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingNotification(Notification notification){}
+
+    @Caching(evict = @CacheEvict(value = "SuspensionLogDTO", key = "#user.id", cacheManager = "redisLongCacheManager"))
+    public void evictCachingSuspensionLog(User user){}
+
+    @Caching(evict = @CacheEvict(value = "NoteDTO", key = "#note.id", cacheManager = "redisLongCacheManager"))
+    public void evictCachingNote(Note note){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "CircuitDTO", key = "#circuit.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "SimpleCircuitDTO", key = "#circuit.id", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingCircuit(Circuit circuit){}
 }

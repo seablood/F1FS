@@ -1,8 +1,9 @@
 package kr.co.F1FS.app.domain.follow.application.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
+import kr.co.F1FS.app.domain.follow.application.port.in.FollowDriverUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowDriverPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowDriver;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowDriverDTO;
@@ -13,15 +14,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FollowDriverService {
+public class FollowDriverService implements FollowDriverUseCase {
     private final FollowMapper followMapper;
     private final FollowDriverRepository followDriverRepository;
     private final CacheEvictUtil cacheEvictUtil;
+    private final DriverUseCase driverUseCase;
     private final FollowDriverPort followDriverPort;
 
     @Transactional
@@ -33,13 +36,15 @@ public class FollowDriverService {
         if(isFollowed(user, driver)){
             FollowDriver followDriver = followDriverRepository.findByFollowerUserAndFolloweeDriver(user, driver);
             followDriverRepository.delete(followDriver);
-            followDriverPort.decreaseFollower(driver);
+            driverUseCase.decreaseFollower(driver);
             return;
         }
 
         FollowDriver followDriver = followMapper.toFollowDriver(user, driver);
         followDriverRepository.save(followDriver);
-        followDriverPort.increaseFollower(driver);
+        driverUseCase.increaseFollower(driver);
+
+        followDriverPort.saveAndFlush(driver);
     }
 
     @Cacheable(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")

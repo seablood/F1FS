@@ -17,6 +17,8 @@ public interface ConstructorUseCase {
     Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition);
     ResponseConstructorDTO findById(Long id);
     Constructor findByIdNotDTO(Long id);
+    void increaseFollower(Constructor constructor);
+    void decreaseFollower(Constructor constructor);
     List<String> getDrivers(Constructor constructor);
     Pageable switchCondition(int page, int size, String condition);
 }

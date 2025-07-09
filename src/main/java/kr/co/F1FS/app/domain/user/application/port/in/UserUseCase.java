@@ -15,4 +15,6 @@ public interface UserUseCase {
     void updateLastLoginDate(User user);
     void updatePassword(User user, String password);
     void updateRefreshToken(User user, String refreshToken);
+    void increaseFollow(User followerUser, User followeeUser);
+    void decreaseFollow(User followerUser, User followeeUser);
 }

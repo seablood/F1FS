@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.notification.application.service;
 
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
@@ -19,7 +20,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationRedisService {
+public class NotificationRedisService implements NotificationRedisUseCase {
     private final NotificationMapper notificationMapper;
     private final RedisHandler redisHandler;
 

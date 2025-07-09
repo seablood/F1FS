@@ -9,7 +9,8 @@ import org.springframework.data.domain.Page;
 
 public interface NotificationUseCase {
     void saveNotification(NotificationRedis redis, String content);
-    ResponseNotificationDTO getNotification(Long redisId);
+    ResponseNotificationDTO getNotificationByRedisId(Long redisId);
+    ResponseNotificationDTO getNotificationById(Long id);
     Page<SimpleResponseNotificationDTO> getNotificationList(int page, int size);
     void modify(Notification notification, ModifyNotificationDTO dto);
 }

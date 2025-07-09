@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.complain.user.application.service;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.complain.user.application.mapper.UserComplainMapper;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.out.ComplainUserPort;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 @Slf4j
 public class UserComplainService implements UserComplainUseCase {
     private final ComplainUserPort userPort;
+    private final UserComplainMapper complainMapper;
     private final SlackService slackService;
     private final UserComplainRepository complainRepository;
 
@@ -31,12 +33,7 @@ public class UserComplainService implements UserComplainUseCase {
     @Transactional
     public void userComplain(User user, CreateUserComplainDTO dto){
         User toUser = userPort.findByNickname(dto.getToUserNickname());
-        UserComplain complain = UserComplain.builder()
-                .toUser(toUser)
-                .fromUser(user)
-                .description(dto.getDescription())
-                .paraphrase(dto.getParaphrase())
-                .build();
+        UserComplain complain = complainMapper.toUserComplain(dto, toUser, user);
 
         save(complain);
         sendMessage(complain);

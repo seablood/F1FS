@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.admin.suggest.application.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.admin.suggest.application.port.in.AdminSuggestUseCase;
 import kr.co.F1FS.app.domain.admin.suggest.application.port.out.AdminSuggestPort;
 import kr.co.F1FS.app.domain.suggest.application.mapper.SuggestMapper;
 import kr.co.F1FS.app.domain.suggest.application.port.in.SuggestUseCase;
@@ -14,11 +14,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AdminSuggestService {
+public class AdminSuggestService implements AdminSuggestUseCase {
     private final AdminSuggestPort suggestPort;
     private final SuggestUseCase suggestUseCase;
     private final SuggestMapper suggestMapper;

@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface AdminPostPort {
     Page<Post> findAllByAuthor(User user, Pageable pageable);
+    Post findByIdNotDTO(Long id);
     void delete(Post post);
 }

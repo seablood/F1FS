@@ -5,10 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateAdminUserDTO {
@@ -22,13 +24,4 @@ public class CreateAdminUserDTO {
     @Email(message = "올바른 email 형식을 입력해주세요")
     @NotBlank(message = "email은 필수 입력 항목입니다.")
     private String email;
-
-    public static User toEntity(CreateAdminUserDTO dto){
-        return User.builder()
-                .username(dto.getUsername())
-                .password(dto.getPassword())
-                .nickname(dto.getNickname())
-                .email(dto.getEmail())
-                .build();
-    }
 }

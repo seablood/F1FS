@@ -1,5 +1,6 @@
 package kr.co.F1FS.app.domain.user.application.mapper;
 
+import kr.co.F1FS.app.domain.admin.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
@@ -13,6 +14,15 @@ public class UserMapper {
                 .password(command.getPassword())
                 .email(command.getEmail())
                 .nickname(command.getNickname())
+                .build();
+    }
+
+    public User toUser(CreateAdminUserDTO dto){
+        return User.builder()
+                .username(dto.getUsername())
+                .password(dto.getPassword())
+                .nickname(dto.getNickname())
+                .email(dto.getEmail())
                 .build();
     }
 

@@ -1,9 +1,10 @@
 package kr.co.F1FS.app.domain.follow.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
+import kr.co.F1FS.app.domain.follow.application.port.in.FollowUserUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowUserPort;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowUserDTO;
+import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.domain.follow.domain.FollowUser;
@@ -11,14 +12,16 @@ import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FollowUserService {
+public class FollowUserService implements FollowUserUseCase {
     private final FollowMapper followMapper;
     private final FollowUserRepository followUserRepository;
+    private final UserUseCase userUseCase;
     private final FollowUserPort followUserPort;
     private final CacheEvictUtil cacheEvictUtil;
 
@@ -31,13 +34,16 @@ public class FollowUserService {
         if(isFollowed(followerUser, followeeUser)){
             FollowUser followUser = followUserRepository.findByFollowerUserAndFolloweeUser(followerUser, followeeUser);
             followUserRepository.delete(followUser);
-            followUserPort.decreaseFollow(followerUser, followeeUser);
+            userUseCase.decreaseFollow(followerUser, followeeUser);
             return;
         }
 
         FollowUser followUser = followMapper.toFollowUser(followerUser, followeeUser);
         followUserRepository.save(followUser);
-        followUserPort.increaseFollow(followerUser, followeeUser);
+        userUseCase.increaseFollow(followerUser, followeeUser);
+
+        followUserPort.saveAndFlush(followerUser);
+        followUserPort.saveAndFlush(followeeUser);
     }
 
     public List<ResponseFollowUserDTO> findFollowers(String nickname){

@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ConstructorDriverRelationRepository extends JpaRepository<ConstructorDriverRelation, Long> {
     List<ConstructorDriverRelation> findConstructorDriverRelationByDriver(Driver driver);
+    List<ConstructorDriverRelation> findConstructorDriverRelationByConstructor(Constructor constructor);
     Optional<ConstructorDriverRelation> findConstructorDriverRelationByDriverAndRacingClass(Driver driver, RacingClass racingClass);
     boolean existsConstructorDriverRelationByDriverAndRacingClass(Driver driver, RacingClass racingClass);
     boolean existsConstructorDriverRelationByDriverAndConstructor(Driver driver, Constructor constructor);

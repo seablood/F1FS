@@ -1,8 +1,8 @@
 package kr.co.F1FS.app.global.config.login.provider;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.suspend.application.port.in.SuspensionLogUseCase;
 import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
-import kr.co.F1FS.app.global.application.port.out.AuthenticationProviderSuspensionLogPort;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.util.Role;
@@ -22,7 +22,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PrincipalDetailsService detailsService;
-    private final AuthenticationProviderSuspensionLogPort suspensionLogPort;
+    private final SuspensionLogUseCase suspensionLogUseCase;
+
 
     @Override
     @Transactional
@@ -49,14 +50,14 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
-            ResponseSuspensionLogDTO dto = suspensionLogPort.getSuspensionLog(principalDetails.getUser());
+            ResponseSuspensionLogDTO dto = suspensionLogUseCase.getSuspensionLog(principalDetails.getUser());
 
             if(principalDetails.getUser().isSuspendUntil()) {
                 throw new AccountSuspendException("이용이 정지된 계정입니다.", dto);
             }
             else {
                 principalDetails.getUser().updateRole(Role.USER);
-                suspensionLogPort.deleteSuspensionLog(principalDetails.getUser());
+                suspensionLogUseCase.deleteSuspensionLog(principalDetails.getUser());
                 userRepository.saveAndFlush(principalDetails.getUser());
             }
         }

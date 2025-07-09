@@ -1,16 +1,12 @@
 package kr.co.F1FS.app.domain.driver.domain.rdb;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,12 +27,6 @@ public class Driver {
     private Integer championships;
     private String country;
     private Integer followerNum;
-    @JsonIgnore
-    @OneToMany(mappedBy = "driverInfo")
-    private List<DriverRecordRelation> records = new ArrayList<>();
-    @JsonIgnore
-    @OneToMany(mappedBy = "driverSinceInfo")
-    private List<DriverDebutRelation> debuts = new ArrayList<>();
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Timestamp birth;
     @Enumerated(value = EnumType.STRING)

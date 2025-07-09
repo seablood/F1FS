@@ -1,13 +1,13 @@
 package kr.co.F1FS.app.domain.admin.auth.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.auth.application.port.in.AdminAuthUseCase;
 import kr.co.F1FS.app.domain.admin.auth.application.port.out.AdminAuthUserPort;
 import kr.co.F1FS.app.domain.admin.auth.application.port.out.AdminAuthVerificationCodePort;
-import kr.co.F1FS.app.domain.admin.auth.presentation.dto.ResponseUserDTO;
+import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.domain.admin.auth.presentation.dto.CreateAdminUserDTO;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,21 +27,22 @@ public class AdminAuthService implements AdminAuthUseCase {
     private final UserUseCase userUseCase;
     private final AdminAuthUserPort userPort;
     private final AdminAuthVerificationCodePort verificationCodePort;
+    private final UserMapper userMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ValidationService validationService;
 
     @Transactional
     public ResponseUserDTO save(CreateAdminUserDTO dto){
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        User newAdminUser = CreateAdminUserDTO.toEntity(dto);
+        User newAdminUser = userMapper.toUser(dto);
         validationService.checkValid(newAdminUser);
-        newAdminUser.updateLastLoginDate();
+        userUseCase.updateLastLoginDate(newAdminUser);
 
-        newAdminUser.updateRole(Role.ADMIN);
+        userUseCase.updateRole(newAdminUser, Role.ADMIN);
         log.info("관리자 계정 전환(생성) 완료 : {}", newAdminUser.getUsername());
 
         userPort.save(newAdminUser);
-        return ResponseUserDTO.toDto(newAdminUser);
+        return userMapper.toResponseUserDTO(newAdminUser);
     }
 
     // 5분에 한번씩 만료된 인증 코드 삭제

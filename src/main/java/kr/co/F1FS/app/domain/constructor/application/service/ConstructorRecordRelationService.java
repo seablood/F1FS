@@ -1,5 +1,7 @@
 package kr.co.F1FS.app.domain.constructor.application.service;
 
+import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorRecordRelationMapper;
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
@@ -13,15 +15,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ConstructorRecordRelationService {
+public class ConstructorRecordRelationService implements ConstructorRecordRelationUseCase {
+    private final ConstructorRecordRelationMapper relationMapper;
     private final ConstructorRecordRelationRepository relationRepository;
 
     public void save(Constructor constructor, CurrentSeason currentSeason, SinceDebut sinceDebut){
-        ConstructorRecordRelation relation = ConstructorRecordRelation.builder()
-                .constructor(constructor)
-                .currentSeason(currentSeason)
-                .sinceDebut(sinceDebut)
-                .build();
+        ConstructorRecordRelation relation = relationMapper.toConstructorRecordRelation(constructor, currentSeason,
+                sinceDebut);
 
         relationRepository.save(relation);
     }

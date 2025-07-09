@@ -1,8 +1,8 @@
 package kr.co.F1FS.app.domain.constructor.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorMapper;
 import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
+import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorTeamPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorRecordPort;
@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConstructorService implements ConstructorUseCase {
     private final ConstructorRecordPort constructorRecordPort;
+    private final ConstructorTeamPort teamPort;
     private final RecordMapper recordMapper;
     private final ConstructorMapper constructorMapper;
     private final ConstructorRecordRelationService recordRelationService;
@@ -80,9 +82,16 @@ public class ConstructorService implements ConstructorUseCase {
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
-    @Cacheable(value = "ConDriverList", key = "#constructor.id", cacheManager = "redisLongCacheManager")
+    public void increaseFollower(Constructor constructor){
+        constructor.increaseFollower();
+    }
+
+    public void decreaseFollower(Constructor constructor){
+        constructor.decreaseFollower();
+    }
+
     public List<String> getDrivers(Constructor constructor){
-        return constructor.getDrivers().stream()
+        return teamPort.getDrivers(constructor).stream()
                 .map((relation) -> relation.getDriver().getName())
                 .toList();
     }

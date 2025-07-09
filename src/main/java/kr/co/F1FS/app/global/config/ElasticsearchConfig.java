@@ -8,7 +8,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "kr.co.F1FS.app.domain.elastic.infrastructure")
+@EnableElasticsearchRepositories(basePackages = "kr.co.F1FS.app.domain.elastic.infrastructure.repository")
 public class ElasticsearchConfig {
     @Bean
     public ElasticsearchOperations elasticsearchTemplate(ElasticsearchClient elasticsearchClient){

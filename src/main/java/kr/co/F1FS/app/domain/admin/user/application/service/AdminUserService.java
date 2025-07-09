@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.domain.admin.user.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.user.application.mapper.AdminUserMapper;
+import kr.co.F1FS.app.domain.admin.user.application.port.in.AdminUserUseCase;
 import kr.co.F1FS.app.domain.admin.user.application.port.out.AdminUserComplainPort;
 import kr.co.F1FS.app.domain.admin.user.application.port.out.AdminUserPort;
 import kr.co.F1FS.app.domain.admin.user.application.port.out.AdminUserSuspensionLogPort;
@@ -20,12 +20,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AdminUserService {
+public class AdminUserService implements AdminUserUseCase {
     private final UserUseCase userUseCase;
     private final UserComplainUseCase complainUseCase;
     private final AdminUserPort userPort;
@@ -53,7 +54,7 @@ public class AdminUserService {
 
     @Transactional
     public void setSuspend(SuspendRequestDTO dto){
-        User suspendUser = userUseCase.findByNicknameNotDTO(dto.getNickname());
+        User suspendUser = userPort.findByNicknameNotDTO(dto.getNickname());
         userUseCase.suspendUser(suspendUser, dto.getDurationDays());
 
         SuspensionLog log = suspensionLogMapper.toSuspensionLog(adminUserMapper.toCreateSuspensionLogCommand(dto),

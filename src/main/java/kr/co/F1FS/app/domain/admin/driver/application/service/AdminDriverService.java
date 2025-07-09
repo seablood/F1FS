@@ -11,6 +11,7 @@ import kr.co.F1FS.app.domain.admin.driver.presentation.dto.CombinedDriverRequest
 import kr.co.F1FS.app.domain.elastic.application.port.in.CDSearchUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class AdminDriverService implements AdminDriverUseCase {
     private final DriverMapper driverMapper;
 
     @Override
+    @Transactional
     public AdminResponseDriverDTO save(CombinedDriverRequest request) {
         Driver driver = driverPort.save(driverUseCase.save(request.getDriverDTO(), request.getCurrentSeasonDTO(),
                 request.getSinceDebutDTO()));

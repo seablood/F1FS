@@ -8,13 +8,9 @@ import kr.co.F1FS.app.domain.follow.domain.FollowUser;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowConstructorDTO;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowUserDTO;
-import kr.co.F1FS.app.domain.team.domain.ConstructorDriverRelation;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class FollowMapper {
@@ -40,16 +36,9 @@ public class FollowMapper {
     }
 
     public ResponseFollowConstructorDTO toResponseFollowConstructorDTO(Constructor constructor){
-        List<String> list = new ArrayList<>();
-
-        for (ConstructorDriverRelation relation : constructor.getDrivers()){
-            list.add(relation.getDriver().getName());
-        }
-
         return ResponseFollowConstructorDTO.builder()
                 .name(constructor.getName())
                 .engName(constructor.getEngName())
-                .driverList(list)
                 .build();
     }
 

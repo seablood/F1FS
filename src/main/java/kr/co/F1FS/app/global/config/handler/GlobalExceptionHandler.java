@@ -14,6 +14,7 @@ import kr.co.F1FS.app.global.util.exception.notification.NotificationException;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyException;
+import kr.co.F1FS.app.global.util.exception.suggest.SuggestException;
 import kr.co.F1FS.app.global.util.exception.user.UserException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,8 +82,9 @@ public class GlobalExceptionHandler {
                         RedisException.class,
                         EmailException.class,
                         CDSearchException.class,
-                        NotificationException.class})
-    public ResponseEntity<String> handlePostException(BaseException ex){
+                        NotificationException.class,
+                        SuggestException.class})
+    public ResponseEntity<String> handleCustomException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
         sendExceptionType(exceptionType);
         log.error(exceptionType.getMessage());

@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.domain.admin.notification.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.notification.application.port.in.AdminNotificationUseCase;
 import kr.co.F1FS.app.domain.admin.notification.application.port.out.AdminNotificationPort;
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
@@ -11,6 +10,7 @@ import kr.co.F1FS.app.domain.admin.notification.presentation.dto.ModifyNotificat
 import kr.co.F1FS.app.global.presentation.dto.notification.ResponseNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

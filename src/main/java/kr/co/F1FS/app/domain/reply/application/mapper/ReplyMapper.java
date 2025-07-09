@@ -18,8 +18,10 @@ public class ReplyMapper {
     }
 
     public ResponseReplyDTO toResponseReplyDTO(Reply reply){
+        String author = reply.getUser() == null ? "알 수 없음" : reply.getUser().getNickname();
+
         return ResponseReplyDTO.builder()
-                .author(reply.getUser().getNickname())
+                .author(author)
                 .content(reply.getContent())
                 .createdAt(reply.getCreatedAt())
                 .updatedAt(reply.getUpdatedAt())

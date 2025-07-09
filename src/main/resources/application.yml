@@ -52,3 +52,39 @@ email:
     active_account:
       subject: "F1FS 계정 활성화 이메일 인증 코드"
       content: "안녕하세요,\n계정 활성화를 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
+
+---
+
+spring:
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+  config:
+    activate:
+      on-profile: test
+
+  jpa:
+    database: mysql
+    hibernate.ddl-auto: update
+    show-sql: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+email:
+  templates:
+    create_account:
+      subject: "F1FS 회원가입 이메일 인증 코드"
+      content: "안녕하세요,\n회원가입을 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
+
+    update_password:
+      subject: "F1FS 비밀번호 변경 인증 코드"
+      content: "안녕하세요,\n비밀번호 변경을 위한 인증 코드는 {{code}} 입니다.\n감사합니다."
+
+    active_account:
+      subject: "F1FS 계정 활성화 이메일 인증 코드"
+      content: "안녕하세요,\n계정 활성화를 위한 인증 코드는 {{code}} 입니다.\n감사합니다."

@@ -6,5 +6,4 @@ import kr.co.F1FS.app.global.util.RacingClass;
 
 public interface CDRelationDriverDebutPort {
     boolean existsRelation(Driver driver, RacingClass racingClass);
-    void save(Driver driver, SinceDebut sinceDebut);
 }

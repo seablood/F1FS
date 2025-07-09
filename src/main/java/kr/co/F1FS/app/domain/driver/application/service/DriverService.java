@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.domain.driver.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.driver.application.mapper.DriverMapper;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.out.DriverConstructorPort;
@@ -33,6 +32,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -96,27 +96,33 @@ public class DriverService implements DriverUseCase {
     }
 
     @Override
-    @Transactional
     public void updateRacingClass(Driver driver, RacingClass racingClass) {
         driver.updateRacingClass(racingClass);
         driverRepository.saveAndFlush(driver);
     }
 
+    public void increaseFollower(Driver driver){
+        driver.increaseFollower();
+    }
+
+    public void decreaseFollower(Driver driver){
+        driver.decreaseFollower();
+    }
+
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
-        ResponseCurrentSeasonDTO currentSeasonDTO = recordMapper.toResponseCurrentSeasonDTO(driver.getRecords()
-                .stream().filter(recordRelation -> recordRelation.getRacingClass() == driver.getRacingClass())
-                .findFirst().orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_RECORD_ERROR))
-                .getCurrentSeason());
+        ResponseCurrentSeasonDTO currentSeasonDTO = recordMapper.toResponseCurrentSeasonDTO(
+                recordRelationService.getRecordByDriverAndRacingClass(driver).getCurrentSeason()
+        );
 
         return currentSeasonDTO;
     }
 
     @Cacheable(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseSinceDebutDTO getSinceDebut(Driver driver) {
-        ResponseSinceDebutDTO sinceDebutDTO = recordMapper.toResponseSinceDebutDTO(driver.getDebuts().stream()
-                .filter(debutRelation -> debutRelation.getRacingClass() == driver.getRacingClass()).findFirst()
-                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_DEBUT_ERROR)).getSinceDebut());
+        ResponseSinceDebutDTO sinceDebutDTO = recordMapper.toResponseSinceDebutDTO(
+                debutRelationService.getSinceDebutByDriverAndRacingClass(driver).getSinceDebut()
+        );
 
         return sinceDebutDTO;
     }

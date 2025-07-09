@@ -1,13 +1,8 @@
 package kr.co.F1FS.app.domain.constructor.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import kr.co.F1FS.app.domain.team.domain.ConstructorDriverRelation;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,9 +15,6 @@ public class Constructor {
     private Long id;
     private String name;
     private String engName;
-    @JsonIgnore
-    @OneToMany(mappedBy = "constructor")
-    private List<ConstructorDriverRelation> drivers = new ArrayList<>();
     private Integer championships;
     private String base;
     private String teamChief;

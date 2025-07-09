@@ -50,26 +50,30 @@ public class FCMLiveService implements FCMLiveUseCase {
     }
 
     public void sendPushForAuthor(FCMPushDTO dto, FCMToken token, User user, Long contentId){
-        Notification notification = Notification.builder()
-                .setTitle(dto.getTitle())
-                .setBody(dto.getContent())
-                .build();
-
         NotificationRedis redis = notificationMapper.toNotificationRedis(dto, "personal");
 
         redis.setContentId(contentId);
 
-        Message message = Message.builder()
-                .setToken(token.getToken())
-                .setNotification(notification)
-                .build();
+        if(token != null){
+            Notification notification = Notification.builder()
+                    .setTitle(dto.getTitle())
+                    .setBody(dto.getContent())
+                    .build();
 
-        try{
-            String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
+            Message message = Message.builder()
+                    .setToken(token.getToken())
+                    .setNotification(notification)
+                    .build();
+
+            try{
+                String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
+                redisService.saveNotificationForPersonal(redis, user);
+                log.info("토픽 푸시 알림 전송 성공 : {}", response);
+            } catch (Exception e){
+                log.error("토픽 푸시 알림 전송 실패");
+            }
+        }else {
             redisService.saveNotificationForPersonal(redis, user);
-            log.info("토픽 푸시 알림 전송 성공 : {}", response);
-        } catch (Exception e){
-            log.error("토픽 푸시 알림 전송 실패");
         }
     }
 

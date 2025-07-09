@@ -23,13 +23,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class NotificationMapper {
     private AtomicLong sequence = new AtomicLong(1L);
 
-    public FCMToken toFCMToken(User user, String token){
-        return FCMToken.builder()
-                .userId(user.getId())
-                .token(token)
-                .build();
-    }
-
     public NotificationRedis toNotificationRedis(FCMPushDTO dto, String option){
         switch (option){
             case "official" :

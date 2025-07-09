@@ -25,6 +25,12 @@ public class AdminPostAdapter implements AdminPostPort {
     }
 
     @Override
+    public Post findByIdNotDTO(Long id) {
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostException(PostExceptionType.POST_NOT_FOUND));
+    }
+
+    @Override
     public void delete(Post post) {
         postRepository.delete(post);
     }

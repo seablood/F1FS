@@ -1,7 +1,8 @@
 package kr.co.F1FS.app.domain.team.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverDebutRelationUseCase;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverRecordRelationUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,7 +28,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConstructorDriverRelationService implements ConstructorDriverRelationUseCase {
     private final DriverUseCase driverUseCase;
-    private final CDRelationDriverRecordPort driverRecordPort;
+    private final DriverRecordRelationUseCase driverRecordUseCase;
+    private final DriverDebutRelationUseCase driverDebutUseCase;
     private final CDRelationDriverDebutPort driverDebutPort;
     private final CDRelationConstructorPort constructorPort;
     private final CDRelationDriverPort driverPort;
@@ -90,8 +93,8 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
             CurrentSeason currentSeason = new CurrentSeason();
             SinceDebut sinceDebut = new SinceDebut();
 
-            driverRecordPort.save(driver, currentSeason);
-            driverDebutPort.save(driver, sinceDebut);
+            driverRecordUseCase.save(driver, currentSeason);
+            driverDebutUseCase.save(driver, sinceDebut);
             recordPort.save(currentSeason, sinceDebut);
         }
     }

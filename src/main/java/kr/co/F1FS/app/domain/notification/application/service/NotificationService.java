@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.domain.notification.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.notification.presentation.dto.ModifyNotificationDTO;
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.NotificationUseCase;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +30,14 @@ public class NotificationService implements NotificationUseCase {
     }
 
     @Cacheable(value = "NotificationDTOByRedisId", key = "#redisId", cacheManager = "redisLongCacheManager")
-    public ResponseNotificationDTO getNotification(Long redisId){
+    public ResponseNotificationDTO getNotificationByRedisId(Long redisId){
         Notification notification = notificationRepository.findByRedisId(redisId)
+                .orElseThrow(() -> new NotificationException(NotificationExceptionType.NOTIFICATION_NOT_FOUND));
+        return notificationMapper.toResponseNotificationDTO(notification);
+    }
+
+    public ResponseNotificationDTO getNotificationById(Long id){
+        Notification notification = notificationRepository.findById(id)
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.NOTIFICATION_NOT_FOUND));
         return notificationMapper.toResponseNotificationDTO(notification);
     }

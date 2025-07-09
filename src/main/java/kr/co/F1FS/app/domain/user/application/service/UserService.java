@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.domain.user.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
@@ -15,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +36,6 @@ public class UserService implements UserUseCase {
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
     }
 
-    @Cacheable(value = "Username", key = "#username", cacheManager = "redisLongCacheManager")
     public User findByUsernameNotDTO(String username){
         return userRepository.findByUsername(username)
                 .orElse(null);
@@ -64,6 +63,16 @@ public class UserService implements UserUseCase {
 
     public void updateRole(User user, Role newRole){
         user.updateRole(newRole);
+    }
+
+    public void increaseFollow(User followerUser, User followeeUser) {
+        followerUser.changeFollowingNum(1);
+        followeeUser.changeFollowerNum(1);
+    }
+
+    public void decreaseFollow(User followerUser, User followeeUser) {
+        followerUser.changeFollowingNum(-1);
+        followeeUser.changeFollowerNum(-1);
     }
 
     public void suspendUser(User user, Integer durationDays){

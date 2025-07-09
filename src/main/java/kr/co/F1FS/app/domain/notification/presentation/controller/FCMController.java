@@ -3,7 +3,8 @@ package kr.co.F1FS.app.domain.notification.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.notification.application.service.FCMGroupService;
+import kr.co.F1FS.app.domain.notification.application.port.in.FCMGroupUseCase;
+import kr.co.F1FS.app.domain.notification.application.service.FCMTokenService;
 import kr.co.F1FS.app.domain.notification.application.service.NotificationRedisService;
 import kr.co.F1FS.app.domain.notification.application.service.NotificationService;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
@@ -25,15 +26,16 @@ import java.util.List;
 @RequestMapping("/api/v1/fcm")
 @Tag(name = "FCM 시스템", description = "FCM 토큰 발급 및 푸시 알림 서비스")
 public class FCMController {
-    private final FCMGroupService fcmGroupService;
+    private final FCMGroupUseCase fcmGroupService;
     private final NotificationRedisService redisService;
     private final NotificationService notificationService;
+    private final FCMTokenService fcmTokenService;
 
     @PostMapping("/token/save")
     @Operation(summary = "FCM 토큰 발급", description = "발급된 FCM 토큰을 저장")
     public ResponseEntity<Void> save(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                      @RequestBody String token){
-        fcmGroupService.save(principalDetails.getUser(), token);
+        fcmTokenService.save(principalDetails.getUser(), token);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -81,8 +83,14 @@ public class FCMController {
 
     @GetMapping("/find/public-notify/{redisId}")
     @Operation(summary = "공지 상세 페이지", description = "특정 공지의 상세 내용을 반환")
-    public ResponseEntity<ResponseNotificationDTO> getNotification(@PathVariable Long redisId){
-        return ResponseEntity.status(HttpStatus.OK).body(notificationService.getNotification(redisId));
+    public ResponseEntity<ResponseNotificationDTO> getNotificationByRedisId(@PathVariable Long redisId){
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.getNotificationByRedisId(redisId));
+    }
+
+    @GetMapping("/find/public-notify/id/{id}")
+    @Operation(summary = "공지 상세 페이지(ID)", description = "특정 공지의 상세 내용을 반환(ID)")
+    public ResponseEntity<ResponseNotificationDTO> getNotificationById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(notificationService.getNotificationById(id));
     }
 
     @DeleteMapping("/delete/{notificationId}")
@@ -96,7 +104,7 @@ public class FCMController {
     @DeleteMapping("/token/delete")
     @Operation(summary = "FCM 토큰 삭제", description = "DB 상에서 FCM 토큰을 삭제")
     public ResponseEntity<Void> deleteToken(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        fcmGroupService.deleteToken(principalDetails.getUser());
+        fcmTokenService.deleteToken(principalDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

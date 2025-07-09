@@ -3,6 +3,7 @@ package kr.co.F1FS.app.global.application.service;
 import com.slack.api.Slack;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.Field;
+import kr.co.F1FS.app.global.application.port.in.SlackUseCase;
 import kr.co.F1FS.app.global.util.Color;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.List;
 import static com.slack.api.webhook.WebhookPayloads.payload;
 
 @Service
-public class SlackService {
+public class SlackService implements SlackUseCase {
     @Value("${webhook.slack.url}")
     private String SLACK_WEBHOOK_URL;
     private final Slack slackClient = Slack.getInstance();

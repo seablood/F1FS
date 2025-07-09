@@ -1,8 +1,9 @@
 package kr.co.F1FS.app.domain.follow.application.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
+import kr.co.F1FS.app.domain.follow.application.port.in.FollowConstructorUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowConstructor;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowConstructorDTO;
@@ -13,15 +14,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FollowConstructorService {
+public class FollowConstructorService implements FollowConstructorUseCase {
     private final FollowMapper followMapper;
     private final FollowConstructorRepository followConstructorRepository;
     private final CacheEvictUtil cacheEvictUtil;
+    private final ConstructorUseCase constructorUseCase;
     private final FollowConstructorPort followConstructorPort;
 
     @Transactional
@@ -35,13 +38,15 @@ public class FollowConstructorService {
                     user, constructor
             );
             followConstructorRepository.delete(followConstructor);
-            followConstructorPort.decreaseFollower(constructor);
+            constructorUseCase.decreaseFollower(constructor);
             return;
         }
 
         FollowConstructor followConstructor = followMapper.toFollowConstructor(user, constructor);
         followConstructorRepository.save(followConstructor);
-        followConstructorPort.increaseFollower(constructor);
+        constructorUseCase.increaseFollower(constructor);
+
+        followConstructorPort.saveAndFlush(constructor);
     }
 
     @Cacheable(value = "FollowingConstructor", key = "#user.id", cacheManager = "redisLongCacheManager")

@@ -45,3 +45,4 @@ application-email.yml
 docker-compose.yml
 application-elastic.yml
 firebase_service_key.json
+application-db.properties

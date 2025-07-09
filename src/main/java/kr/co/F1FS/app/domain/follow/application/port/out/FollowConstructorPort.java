@@ -4,6 +4,5 @@ import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 
 public interface FollowConstructorPort {
     Constructor findByIdNotDTO(Long id);
-    void increaseFollower(Constructor constructor);
-    void decreaseFollower(Constructor constructor);
+    void saveAndFlush(Constructor constructor);
 }

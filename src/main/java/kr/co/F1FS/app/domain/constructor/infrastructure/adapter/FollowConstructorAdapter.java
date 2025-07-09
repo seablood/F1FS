@@ -1,28 +1,26 @@
 package kr.co.F1FS.app.domain.constructor.infrastructure.adapter;
 
-import kr.co.F1FS.app.domain.constructor.application.service.ConstructorService;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
+import kr.co.F1FS.app.domain.constructor.infrastructure.repository.ConstructorRepository;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorPort;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class FollowConstructorAdapter implements FollowConstructorPort {
-    private final ConstructorService constructorService;
+    private final ConstructorRepository constructorRepository;
 
     @Override
     public Constructor findByIdNotDTO(Long id) {
-        return constructorService.findByIdNotDTO(id);
+        return constructorRepository.findById(id)
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
     @Override
-    public void increaseFollower(Constructor constructor) {
-        constructor.increaseFollower();
-    }
-
-    @Override
-    public void decreaseFollower(Constructor constructor) {
-        constructor.decreaseFollower();
+    public void saveAndFlush(Constructor constructor) {
+        constructorRepository.saveAndFlush(constructor);
     }
 }

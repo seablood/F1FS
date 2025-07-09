@@ -20,6 +20,8 @@ public interface DriverUseCase {
     Driver findByIdNotDTO(Long id);
     void updateTeam(Driver driver, String constructorName, String constructorEngName);
     void updateRacingClass(Driver driver, RacingClass racingClass);
+    void increaseFollower(Driver driver);
+    void decreaseFollower(Driver driver);
     ResponseCurrentSeasonDTO getCurrentSeason(Driver driver);
     ResponseSinceDebutDTO getSinceDebut(Driver driver);
     Pageable switchCondition(int page, int size, String condition);

@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.elastic.application.service;
 
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
+import kr.co.F1FS.app.domain.elastic.application.port.in.PostSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.PostSearchRepository;
@@ -21,7 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PostSearchService {
+public class PostSearchService implements PostSearchUseCase {
     private final DocumentMapper documentMapper;
     private final PostSearchRepository postSearchRepository;
     private final ElasticsearchTemplate elasticsearchTemplate;

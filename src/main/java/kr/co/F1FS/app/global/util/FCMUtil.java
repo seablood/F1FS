@@ -1,12 +1,10 @@
 package kr.co.F1FS.app.global.util;
 
+import kr.co.F1FS.app.domain.follow.application.port.in.FollowUserUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.notification.infrastructure.repository.FCMTokenRepository;
-import kr.co.F1FS.app.global.application.port.out.FCMUtilFollowUserPort;
+import kr.co.F1FS.app.global.application.port.out.FCMUtilTokenPort;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
-import kr.co.F1FS.app.global.util.exception.user.UserException;
-import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -17,8 +15,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FCMUtil {
-    private final FCMUtilFollowUserPort followUserPort;
-    private final FCMTokenRepository notificationRepository;
+    private final FollowUserUseCase followUserUseCase;
+    private final FCMUtilTokenPort tokenPort;
 
     public FCMPushDTO sendPushForPost(User author, String title){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
@@ -50,18 +48,26 @@ public class FCMUtil {
         return pushDTO;
     }
 
+    public FCMPushDTO sendPushForNote(User user){
+        FCMPushDTO pushDTO = FCMPushDTO.builder()
+                .topic("note")
+                .title("새로운 쪽지가 도착했습니다.")
+                .content(user.getNickname()+"님이 족지를 보냈습니다.")
+                .build();
+
+        return pushDTO;
+    }
+
     public FCMToken getAuthorToken(User author){
-        return notificationRepository.findByUserId(author.getId())
-                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
+        return tokenPort.findByUserIdOrNull(author.getId());
     }
 
     public List<FCMToken> getFollowerToken(User author){
-        List<ResponseUserIdDTO> followerList = followUserPort.findFollowersNotDTO(author);
+        List<ResponseUserIdDTO> followerList = followUserUseCase.findFollowersNotDTO(author);
         List<FCMToken> tokens = new ArrayList<>();
 
         for (ResponseUserIdDTO followerId : followerList){
-            FCMToken notification = notificationRepository.findByUserId(followerId.getId())
-                    .orElse(null);
+            FCMToken notification = tokenPort.findByUserIdOrNull(followerId.getId());
             if(notification != null) tokens.add(notification);
         }
 

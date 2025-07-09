@@ -1,13 +1,11 @@
 package kr.co.F1FS.app.domain.admin.post.application.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.admin.post.application.port.in.AdminPostUseCase;
 import kr.co.F1FS.app.domain.admin.post.application.port.out.AdminPostPort;
 import kr.co.F1FS.app.domain.admin.post.presentation.dto.AdminResponsePostComplainDTO;
 import kr.co.F1FS.app.domain.complain.post.application.mapper.PostComplainMapper;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
 import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
-import kr.co.F1FS.app.domain.post.application.port.in.PostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
@@ -20,13 +18,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AdminPostService implements AdminPostUseCase {
     private final UserUseCase userUseCase;
-    private final PostUseCase postUseCase;
     private final PostComplainUseCase postComplainUseCase;
     private final AdminPostPort postPort;
     private final PostMapper postMapper;
@@ -51,7 +49,7 @@ public class AdminPostService implements AdminPostUseCase {
 
     @Transactional
     public void delete(Long id){
-        Post post = postUseCase.findByIdNotDTO(id);
+        Post post = postPort.findByIdNotDTO(id);
         cacheEvictUtil.evictCachingPost(post);
 
         postPort.delete(post);

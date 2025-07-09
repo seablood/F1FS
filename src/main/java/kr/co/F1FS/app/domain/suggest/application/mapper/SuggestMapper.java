@@ -21,10 +21,11 @@ public class SuggestMapper {
 
     public ResponseSuggestDTO toResponseSuggestDTO(Suggest suggest){
         LocalDateTime suggestTime = TimeUtil.convertToKoreanTime(suggest.getCreatedAt());
+        String author = suggest.getFromUser() == null ? "탈퇴한 회원" : suggest.getFromUser().getNickname();
 
         return ResponseSuggestDTO.builder()
                 .id(suggest.getId())
-                .author(suggest.getFromUser().getNickname())
+                .author(author)
                 .title(suggest.getTitle())
                 .content(suggest.getContent())
                 .createdAt(TimeUtil.formatPostTime(suggestTime))

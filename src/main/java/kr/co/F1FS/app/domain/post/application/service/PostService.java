@@ -1,11 +1,10 @@
 package kr.co.F1FS.app.domain.post.application.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.notification.application.port.in.FCMLiveUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
 import kr.co.F1FS.app.domain.post.application.port.in.PostUseCase;
-import kr.co.F1FS.app.domain.post.application.port.out.PostFCMLivePort;
-import kr.co.F1FS.app.domain.post.application.port.out.PostNotificationRedisPort;
 import kr.co.F1FS.app.domain.post.application.port.out.PostSearchPort;
 import kr.co.F1FS.app.domain.post.presentation.dto.*;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDTO;
@@ -28,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -38,8 +38,8 @@ public class PostService implements PostUseCase {
     private final PostRepository postRepository;
     private final PostSearchPort postSearchPort;
     private final ValidationService validationService;
-    private final PostFCMLivePort fcmLivePort;
-    private final PostNotificationRedisPort redisPort;
+    private final FCMLiveUseCase fcmLiveUseCase;
+    private final NotificationRedisUseCase redisUseCase;
     private final PostMapper postMapper;
     private final CacheEvictUtil cacheEvictUtil;
     private final FCMUtil fcmUtil;
@@ -52,11 +52,11 @@ public class PostService implements PostUseCase {
         postSearchPort.save(post);
 
         List<FCMToken> tokens = fcmUtil.getFollowerToken(author).stream()
-                .filter(token -> redisPort.isSubscribe(token.getUserId(), "post"))
+                .filter(token -> redisUseCase.isSubscribe(token.getUserId(), "post"))
                 .toList();
         if(!tokens.isEmpty()){
             FCMPushDTO pushDTO = fcmUtil.sendPushForPost(author, post.getTitle());
-            fcmLivePort.sendPushForFollow(pushDTO, tokens, post.getId());
+            fcmLiveUseCase.sendPushForFollow(pushDTO, tokens, post.getId());
             log.info("팔로워 푸시 알림 전송 완료");
         }
 

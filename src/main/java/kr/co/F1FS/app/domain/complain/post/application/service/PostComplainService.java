@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.complain.post.application.service;
 
-import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.complain.post.application.mapper.PostComplainMapper;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainPort;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 
@@ -22,6 +23,7 @@ import java.util.HashMap;
 @Slf4j
 public class PostComplainService implements PostComplainUseCase {
     private final PostComplainPort postPort;
+    private final PostComplainMapper complainMapper;
     private final SlackService slackService;
     private final PostComplainRepository complainRepository;
 
@@ -32,12 +34,7 @@ public class PostComplainService implements PostComplainUseCase {
     @Transactional
     public void postComplain(Long id, User user, CreatePostComplainDTO dto){
         Post post = postPort.findByIdNotDTO(id);
-        PostComplain complain = PostComplain.builder()
-                .toPost(post)
-                .fromUser(user)
-                .description(dto.getDescription())
-                .paraphrase(dto.getParaphrase())
-                .build();
+        PostComplain complain = complainMapper.toPostComplain(post, user, dto);
 
         save(complain);
         sendMessage(complain);
