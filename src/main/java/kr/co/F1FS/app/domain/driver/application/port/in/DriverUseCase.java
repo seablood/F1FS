@@ -20,6 +20,8 @@ public interface DriverUseCase {
     Driver findByIdNotDTO(Long id);
     void updateTeam(Driver driver, String constructorName, String constructorEngName);
     void updateRacingClass(Driver driver, RacingClass racingClass);
+    void updateRecordForRace(Driver driver, int position, int points, boolean isFastestLap);
+    void updateRecordForQualifying(Driver driver, int position);
     void increaseFollower(Driver driver);
     void decreaseFollower(Driver driver);
     ResponseCurrentSeasonDTO getCurrentSeason(Driver driver);

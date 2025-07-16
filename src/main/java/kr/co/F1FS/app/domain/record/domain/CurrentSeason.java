@@ -28,6 +28,26 @@ public class CurrentSeason {
         this.polePosition = 0;
     }
 
+    public void updateChampionshipPoint(int points){
+        this.championshipPoint+=points;
+    }
+
+    public void updatePodiums(){
+        this.podiums++;
+    }
+
+    public void updateHighestFinish(){
+        this.highestFinish++;
+    }
+
+    public void updateFastestLap(){
+        this.fastestLap++;
+    }
+
+    public void updatePolePosition(){
+        this.polePosition++;
+    }
+
     @Builder
     public CurrentSeason(Integer championshipRank, Integer championshipPoint, Integer podiums, Integer highestFinish,
                          Integer fastestLap, Integer polePosition){

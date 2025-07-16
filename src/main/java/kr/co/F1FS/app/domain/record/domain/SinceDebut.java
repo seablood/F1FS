@@ -18,6 +18,26 @@ public class SinceDebut {
     private Integer polePosition;
     private Integer enteredGP;
 
+    public void updatePodiums(){
+        this.podiums++;
+    }
+
+    public void updateHighestFinish(){
+        this.highestFinish++;
+    }
+
+    public void updateFastestLap(){
+        this.fastestLap++;
+    }
+
+    public void updatePolePosition(){
+        this.polePosition++;
+    }
+
+    public void updateEnteredGP(){
+        this.enteredGP++;
+    }
+
     @Builder
     public SinceDebut(Integer podiums, Integer highestFinish, Integer fastestLap, Integer polePosition,
                       Integer enteredGP){

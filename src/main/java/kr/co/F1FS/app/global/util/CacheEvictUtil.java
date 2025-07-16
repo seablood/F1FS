@@ -3,6 +3,7 @@ package kr.co.F1FS.app.global.util;
 import kr.co.F1FS.app.domain.circuit.domain.Circuit;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
+import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
 import kr.co.F1FS.app.domain.post.domain.Post;
@@ -66,4 +67,7 @@ public class CacheEvictUtil {
             @CacheEvict(value = "SimpleCircuitDTO", key = "#circuit.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingCircuit(Circuit circuit){}
+
+    @Caching(evict = @CacheEvict(value = "GrandPrixDTO", key = "#grandPrix.id", cacheManager = "redisLongCacheManager"))
+    public void evictCachingGrandPrix(GrandPrix grandPrix){}
 }

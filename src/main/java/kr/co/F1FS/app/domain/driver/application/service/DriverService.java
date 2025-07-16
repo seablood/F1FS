@@ -6,7 +6,11 @@ import kr.co.F1FS.app.domain.driver.application.port.out.DriverConstructorPort;
 import kr.co.F1FS.app.domain.driver.application.port.out.DriverRecordPort;
 import kr.co.F1FS.app.domain.driver.application.port.out.DriverTeamPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
+import kr.co.F1FS.app.domain.driver.domain.rdb.DriverDebutRelation;
+import kr.co.F1FS.app.domain.driver.domain.rdb.DriverRecordRelation;
 import kr.co.F1FS.app.domain.driver.presentation.dto.CreateDriverDTO;
+import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
+import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
 import kr.co.F1FS.app.domain.team.application.mapper.ConstructorDriverRelationMapper;
 import kr.co.F1FS.app.global.presentation.dto.driver.ResponseDriverDTO;
 import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
@@ -40,6 +44,8 @@ public class DriverService implements DriverUseCase {
     private final DriverConstructorPort driverConstructorPort;
     private final DriverTeamPort driverTeamPort;
     private final DriverRecordPort driverRecordPort;
+    private final CurrentSeasonUseCase currentSeasonUseCase;
+    private final SinceDebutUseCase sinceDebutUseCase;
     private final RecordMapper recordMapper;
     private final DriverMapper driverMapper;
     private final ConstructorDriverRelationMapper relationMapper;
@@ -99,6 +105,24 @@ public class DriverService implements DriverUseCase {
     public void updateRacingClass(Driver driver, RacingClass racingClass) {
         driver.updateRacingClass(racingClass);
         driverRepository.saveAndFlush(driver);
+    }
+
+    @Override
+    public void updateRecordForRace(Driver driver, int position, int points, boolean isFastestLap){
+        DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
+        DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
+
+        currentSeasonUseCase.updateCurrentSeasonForRace(recordRelation.getCurrentSeason(), position, points, isFastestLap);
+        sinceDebutUseCase.updateSinceDebutForRace(debutRelation.getSinceDebut(), position, isFastestLap);
+    }
+
+    @Override
+    public void updateRecordForQualifying(Driver driver, int position){
+        DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
+        DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
+
+        currentSeasonUseCase.updateCurrentSeasonForQualifying(recordRelation.getCurrentSeason(), position);
+        sinceDebutUseCase.updateSinceDebutForQualifying(debutRelation.getSinceDebut(), position);
     }
 
     public void increaseFollower(Driver driver){
