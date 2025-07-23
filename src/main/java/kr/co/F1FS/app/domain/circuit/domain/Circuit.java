@@ -27,6 +27,9 @@ public class Circuit {
     private Integer laps;
     @Positive(message = "fastestLap값을 확인해주세요.")
     private Long fastestLap;
+    private String fastestLapDriver;
+    @Positive(message = "fastestLapSeason값을 확인해주세요.")
+    private Integer fastestLapSeason;
     @Positive(message = "raceDistance값을 확인해주세요.")
     private Double raceDistance;
 
@@ -37,18 +40,22 @@ public class Circuit {
         this.first_grand_prix = command.getFirst_grand_prix();
         this.laps = command.getLaps();
         this.fastestLap = LapMillisUtil.fastestToMillis(command.getFastestLap());
+        this.fastestLapDriver = command.getFastestLapDriver();
+        this.fastestLapSeason = command.getFastestLapSeason();
         this.raceDistance = command.getRaceDistance();
     }
 
     @Builder
     public Circuit(String name, String engName, Double length, Integer first_grand_prix, Integer laps, Long fastestLap,
-                   Double raceDistance){
+                   String fastestLapDriver, Integer fastestLapSeason, Double raceDistance){
         this.name = name;
         this.engName = engName;
         this.length = length;
         this.first_grand_prix = first_grand_prix;
         this.laps = laps;
         this.fastestLap = fastestLap;
+        this.fastestLapDriver = fastestLapDriver;
+        this.fastestLapSeason = fastestLapSeason;
         this.raceDistance = raceDistance;
     }
 }

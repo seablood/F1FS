@@ -25,50 +25,70 @@ public class GrandPrix {
     private Long id;
     private String name;
     private String engName;
-    @Column(name = "first_practice_time")
+    @Column(name = "first_session_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp firstPracticeTime;
-    @Column(name = "second_practice_time")
+    private Timestamp firstSessionTime;
+    @Column(name = "last_session_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp secondPracticeTime;
-    @Column(name = "third_practice_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp thirdPracticeTime;
-    @Column(name = "sprint_qualifying_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp sprintQualifyingTime;
-    @Column(name = "qualifying_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp qualifyingTime;
-    @Column(name = "sprint_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp sprintTime;
-    @Column(name = "race_time")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp raceTime;
+    private Timestamp lastSessionTime;
+    private Long firstPractice;
+    private Long secondPractice;
+    private Long thirdPractice;
+    private Long sprintQualifying;
+    private Long qualifying;
+    private Long sprint;
+    private Long race;
     @Lob
     private String description;
     @Positive(message = "정확한 ID를 입력하세요.")
     private Long circuitId;
     private Integer season;
     private Integer round;
+    private String firstPracticeTime;
+    private String secondPracticeTime;
+    private String thirdPracticeTime;
+    private String sprintQualifyingTime;
+    private String qualifyingTime;
+    private String sprintTime;
+    private String raceTime;
+
+    public void setFirstPractice(Long firstPractice) {
+        this.firstPractice = firstPractice;
+    }
+
+    public void setSecondPractice(Long secondPractice) {
+        this.secondPractice = secondPractice;
+    }
+
+    public void setThirdPractice(Long thirdPractice) {
+        this.thirdPractice = thirdPractice;
+    }
+
+    public void setSprintQualifying(Long sprintQualifying) {
+        this.sprintQualifying = sprintQualifying;
+    }
+
+    public void setQualifying(Long qualifying) {
+        this.qualifying = qualifying;
+    }
+
+    public void setSprint(Long sprint) {
+        this.sprint = sprint;
+    }
+
+    public void setRace(Long race) {
+        this.race = race;
+    }
 
     public void modify(ModifyGrandPrixCommand command){
         this.name = command.getName();
         this.engName = command.getEngName();
-        this.firstPracticeTime = command.getFirstPracticeTime();
-        this.secondPracticeTime = command.getSecondPracticeTime();
-        this.thirdPracticeTime = command.getThirdPracticeTime();
-        this.sprintQualifyingTime = command.getSprintQualifyingTime();
-        this.qualifyingTime = command.getQualifyingTime();
-        this.sprintTime = command.getSprintTime();
-        this.raceTime  = command.getRaceTime();
         this.description = command.getDescription();
         this.circuitId = command.getCircuitId();
     }
 
     public boolean isThisWeek(){
-        Timestamp grandTime = this.firstPracticeTime;
+        Timestamp grandTime = this.firstSessionTime;
 
         LocalDate raceDate = grandTime.toInstant()
                 .atZone(ZoneId.of("Asia/Seoul"))
@@ -84,19 +104,21 @@ public class GrandPrix {
     }
 
     @Builder
-    public GrandPrix(String name, String engName, Timestamp firstPracticeTime, Timestamp secondPracticeTime,
-                     Timestamp thirdPracticeTime, Timestamp sprintQualifyingTime, Timestamp qualifyingTime,
-                     Timestamp sprintTime, Timestamp raceTime, String description, Long circuitId,
-                     Integer season, Integer round){
+    public GrandPrix(String name, String engName, Timestamp firstSessionTime, Timestamp lastSessionTime,
+                     String firstPracticeTime, String secondPracticeTime, String thirdPracticeTime,
+                     String sprintQualifyingTime, String qualifyingTime, String sprintTime, String raceTime,
+                     String description, Long circuitId, Integer season, Integer round){
         this.name = name;
         this.engName = engName;
+        this.firstSessionTime = firstSessionTime;
+        this.lastSessionTime = lastSessionTime;
         this.firstPracticeTime = firstPracticeTime;
         this.secondPracticeTime = secondPracticeTime;
         this.thirdPracticeTime = thirdPracticeTime;
         this.sprintQualifyingTime = sprintQualifyingTime;
         this.qualifyingTime = qualifyingTime;
         this.sprintTime = sprintTime;
-        this.raceTime  =raceTime;
+        this.raceTime = raceTime;
         this.description = description;
         this.circuitId = circuitId;
         this.season = season;

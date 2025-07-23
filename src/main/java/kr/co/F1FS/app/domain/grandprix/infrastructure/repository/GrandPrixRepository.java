@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface GrandPrixRepository extends JpaRepository<GrandPrix, Long> {
-    Page<GrandPrix> findAll(Pageable pageable);
+    Page<GrandPrix> findGrandPrixesBySeason(Integer season, Pageable pageable);
 }

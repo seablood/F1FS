@@ -12,5 +12,6 @@ import java.util.Optional;
 public interface DriverRepository extends JpaRepository<Driver, Long> {
     Optional<Driver> findByNumber(Integer number);
     Optional<Driver> findByName(String name);
+    Optional<Driver> findByEngName(String engName);
     Page<Driver> findAll(Pageable pageable);
 }

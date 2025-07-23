@@ -23,8 +23,9 @@ public class GrandPrixController {
     @GetMapping("/find-all")
     @Operation(summary = "모든 그랑프리 리스트", description = "모든 그랑프리 리스트를 반환")
     public ResponseEntity<List<SimpleResponseGrandPrixDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                    @RequestParam(value = "size", defaultValue = "10") int size){
-        Page<SimpleResponseGrandPrixDTO> newPage = grandPrixService.findAll(page, size);
+                                                                    @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                    @RequestParam(value = "season", defaultValue = "2025") int season){
+        Page<SimpleResponseGrandPrixDTO> newPage = grandPrixService.findAll(page, size, season);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }

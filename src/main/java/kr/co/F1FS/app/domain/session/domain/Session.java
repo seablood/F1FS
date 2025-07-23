@@ -1,11 +1,8 @@
 package kr.co.F1FS.app.domain.session.domain;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.global.util.SessionType;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -18,14 +15,11 @@ public class Session {
     private Long id;
     @Enumerated(value = EnumType.STRING)
     private SessionType sessionType;
-    @ManyToOne
-    @JoinColumn(name = "grand_prix_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private GrandPrix grandPrix;
+    private String time;
 
     @Builder
-    public Session(SessionType sessionType, GrandPrix grandPrix){
+    public Session(SessionType sessionType, String time){
         this.sessionType = sessionType;
-        this.grandPrix = grandPrix;
+        this.time = time;
     }
 }

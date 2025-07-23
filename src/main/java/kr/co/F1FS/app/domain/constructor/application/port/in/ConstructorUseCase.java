@@ -17,6 +17,8 @@ public interface ConstructorUseCase {
     Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition);
     ResponseConstructorDTO findById(Long id);
     Constructor findByIdNotDTO(Long id);
+    void updateRecordForRace(Constructor constructor, int position, int points, boolean isFastestLap);
+    void updateRecordForQualifying(Constructor constructor, int position);
     void increaseFollower(Constructor constructor);
     void decreaseFollower(Constructor constructor);
     List<String> getDrivers(Constructor constructor);

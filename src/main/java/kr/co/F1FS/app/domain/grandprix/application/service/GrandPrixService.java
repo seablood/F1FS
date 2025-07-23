@@ -13,6 +13,7 @@ import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
+import kr.co.F1FS.app.global.util.SessionType;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +43,11 @@ public class GrandPrixService implements GrandPrixUseCase {
     }
 
     @Override
-    public Page<SimpleResponseGrandPrixDTO> findAll(int page, int size){
+    public Page<SimpleResponseGrandPrixDTO> findAll(int page, int size, Integer season){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "firstPracticeTime"));
 
-        return grandPrixRepository.findAll(pageable).map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(
-                grandPrix
-        ));
+        return grandPrixRepository.findGrandPrixesBySeason(season, pageable)
+                .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix));
     }
 
     @Override
@@ -67,5 +67,40 @@ public class GrandPrixService implements GrandPrixUseCase {
         validationService.checkValid(grandPrix);
 
         return grandPrix;
+    }
+
+    @Override
+    public void setFirstPractice(GrandPrix grandPrix, Long firstPractice) {
+        grandPrix.setFirstPractice(firstPractice);
+    }
+
+    @Override
+    public void setSecondPractice(GrandPrix grandPrix, Long secondPractice) {
+        grandPrix.setSecondPractice(secondPractice);
+    }
+
+    @Override
+    public void setThirdPractice(GrandPrix grandPrix, Long thirdPractice) {
+        grandPrix.setThirdPractice(thirdPractice);
+    }
+
+    @Override
+    public void setSprintQualifying(GrandPrix grandPrix, Long sprintQualifying) {
+        grandPrix.setSprintQualifying(sprintQualifying);
+    }
+
+    @Override
+    public void setQualifying(GrandPrix grandPrix, Long qualifying) {
+        grandPrix.setQualifying(qualifying);
+    }
+
+    @Override
+    public void setSprint(GrandPrix grandPrix, Long sprint) {
+        grandPrix.setSprint(sprint);
+    }
+
+    @Override
+    public void setRace(GrandPrix grandPrix, Long race) {
+        grandPrix.setRace(race);
     }
 }

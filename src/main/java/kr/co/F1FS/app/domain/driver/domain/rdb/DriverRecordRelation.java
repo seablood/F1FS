@@ -32,11 +32,21 @@ public class DriverRecordRelation {
 
     @Enumerated(value = EnumType.STRING)
     private RacingClass racingClass;
+    private boolean entryClassSeason;
+
+    public boolean isEntryClassSeason(){
+        return this.entryClassSeason;
+    }
+
+    public void updateEntryClassSeason(boolean entryClassSeason){
+        this.entryClassSeason = entryClassSeason;
+    }
 
     @Builder
     public DriverRecordRelation(Driver driver, CurrentSeason currentSeason, RacingClass racingClass){
         this.driverInfo = driver;
         this.currentSeason = currentSeason;
         this.racingClass = racingClass;
+        this.entryClassSeason = false;
     }
 }

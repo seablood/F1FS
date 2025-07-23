@@ -82,6 +82,24 @@ public class ConstructorService implements ConstructorUseCase {
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 
+    @Override
+    public void updateRecordForRace(Constructor constructor, int position, int points, boolean isFastestLap){
+        ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
+
+        if(!relation.isEntryClassSeason()) relation.updateEntryClassSeason(true);
+
+        recordRelationService.updateRecordForRace(relation, position, points, isFastestLap);
+    }
+
+    @Override
+    public void updateRecordForQualifying(Constructor constructor, int position){
+        ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
+
+        if(!relation.isEntryClassSeason()) relation.updateEntryClassSeason(true);
+
+        recordRelationService.updateRecordForQualifying(relation, position);
+    }
+
     public void increaseFollower(Constructor constructor){
         constructor.increaseFollower();
     }

@@ -16,6 +16,8 @@ public class AdminCircuitMapper {
                 .first_grand_prix(dto.getFirst_grand_prix())
                 .laps(dto.getLaps())
                 .fastestLap(dto.getFastestLap())
+                .fastestLapDriver(dto.getFastestLapDriver())
+                .fastestLapSeason(dto.getFastestLapSeason())
                 .raceDistance(dto.getRaceDistance())
                 .build();
     }
@@ -28,6 +30,8 @@ public class AdminCircuitMapper {
                 .first_grand_prix(dto.getFirst_grand_prix())
                 .laps(dto.getLaps())
                 .fastestLap(dto.getFastestLap())
+                .fastestLapDriver(dto.getFastestLapDriver())
+                .fastestLapSeason(dto.getFastestLapSeason())
                 .raceDistance(dto.getRaceDistance())
                 .build();
     }

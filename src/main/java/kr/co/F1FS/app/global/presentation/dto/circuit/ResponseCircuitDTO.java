@@ -16,5 +16,7 @@ public class ResponseCircuitDTO {
     private Integer first_grand_prix;
     private Integer laps;
     private String fastestLap;
+    private String fastestLapDriver;
+    private Integer fastestLapSeason;
     private Double raceDistance;
 }

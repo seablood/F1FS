@@ -17,6 +17,8 @@ public class CircuitMapper {
                 .laps(command.getLaps())
                 .first_grand_prix(command.getFirst_grand_prix())
                 .fastestLap(LapMillisUtil.fastestToMillis(command.getFastestLap()))
+                .fastestLapDriver(command.getFastestLapDriver())
+                .fastestLapSeason(command.getFastestLapSeason())
                 .raceDistance(command.getRaceDistance())
                 .build();
     }
@@ -29,6 +31,8 @@ public class CircuitMapper {
                 .laps(circuit.getLaps())
                 .first_grand_prix(circuit.getFirst_grand_prix())
                 .fastestLap(LapMillisUtil.fastestLapFormat(circuit.getFastestLap()))
+                .fastestLapDriver(circuit.getFastestLapDriver())
+                .fastestLapSeason(circuit.getFastestLapSeason())
                 .raceDistance(circuit.getRaceDistance())
                 .build();
     }

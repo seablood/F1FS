@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.session.domain.Session;
 import kr.co.F1FS.app.domain.sessionresult.domain.SessionResult;
 import kr.co.F1FS.app.domain.sessionresult.presentation.dto.CreateSessionResultCommand;
+import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,18 @@ public class SessionResultMapper {
                 .points(command.getPoints())
                 .isFastestLap(command.isFastestLap())
                 .raceStatus(command.getRaceStatus())
+                .build();
+    }
+
+    public ResponseSessionResultDTO toResponseSessionResultDTO(SessionResult sessionResult){
+        return ResponseSessionResultDTO.builder()
+                .driverName(sessionResult.getDriver().getName())
+                .constructorName(sessionResult.getConstructor().getName())
+                .position(sessionResult.getPosition())
+                .timeOrGap(sessionResult.getTimeOrGap())
+                .points(sessionResult.getPoints())
+                .isFastestLap(sessionResult.isFastestLap())
+                .raceStatus(sessionResult.getRaceStatus())
                 .build();
     }
 }

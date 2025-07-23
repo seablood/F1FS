@@ -17,6 +17,7 @@ public interface DriverUseCase {
                 CreateSinceDebutDTO sinceDebutDTO);
     Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition);
     ResponseDriverDTO findById(Long id);
+    ResponseDriverDTO findByEngName(String engName);
     Driver findByIdNotDTO(Long id);
     void updateTeam(Driver driver, String constructorName, String constructorEngName);
     void updateRacingClass(Driver driver, RacingClass racingClass);

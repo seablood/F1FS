@@ -16,20 +16,13 @@ import java.sql.Timestamp;
 public class ResponseGrandPrixDTO {
     private String name;
     private String engName;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp firstPracticeTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp secondPracticeTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp thirdPracticeTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp sprintQualifyingTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp qualifyingTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp sprintTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-    private Timestamp raceTime;
+    private SimpleResponseSessionDTO firstPractice;
+    private SimpleResponseSessionDTO secondPractice;
+    private SimpleResponseSessionDTO thirdPractice;
+    private SimpleResponseSessionDTO sprintQualifying;
+    private SimpleResponseSessionDTO qualifying;
+    private SimpleResponseSessionDTO sprint;
+    private SimpleResponseSessionDTO race;
     private String description;
     private SimpleResponseCircuitDTO circuit;
 }

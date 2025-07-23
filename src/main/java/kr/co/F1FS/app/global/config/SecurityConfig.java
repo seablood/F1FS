@@ -97,7 +97,9 @@ public class SecurityConfig {
                                     "/elastic/**",
                                     "/api/v1/fcm/**",
                                     "/api/v1/admin/**",
-                                    "/api/v1/suggest/**").permitAll()
+                                    "/api/v1/suggest/**",
+                                    "/api/v1/grand-prix/**",
+                                    "/api/v1/session/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->

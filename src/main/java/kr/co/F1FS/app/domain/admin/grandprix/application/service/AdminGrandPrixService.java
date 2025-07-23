@@ -33,8 +33,8 @@ public class AdminGrandPrixService implements AdminGrandPrixUseCase {
     public ResponseGrandPrixDTO save(CreateGrandPrixDTO dto) {
         GrandPrix grandPrix = grandPrixUseCase.createGrandPrix(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
         Circuit circuit = circuitPort.getCircuitByIdNotDTO(grandPrix.getCircuitId());
-        grandPrixPort.save(grandPrix);
         sessionUseCase.save(grandPrix);
+        grandPrixPort.save(grandPrix);
 
         return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
     }

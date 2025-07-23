@@ -8,4 +8,6 @@ import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 public interface ConstructorRecordRelationUseCase {
     void save(Constructor constructor, CurrentSeason currentSeason, SinceDebut sinceDebut);
     ConstructorRecordRelation findByConstructor(Constructor constructor);
+    void updateRecordForRace(ConstructorRecordRelation relation, int position, int points, boolean isFastestLap);
+    void updateRecordForQualifying(ConstructorRecordRelation relation, int position);
 }

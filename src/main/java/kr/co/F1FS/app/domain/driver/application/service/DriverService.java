@@ -90,6 +90,17 @@ public class DriverService implements DriverUseCase {
         return driverMapper.toResponseDriverDTO(driver, currentSeasonDTO, sinceDebutDTO);
     }
 
+    @Override
+    @Cacheable(value = "DriverDTOByEngName", key = "#engName", cacheManager = "redisLongCacheManager")
+    public ResponseDriverDTO findByEngName(String engName){
+        Driver driver = driverRepository.findByEngName(engName)
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
+        ResponseCurrentSeasonDTO currentSeasonDTO = getCurrentSeason(driver);
+        ResponseSinceDebutDTO sinceDebutDTO = getSinceDebut(driver);
+
+        return driverMapper.toResponseDriverDTO(driver, currentSeasonDTO, sinceDebutDTO);
+    }
+
     @Cacheable(value = "Driver", key = "#id", cacheManager = "redisLongCacheManager")
     public Driver findByIdNotDTO(Long id){
         return driverRepository.findById(id)
@@ -112,6 +123,8 @@ public class DriverService implements DriverUseCase {
         DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
         DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
 
+        if(!recordRelation.isEntryClassSeason()) recordRelation.updateEntryClassSeason(true);
+
         currentSeasonUseCase.updateCurrentSeasonForRace(recordRelation.getCurrentSeason(), position, points, isFastestLap);
         sinceDebutUseCase.updateSinceDebutForRace(debutRelation.getSinceDebut(), position, isFastestLap);
     }
@@ -120,6 +133,8 @@ public class DriverService implements DriverUseCase {
     public void updateRecordForQualifying(Driver driver, int position){
         DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
         DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
+
+        if(!recordRelation.isEntryClassSeason()) recordRelation.updateEntryClassSeason(true);
 
         currentSeasonUseCase.updateCurrentSeasonForQualifying(recordRelation.getCurrentSeason(), position);
         sinceDebutUseCase.updateSinceDebutForQualifying(debutRelation.getSinceDebut(), position);

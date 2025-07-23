@@ -22,6 +22,10 @@ public class ModifyCircuitDTO {
     private Integer laps;
     @NotNull(message = "fastestLap는 null이 될 수 없습니다.")
     private String fastestLap;
+    @NotNull(message = "fastestLapDriver는 null이 될 수 없습니다.")
+    private String fastestLapDriver;
+    @NotNull(message = "fastestLapSeason는 null이 될 수 없습니다.")
+    private Integer fastestLapSeason;
     @NotNull(message = "raceDistance는 null이 될 수 없습니다.")
     private Double raceDistance;
 }

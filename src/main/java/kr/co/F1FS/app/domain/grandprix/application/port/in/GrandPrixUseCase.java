@@ -9,7 +9,14 @@ import org.springframework.data.domain.Page;
 
 public interface GrandPrixUseCase {
     GrandPrix createGrandPrix(CreateGrandPrixCommand command);
-    Page<SimpleResponseGrandPrixDTO> findAll(int page, int size);
+    Page<SimpleResponseGrandPrixDTO> findAll(int page, int size, Integer season);
     ResponseGrandPrixDTO getGrandPrixById(Long id);
     GrandPrix modify(ModifyGrandPrixCommand command, GrandPrix grandPrix);
+    void setFirstPractice(GrandPrix grandPrix, Long firstPractice);
+    void setSecondPractice(GrandPrix grandPrix, Long secondPractice);
+    void setThirdPractice(GrandPrix grandPrix, Long thirdPractice);
+    void setSprintQualifying(GrandPrix grandPrix, Long sprintQualifying);
+    void setQualifying(GrandPrix grandPrix, Long qualifying);
+    void setSprint(GrandPrix grandPrix, Long sprint);
+    void setRace(GrandPrix grandPrix, Long race);
 }

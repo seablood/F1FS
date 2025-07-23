@@ -8,6 +8,7 @@ import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
+import kr.co.F1FS.app.domain.session.domain.Session;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
 import kr.co.F1FS.app.domain.user.domain.User;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,7 +26,8 @@ public class CacheEvictUtil {
     @Caching(evict = {
             @CacheEvict(value = "DriverDTO", key = "#driver.id", cacheManager = "redisLongCacheManager"),
             @CacheEvict(value = "Driver", key = "#driver.id", cacheManager = "redisLongCacheManager"),
-            @CacheEvict(value = "DriverByNumber", key = "#driver.number", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "DriverByNumber", key = "#driver.number", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "DriverDTOByEngName", key = "#driver.engName", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingDriver(Driver driver){}
 
@@ -70,4 +72,7 @@ public class CacheEvictUtil {
 
     @Caching(evict = @CacheEvict(value = "GrandPrixDTO", key = "#grandPrix.id", cacheManager = "redisLongCacheManager"))
     public void evictCachingGrandPrix(GrandPrix grandPrix){}
+
+    @Caching(evict = @CacheEvict(value = "SessionDTO", key = "#session.id", cacheManager = "redisLongCacheManager"))
+    public void evictCachingSession(Session session){}
 }

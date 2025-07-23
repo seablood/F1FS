@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.constructor.domain;
 import jakarta.persistence.*;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -35,11 +36,25 @@ public class ConstructorRecordRelation {
     @JoinColumn(name = "sinceDebut_id", foreignKey = @ForeignKey(name = "FK_CRR_sinceDebut_id"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private SinceDebut sinceDebut;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
+    private boolean entryClassSeason;
+
+    public boolean isEntryClassSeason(){
+        return this.entryClassSeason;
+    }
+
+    public void updateEntryClassSeason(boolean entryClassSeason){
+        this.entryClassSeason = entryClassSeason;
+    }
 
     @Builder
-    public ConstructorRecordRelation(Constructor constructor, CurrentSeason currentSeason, SinceDebut sinceDebut){
+    public ConstructorRecordRelation(Constructor constructor, CurrentSeason currentSeason, SinceDebut sinceDebut,
+                                     RacingClass racingClass){
         this.constructorInfo = constructor;
         this.currentSeason = currentSeason;
         this.sinceDebut = sinceDebut;
+        this.racingClass = racingClass;
+        this.entryClassSeason = false;
     }
 }

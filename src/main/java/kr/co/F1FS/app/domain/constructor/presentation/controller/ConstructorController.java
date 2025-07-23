@@ -2,6 +2,8 @@ package kr.co.F1FS.app.domain.constructor.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.F1FS.app.domain.constructor.application.service.ConstructorRecordRelationService;
+import kr.co.F1FS.app.domain.constructor.presentation.dto.ResponseConstructorStandingDTO;
 import kr.co.F1FS.app.global.presentation.dto.constructor.ResponseConstructorDTO;
 import kr.co.F1FS.app.domain.constructor.application.service.ConstructorService;
 import kr.co.F1FS.app.global.presentation.dto.constructor.SimpleResponseConstructorDTO;
@@ -19,6 +21,7 @@ import java.util.List;
 @Tag(name = "Constructor Controller", description = "컨스트럭터 관련 서비스")
 public class ConstructorController {
     private final ConstructorService constructorService;
+    private final ConstructorRecordRelationService relationService;
 
     @GetMapping("/{id}")
     @Operation(summary = "컨스트럭터 검색(id)", description = "특정 id의 컨스트럭터를 검색한다.")
@@ -33,5 +36,11 @@ public class ConstructorController {
                                                                       @RequestParam(value = "condition", defaultValue = "new") String condition){
         Page<SimpleResponseConstructorDTO> newPage = constructorService.findAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
+    @GetMapping("/constructor-standing")
+    @Operation(summary = "컨스트럭터 챔피언십 순위", description = "컨스트럭터 챔피언십 순위 반환")
+    public ResponseEntity<List<ResponseConstructorStandingDTO>> getConstructorStandingList(@RequestParam String racingClassCode){
+        return ResponseEntity.status(HttpStatus.OK).body(relationService.getConstructorStandingList(racingClassCode));
     }
 }
