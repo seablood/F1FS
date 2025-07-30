@@ -5,12 +5,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.admin.driver.application.service.AdminDriverService;
 import kr.co.F1FS.app.domain.admin.driver.presentation.dto.AdminResponseDriverDTO;
+import kr.co.F1FS.app.domain.admin.driver.presentation.dto.ModifyDriverDTO;
 import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationUseCase;
 import kr.co.F1FS.app.domain.admin.driver.presentation.dto.CombinedDriverRequest;
+import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +29,28 @@ public class AdminDriverController {
     @Operation(summary = "드라이버 생성", description = "드라이버를 생성하고 컨스트럭터 소속을 저장한다.")
     public ResponseEntity<AdminResponseDriverDTO> save(@Valid @RequestBody CombinedDriverRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(adminDriverService.save(request));
+    }
+
+    @GetMapping("/find-all")
+    @Operation(summary = "드라이버 전체 리스트", description = "드라이버 전체 리스트 반환")
+    public ResponseEntity<List<SimpleResponseDriverDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                 @RequestParam(value = "condition", defaultValue = "nameASC") String condition){
+        Page<SimpleResponseDriverDTO> newPage = adminDriverService.findAll(page, size, condition);
+        return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
+    @GetMapping("/find/{id}")
+    @Operation(summary = "드라이버 상세 정보", description = "특정 ID 드라이버 상세 정보 반환")
+    public ResponseEntity<AdminResponseDriverDTO> getDriverById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(adminDriverService.getDriverById(id));
+    }
+
+    @PutMapping("/modify/{id}")
+    @Operation(summary = "드라이버 수정", description = "특정 드라이버 정보 수정")
+    public ResponseEntity<AdminResponseDriverDTO> modify(@PathVariable Long id,
+                                                         @Valid @RequestBody ModifyDriverDTO dto){
+        return ResponseEntity.status(HttpStatus.OK).body(adminDriverService.modify(id, dto));
     }
 
     @PutMapping("/modify/constructor/{number}/{constructorName}")

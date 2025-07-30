@@ -6,6 +6,7 @@ import kr.co.F1FS.app.global.presentation.dto.circuit.SimpleResponseCircuitDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseSessionDTO;
+import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.SessionType;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class GrandPrixMapper {
                 .circuitId(command.getCircuitId())
                 .season(command.getSeason())
                 .round(command.getRound())
+                .racingClass(RacingClass.valueOf(command.getRacingClass()))
                 .build();
     }
 

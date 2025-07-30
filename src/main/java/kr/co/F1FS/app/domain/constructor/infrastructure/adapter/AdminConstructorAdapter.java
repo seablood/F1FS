@@ -8,6 +8,8 @@ import kr.co.F1FS.app.domain.constructor.infrastructure.repository.ConstructorRe
 import kr.co.F1FS.app.domain.constructor.presentation.dto.CreateConstructorDTO;
 import kr.co.F1FS.app.domain.record.presentation.dto.CreateCurrentSeasonDTO;
 import kr.co.F1FS.app.domain.record.presentation.dto.CreateSinceDebutDTO;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
+import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,5 +21,16 @@ public class AdminConstructorAdapter implements AdminConstructorPort {
     @Override
     public Constructor save(Constructor constructor) {
         return constructorRepository.save(constructor);
+    }
+
+    @Override
+    public void saveAndFlush(Constructor constructor) {
+        constructorRepository.saveAndFlush(constructor);
+    }
+
+    @Override
+    public Constructor findById(Long id) {
+        return constructorRepository.findById(id)
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
 }

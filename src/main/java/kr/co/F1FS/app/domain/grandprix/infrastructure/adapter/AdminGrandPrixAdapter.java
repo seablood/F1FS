@@ -14,8 +14,8 @@ public class AdminGrandPrixAdapter implements AdminGrandPrixPort {
     private final GrandPrixRepository grandPrixRepository;
 
     @Override
-    public void save(GrandPrix grandPrix) {
-        grandPrixRepository.save(grandPrix);
+    public GrandPrix save(GrandPrix grandPrix) {
+        return grandPrixRepository.save(grandPrix);
     }
 
     @Override

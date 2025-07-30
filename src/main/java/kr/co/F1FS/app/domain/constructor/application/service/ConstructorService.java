@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorTeamPor
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorRecordPort;
+import kr.co.F1FS.app.domain.constructor.presentation.dto.ModifyConstructorCommand;
 import kr.co.F1FS.app.domain.record.application.mapper.RecordMapper;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
@@ -80,6 +81,11 @@ public class ConstructorService implements ConstructorUseCase {
     public Constructor findByIdNotDTO(Long id){
         return constructorRepository.findById(id)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
+    }
+
+    @Override
+    public void modify(Constructor constructor, ModifyConstructorCommand command){
+        constructor.modify(command);
     }
 
     @Override

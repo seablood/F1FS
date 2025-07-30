@@ -70,9 +70,18 @@ public class CacheEvictUtil {
     })
     public void evictCachingCircuit(Circuit circuit){}
 
-    @Caching(evict = @CacheEvict(value = "GrandPrixDTO", key = "#grandPrix.id", cacheManager = "redisLongCacheManager"))
+    @Caching(evict = {
+            @CacheEvict(value = "GrandPrixDTO", key = "#grandPrix.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "GrandPrixList", key = "#grandPrix.season", cacheManager = "redisLongCacheManager")
+    })
     public void evictCachingGrandPrix(GrandPrix grandPrix){}
 
     @Caching(evict = @CacheEvict(value = "SessionDTO", key = "#session.id", cacheManager = "redisLongCacheManager"))
     public void evictCachingSession(Session session){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "ConstructorStandingList", key = "#racingClassCode", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "DriverStandingList", key = "#racingClassCode", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingStandingList(String racingClassCode){}
 }

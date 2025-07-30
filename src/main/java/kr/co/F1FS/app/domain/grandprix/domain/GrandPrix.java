@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.ModifyGrandPrixCommand;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 
 import java.sql.Timestamp;
@@ -51,6 +52,8 @@ public class GrandPrix {
     private String qualifyingTime;
     private String sprintTime;
     private String raceTime;
+    @Enumerated(value = EnumType.STRING)
+    private RacingClass racingClass;
 
     public void setFirstPractice(Long firstPractice) {
         this.firstPractice = firstPractice;
@@ -107,7 +110,7 @@ public class GrandPrix {
     public GrandPrix(String name, String engName, Timestamp firstSessionTime, Timestamp lastSessionTime,
                      String firstPracticeTime, String secondPracticeTime, String thirdPracticeTime,
                      String sprintQualifyingTime, String qualifyingTime, String sprintTime, String raceTime,
-                     String description, Long circuitId, Integer season, Integer round){
+                     String description, Long circuitId, Integer season, Integer round, RacingClass racingClass){
         this.name = name;
         this.engName = engName;
         this.firstSessionTime = firstSessionTime;
@@ -123,5 +126,6 @@ public class GrandPrix {
         this.circuitId = circuitId;
         this.season = season;
         this.round = round;
+        this.racingClass = racingClass;
     }
 }

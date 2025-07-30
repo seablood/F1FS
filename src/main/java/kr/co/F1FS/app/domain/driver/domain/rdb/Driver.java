@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.driver.domain.rdb;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import kr.co.F1FS.app.domain.driver.presentation.dto.ModifyDriverCommand;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 
@@ -34,6 +35,15 @@ public class Driver {
     //
     // 드라이버 이미지 제공 필요
                        //
+
+    public void modify(ModifyDriverCommand command){
+        this.name = command.getName();
+        this.engName = command.getEngName();
+        this.number = command.getNumber();
+        this.championships = command.getChampionships();
+        this.country = command.getCountry();
+        this.birth = command.getBirth();
+    }
 
     public void updateTeam(String team, String engTeam){
         this.team = team;

@@ -55,6 +55,7 @@ public class SessionResultService implements SessionResultUseCase {
                     if(command.getRaceStatus().equals(RaceStatus.FINISHED)){
                         cacheEvictUtil.evictCachingDriver(driver);
                         cacheEvictUtil.evictCachingConstructor(constructor);
+                        cacheEvictUtil.evictCachingStandingList(session.getRacingClass().toString());
 
                         driverUseCase.updateRecordForRace(driver, command.getPosition(), command.getPoints(), command.isFastestLap());
                         constructorUseCase.updateRecordForRace(constructor, command.getPosition(), command.getPoints(),

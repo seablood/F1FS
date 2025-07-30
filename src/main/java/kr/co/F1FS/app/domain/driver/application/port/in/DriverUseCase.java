@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.driver.application.port.in;
 
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.presentation.dto.CreateDriverDTO;
+import kr.co.F1FS.app.domain.driver.presentation.dto.ModifyDriverCommand;
 import kr.co.F1FS.app.global.presentation.dto.driver.ResponseDriverDTO;
 import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
 import kr.co.F1FS.app.domain.record.presentation.dto.CreateCurrentSeasonDTO;
@@ -19,6 +20,7 @@ public interface DriverUseCase {
     ResponseDriverDTO findById(Long id);
     ResponseDriverDTO findByEngName(String engName);
     Driver findByIdNotDTO(Long id);
+    void modify(Driver driver, ModifyDriverCommand command);
     void updateTeam(Driver driver, String constructorName, String constructorEngName);
     void updateRacingClass(Driver driver, RacingClass racingClass);
     void updateRecordForRace(Driver driver, int position, int points, boolean isFastestLap);

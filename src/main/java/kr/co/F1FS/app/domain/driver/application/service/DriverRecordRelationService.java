@@ -11,6 +11,7 @@ import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.exception.driver.DriverException;
 import kr.co.F1FS.app.global.util.exception.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class DriverRecordRelationService implements DriverRecordRelationUseCase 
     }
 
     @Override
+    @Cacheable(value = "DriverStandingList", key = "#racingClassCode", cacheManager = "redisLongCacheManager")
     public List<ResponseDriverStandingDTO> getDriverStandingList(String racingClassCode){
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
         List<DriverRecordRelation> relationList = relationRepository.findDriverRecordRelationsByRacingClassAndEntryClassSeason(

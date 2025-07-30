@@ -13,16 +13,13 @@ import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
-import kr.co.F1FS.app.global.util.SessionType;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,11 +40,11 @@ public class GrandPrixService implements GrandPrixUseCase {
     }
 
     @Override
-    public Page<SimpleResponseGrandPrixDTO> findAll(int page, int size, Integer season){
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "firstPracticeTime"));
-
-        return grandPrixRepository.findGrandPrixesBySeason(season, pageable)
-                .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix));
+    @Cacheable(value = "GrandPrixList", key = "#season", cacheManager = "redisLongCacheManager")
+    public List<SimpleResponseGrandPrixDTO> findAll(Integer season){
+        return grandPrixRepository.findGrandPrixesBySeason(season).stream()
+                .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix))
+                .toList();
     }
 
     @Override

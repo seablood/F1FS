@@ -2,8 +2,10 @@ package kr.co.F1FS.app.domain.elastic.application.mapper;
 
 import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
 import kr.co.F1FS.app.domain.elastic.domain.DriverDocument;
+import kr.co.F1FS.app.domain.elastic.domain.GrandPrixDocument;
 import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,15 @@ public class DocumentMapper {
                 .author(postDocument.getAuthor())
                 .createdAt(TimeUtil.formatPostTime(postDocument.getCreatedAt()))
                 .likeNum(postDocument.getLikeNum())
+                .build();
+    }
+
+    public ResponseGrandPrixSearchDTO toResponseGrandPrixSearchDTO(GrandPrixDocument grandPrixDocument){
+        return ResponseGrandPrixSearchDTO.builder()
+                .id(grandPrixDocument.getId())
+                .korName(grandPrixDocument.getKorName())
+                .engName(grandPrixDocument.getEngName())
+                .season(grandPrixDocument.getSeason())
                 .build();
     }
 }

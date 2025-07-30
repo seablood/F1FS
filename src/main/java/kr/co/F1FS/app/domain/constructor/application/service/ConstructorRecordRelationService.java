@@ -14,6 +14,7 @@ import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +35,8 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
         relationRepository.save(relation);
     }
 
+    @Override
+    @Cacheable(value = "ConstructorStandingList", key = "#racingClassCode", cacheManager = "redisLongCacheManager")
     public List<ResponseConstructorStandingDTO> getConstructorStandingList(String racingClassCode){
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
         List<ConstructorRecordRelation> relationList =

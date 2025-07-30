@@ -33,4 +33,5 @@ public class CreateGrandPrixCommand {
     private Long circuitId;
     private Integer season;
     private Integer round;
+    private String racingClass;
 }

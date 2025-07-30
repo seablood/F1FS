@@ -41,4 +41,6 @@ public class CreateGrandPrixDTO {
     private Integer season;
     @NotNull
     private Integer round;
+    @NotNull
+    private String racingClass;
 }

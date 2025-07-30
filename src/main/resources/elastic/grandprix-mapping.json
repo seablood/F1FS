@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "korName": {
+      "type": "text",
+      "analyzer": "autocomplete_nori",
+      "search_analyzer": "nori_search",
+      "fields": {
+        "ngram": {
+          "type": "text",
+          "analyzer": "autocomplete_nori",
+          "search_analyzer": "nori_search"
+        },
+        "ngram_search": {
+          "type": "text",
+          "analyzer": "ngram_analyzer"
+        }
+      }
+    },
+    "engName": {
+      "type": "text",
+      "analyzer": "autocomplete_standard",
+      "search_analyzer": "standard"
+    },
+    "season": {
+      "type": "integer",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

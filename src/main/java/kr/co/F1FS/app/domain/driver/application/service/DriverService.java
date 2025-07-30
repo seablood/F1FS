@@ -9,6 +9,7 @@ import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverDebutRelation;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverRecordRelation;
 import kr.co.F1FS.app.domain.driver.presentation.dto.CreateDriverDTO;
+import kr.co.F1FS.app.domain.driver.presentation.dto.ModifyDriverCommand;
 import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
 import kr.co.F1FS.app.domain.team.application.mapper.ConstructorDriverRelationMapper;
@@ -54,6 +55,7 @@ public class DriverService implements DriverUseCase {
     private final DriverDebutRelationService debutRelationService;
     private final ValidationService validationService;
 
+    @Override
     @Transactional
     public Driver save(CreateDriverDTO driverDTO, CreateCurrentSeasonDTO currentSeasonDTO,
                        CreateSinceDebutDTO sinceDebutDTO){
@@ -75,12 +77,14 @@ public class DriverService implements DriverUseCase {
         return driver;
     }
 
+    @Override
     public Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
-        return driverRepository.findAll(pageable).map(driver -> SimpleResponseDriverDTO.toDto(driver));
+        return driverRepository.findAll(pageable).map(driver -> driverMapper.toSimpleResponseDriverDTO(driver));
     }
 
+    @Override
     @Cacheable(value = "DriverDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseDriverDTO findById(Long id){
         Driver driver = findByIdNotDTO(id);
@@ -101,12 +105,19 @@ public class DriverService implements DriverUseCase {
         return driverMapper.toResponseDriverDTO(driver, currentSeasonDTO, sinceDebutDTO);
     }
 
+    @Override
     @Cacheable(value = "Driver", key = "#id", cacheManager = "redisLongCacheManager")
     public Driver findByIdNotDTO(Long id){
         return driverRepository.findById(id)
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
 
+    @Override
+    public void modify(Driver driver, ModifyDriverCommand command){
+        driver.modify(command);
+    }
+
+    @Override
     public void updateTeam(Driver driver, String constructorName, String constructorEngName){
         driver.updateTeam(constructorName, constructorEngName);
         driverRepository.saveAndFlush(driver);
@@ -140,14 +151,17 @@ public class DriverService implements DriverUseCase {
         sinceDebutUseCase.updateSinceDebutForQualifying(debutRelation.getSinceDebut(), position);
     }
 
+    @Override
     public void increaseFollower(Driver driver){
         driver.increaseFollower();
     }
 
+    @Override
     public void decreaseFollower(Driver driver){
         driver.decreaseFollower();
     }
 
+    @Override
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
         ResponseCurrentSeasonDTO currentSeasonDTO = recordMapper.toResponseCurrentSeasonDTO(
@@ -157,6 +171,7 @@ public class DriverService implements DriverUseCase {
         return currentSeasonDTO;
     }
 
+    @Override
     @Cacheable(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseSinceDebutDTO getSinceDebut(Driver driver) {
         ResponseSinceDebutDTO sinceDebutDTO = recordMapper.toResponseSinceDebutDTO(
@@ -166,6 +181,7 @@ public class DriverService implements DriverUseCase {
         return sinceDebutDTO;
     }
 
+    @Override
     public Pageable switchCondition(int page, int size, String condition){
         switch (condition){
             case "nameASC" :

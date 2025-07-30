@@ -99,7 +99,8 @@ public class SecurityConfig {
                                     "/api/v1/admin/**",
                                     "/api/v1/suggest/**",
                                     "/api/v1/grand-prix/**",
-                                    "/api/v1/session/**").permitAll()
+                                    "/api/v1/session/**",
+                                    "/api/v1/search-grand-prix/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->

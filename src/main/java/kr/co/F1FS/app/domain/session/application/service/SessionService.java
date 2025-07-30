@@ -51,49 +51,56 @@ public class SessionService implements SessionUseCase {
         switch (sessionType){
             case PRACTICE_1 -> {
                 if (grandPrix.getFirstPracticeTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getFirstPracticeTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getFirstPracticeTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setFirstPractice(grandPrix, session.getId());
                 }
             }
             case PRACTICE_2 -> {
                 if (grandPrix.getSecondPracticeTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSecondPracticeTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSecondPracticeTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setSecondPractice(grandPrix, session.getId());
                 }
             }
             case PRACTICE_3 -> {
                 if (grandPrix.getThirdPracticeTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getThirdPracticeTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getThirdPracticeTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setThirdPractice(grandPrix, session.getId());
                 }
             }
             case SPRINT_QUALIFYING -> {
                 if (grandPrix.getSprintQualifyingTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintQualifyingTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintQualifyingTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setSprintQualifying(grandPrix, session.getId());
                 }
             }
             case QUALIFYING -> {
                 if (grandPrix.getQualifyingTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getQualifyingTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getQualifyingTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setQualifying(grandPrix, session.getId());
                 }
             }
             case SPRINT_RACE -> {
                 if (grandPrix.getSprintTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setSprint(grandPrix, session.getId());
                 }
             }
             case RACE -> {
                 if (grandPrix.getRaceTime() != null) {
-                    Session session = sessionMapper.toSession(sessionType, grandPrix.getRaceTime());
+                    Session session = sessionMapper.toSession(sessionType, grandPrix.getRaceTime(),
+                            grandPrix.getRacingClass());
                     session = sessionRepository.save(session);
                     grandPrixUseCase.setRace(grandPrix, session.getId());
                 }

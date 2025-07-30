@@ -5,11 +5,12 @@ import kr.co.F1FS.app.domain.grandprix.presentation.dto.CreateGrandPrixCommand;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.ModifyGrandPrixCommand;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface GrandPrixUseCase {
     GrandPrix createGrandPrix(CreateGrandPrixCommand command);
-    Page<SimpleResponseGrandPrixDTO> findAll(int page, int size, Integer season);
+    List<SimpleResponseGrandPrixDTO> findAll(Integer season);
     ResponseGrandPrixDTO getGrandPrixById(Long id);
     GrandPrix modify(ModifyGrandPrixCommand command, GrandPrix grandPrix);
     void setFirstPractice(GrandPrix grandPrix, Long firstPractice);

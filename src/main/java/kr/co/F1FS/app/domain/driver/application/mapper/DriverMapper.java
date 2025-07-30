@@ -1,31 +1,15 @@
 package kr.co.F1FS.app.domain.driver.application.mapper;
 
-import kr.co.F1FS.app.domain.admin.driver.presentation.dto.AdminResponseDriverDTO;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.presentation.dto.CreateDriverDTO;
 import kr.co.F1FS.app.global.presentation.dto.driver.ResponseDriverDTO;
+import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseCurrentSeasonDTO;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseSinceDebutDTO;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DriverMapper {
-    public AdminResponseDriverDTO toAdminResponseDriverDTO(Driver driver){
-        return AdminResponseDriverDTO.builder()
-                .id(driver.getId())
-                .name(driver.getName())
-                .engName(driver.getEngName())
-                .number(driver.getNumber())
-                .team(driver.getTeam())
-                .engTeam(driver.getEngTeam())
-                .championships(driver.getChampionships())
-                .country(driver.getCountry())
-                .followerNum(driver.getFollowerNum())
-                .birth(driver.getBirth())
-                .racingClass(driver.getRacingClass().toString())
-                .build();
-    }
-
     public Driver toDriver(CreateDriverDTO dto){
         return Driver.builder()
                 .name(dto.getName())
@@ -53,6 +37,17 @@ public class DriverMapper {
                 .constructorName(driver.getTeam())
                 .currentSeason(seasonDTO)
                 .sinceDebut(debutDTO)
+                .build();
+    }
+
+    public SimpleResponseDriverDTO toSimpleResponseDriverDTO(Driver driver){
+        return SimpleResponseDriverDTO.builder()
+                .id(driver.getId())
+                .name(driver.getName())
+                .engName(driver.getEngName())
+                .number(driver.getNumber())
+                .team(driver.getTeam())
+                .racingClass(driver.getRacingClass())
                 .build();
     }
 }

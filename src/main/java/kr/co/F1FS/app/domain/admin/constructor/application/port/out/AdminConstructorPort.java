@@ -7,4 +7,6 @@ import kr.co.F1FS.app.domain.record.presentation.dto.CreateSinceDebutDTO;
 
 public interface AdminConstructorPort {
     Constructor save(Constructor constructor);
+    void saveAndFlush(Constructor constructor);
+    Constructor findById(Long id);
 }

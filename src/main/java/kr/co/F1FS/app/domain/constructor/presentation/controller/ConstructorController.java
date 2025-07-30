@@ -33,7 +33,7 @@ public class ConstructorController {
     @Operation(summary = "모든 컨스트럭터 검색", description = "모든 컨스트럭터 리스트 반환")
     public ResponseEntity<List<SimpleResponseConstructorDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                      @RequestParam(value = "condition", defaultValue = "new") String condition){
+                                                                      @RequestParam(value = "condition", defaultValue = "newASC") String condition){
         Page<SimpleResponseConstructorDTO> newPage = constructorService.findAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }

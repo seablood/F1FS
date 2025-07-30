@@ -7,4 +7,6 @@ import kr.co.F1FS.app.domain.record.presentation.dto.CreateSinceDebutDTO;
 
 public interface AdminDriverPort {
     Driver save(Driver driver);
+    void saveAndFlush(Driver driver);
+    Driver findById(Long id);
 }

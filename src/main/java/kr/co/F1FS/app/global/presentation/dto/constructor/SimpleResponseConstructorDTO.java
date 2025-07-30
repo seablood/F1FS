@@ -18,9 +18,4 @@ public class SimpleResponseConstructorDTO {
     private String engName;
 
     private String racingClass;
-
-    public static SimpleResponseConstructorDTO toDto(Constructor constructor){
-        return new SimpleResponseConstructorDTO(constructor.getId(), constructor.getName(), constructor.getEngName(),
-                constructor.getRacingClass().toString());
-    }
 }

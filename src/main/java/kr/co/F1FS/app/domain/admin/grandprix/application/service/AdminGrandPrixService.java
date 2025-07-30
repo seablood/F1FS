@@ -4,26 +4,33 @@ import kr.co.F1FS.app.domain.admin.grandprix.application.mapper.AdminGrandPrixMa
 import kr.co.F1FS.app.domain.admin.grandprix.application.port.in.AdminGrandPrixUseCase;
 import kr.co.F1FS.app.domain.admin.grandprix.application.port.out.AdminGrandPrixCircuitPort;
 import kr.co.F1FS.app.domain.admin.grandprix.application.port.out.AdminGrandPrixPort;
+import kr.co.F1FS.app.domain.admin.grandprix.application.port.out.AdminGrandPrixSearchPort;
 import kr.co.F1FS.app.domain.admin.grandprix.presentation.dto.CreateGrandPrixDTO;
 import kr.co.F1FS.app.domain.admin.grandprix.presentation.dto.ModifyGrandPrixDTO;
 import kr.co.F1FS.app.domain.circuit.application.mapper.CircuitMapper;
 import kr.co.F1FS.app.domain.circuit.domain.Circuit;
+import kr.co.F1FS.app.domain.elastic.application.port.in.GrandPrixSearchUseCase;
 import kr.co.F1FS.app.domain.grandprix.application.mapper.GrandPrixMapper;
 import kr.co.F1FS.app.domain.grandprix.application.port.in.GrandPrixUseCase;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.session.application.port.in.SessionUseCase;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AdminGrandPrixService implements AdminGrandPrixUseCase {
     private final GrandPrixUseCase grandPrixUseCase;
+    private final GrandPrixSearchUseCase searchUseCase;
     private final SessionUseCase sessionUseCase;
     private final AdminGrandPrixPort grandPrixPort;
     private final AdminGrandPrixCircuitPort circuitPort;
+    private final AdminGrandPrixSearchPort searchPort;
     private final AdminGrandPrixMapper adminGrandPrixMapper;
     private final GrandPrixMapper grandPrixMapper;
     private final CircuitMapper circuitMapper;
@@ -34,9 +41,20 @@ public class AdminGrandPrixService implements AdminGrandPrixUseCase {
         GrandPrix grandPrix = grandPrixUseCase.createGrandPrix(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
         Circuit circuit = circuitPort.getCircuitByIdNotDTO(grandPrix.getCircuitId());
         sessionUseCase.save(grandPrix);
-        grandPrixPort.save(grandPrix);
+        grandPrix = grandPrixPort.save(grandPrix);
+        searchPort.save(searchUseCase.save(grandPrix));
 
         return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
+    }
+
+    @Override
+    public List<SimpleResponseGrandPrixDTO> findAll(Integer season){
+        return grandPrixUseCase.findAll(season);
+    }
+
+    @Override
+    public ResponseGrandPrixDTO getGrandPrixById(Long id){
+        return grandPrixUseCase.getGrandPrixById(id);
     }
 
     @Override

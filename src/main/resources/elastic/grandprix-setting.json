@@ -1,0 +1,53 @@
+{
+  "analysis": {
+    "tokenizer": {
+      "autocomplete_nori_tokenizer": {
+        "type": "nori_tokenizer"
+      },
+      "autocomplete_tokenizer": {
+        "type": "edge_ngram",
+        "min_gram": 1,
+        "max_gram": 30,
+        "token_chars": ["letter", "digit"]
+      },
+      "ngram_tokenizer": {
+        "type": "ngram",
+        "min_gram": 2,
+        "max_gram": 3,
+        "token_chars": ["letter", "digit"]
+      }
+    },
+    "analyzer": {
+      "autocomplete_nori": {
+        "type": "custom",
+        "tokenizer": "autocomplete_nori_tokenizer",
+        "filter": ["lowercase", "nori_filter"]
+      },
+      "autocomplete_standard": {
+        "type": "custom",
+        "tokenizer": "autocomplete_tokenizer",
+        "filter": ["lowercase"]
+      },
+      "nori_search": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": ["lowercase", "nori_filter"]
+      },
+      "ngram_analyzer": {
+        "type": "custom",
+        "tokenizer": "ngram_tokenizer",
+        "filter": ["lowercase"]
+      }
+    },
+    "filter": {
+      "nori_filter": {
+        "type": "nori_part_of_speech",
+        "stoptags": [
+          "E", "IC", "J", "MAG", "MAJ", "MM",
+          "SP", "SSC", "SSO", "SC", "SE",
+          "XPN", "XSA", "XSN", "XSV", "UNA", "NA", "VSV"
+        ]
+      }
+    }
+  }
+}

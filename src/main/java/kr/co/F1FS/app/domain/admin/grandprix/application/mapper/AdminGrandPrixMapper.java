@@ -23,6 +23,7 @@ public class AdminGrandPrixMapper {
                 .circuitId(dto.getCircuitId())
                 .season(dto.getSeason())
                 .round(dto.getRound())
+                .racingClass(dto.getRacingClass())
                 .build();
     }
 

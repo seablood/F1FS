@@ -7,10 +7,13 @@ import kr.co.F1FS.app.domain.admin.grandprix.application.service.AdminGrandPrixS
 import kr.co.F1FS.app.domain.admin.grandprix.presentation.dto.CreateGrandPrixDTO;
 import kr.co.F1FS.app.domain.admin.grandprix.presentation.dto.ModifyGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,18 @@ public class AdminGrandPrixController {
     @Operation(summary = "그랑프리 생성", description = "그랑프리를 생성 및 저장")
     public ResponseEntity<ResponseGrandPrixDTO> save(@Valid @RequestBody CreateGrandPrixDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(adminGrandPrixService.save(dto));
+    }
+
+    @GetMapping("/find-all")
+    @Operation(summary = "그랑프리 전체 리스트", description = "특정 시즌의 그랑프리 전체 리스트 반환")
+    public ResponseEntity<List<SimpleResponseGrandPrixDTO>> findAll(@RequestParam(value = "season", defaultValue = "2025") Integer season){
+        return ResponseEntity.status(HttpStatus.OK).body(adminGrandPrixService.findAll(season));
+    }
+
+    @GetMapping("/find/{id}")
+    @Operation(summary = "그랑프리 상세 정보", description = "특정 ID 그랑프리 상세 정보 반환")
+    public ResponseEntity<ResponseGrandPrixDTO> getGrandPrixById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(adminGrandPrixService.getGrandPrixById(id));
     }
 
     @PutMapping("/modify/{id}")

@@ -12,21 +12,6 @@ import java.util.List;
 
 @Component
 public class ConstructorMapper {
-    public AdminResponseConstructorDTO toAdminResponseConstructorDTO(Constructor constructor){
-        return AdminResponseConstructorDTO.builder()
-                .id(constructor.getId())
-                .name(constructor.getName())
-                .engName(constructor.getEngName())
-                .championships(constructor.getChampionships())
-                .base(constructor.getBase())
-                .teamChief(constructor.getTeamChief())
-                .chassis(constructor.getChassis())
-                .powerUnit(constructor.getPowerUnit())
-                .followerNum(constructor.getFollowerNum())
-                .racingClass(constructor.getRacingClass().toString())
-                .build();
-    }
-
     public SimpleResponseConstructorDTO toSimpleResponseConstructorDTO(Constructor constructor){
         return SimpleResponseConstructorDTO.builder()
                 .id(constructor.getId())
