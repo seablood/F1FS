@@ -2,7 +2,9 @@ package kr.co.F1FS.app.domain.driver.application.service;
 
 import kr.co.F1FS.app.domain.driver.application.mapper.DriverRecordRelationMapper;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverRecordRelationUseCase;
+import kr.co.F1FS.app.domain.driver.application.port.out.DriverRecordPort;
 import kr.co.F1FS.app.domain.driver.presentation.dto.ResponseDriverStandingDTO;
+import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverRecordRelation;
@@ -19,6 +21,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class DriverRecordRelationService implements DriverRecordRelationUseCase {
+    private final CurrentSeasonUseCase currentSeasonUseCase;
+    private final DriverRecordPort recordPort;
     private final DriverRecordRelationMapper relationMapper;
     private final DriverRecordRelationRepository relationRepository;
 
@@ -41,6 +45,21 @@ public class DriverRecordRelationService implements DriverRecordRelationUseCase 
                 .map(relation -> relationMapper.toResponseDriverStandingDTO(relation))
                 .sorted((o1, o2) -> Integer.compare(o2.getPoints(), o1.getPoints()))
                 .toList();
+    }
+
+    @Override
+    public void updateChampionshipRank(String racingClassCode){
+        RacingClass racingClass = RacingClass.valueOf(racingClassCode);
+        List<DriverRecordRelation> relationList = relationRepository.findDriverRecordRelationsByRacingClassAndEntryClassSeason(
+                racingClass, true
+        ).stream().sorted((o1, o2) -> Integer.compare(o2.getCurrentSeason().getChampionshipPoint(), o1.getCurrentSeason().getChampionshipPoint())).toList();
+
+        int rank = 1;
+        for (DriverRecordRelation relation : relationList){
+            CurrentSeason record = relation.getCurrentSeason();
+            currentSeasonUseCase.updateChampionshipRank(record, rank++);
+            recordPort.saveAndFlush(record);
+        }
     }
 
     public DriverRecordRelation getRecordByDriverAndRacingClass(Driver driver){

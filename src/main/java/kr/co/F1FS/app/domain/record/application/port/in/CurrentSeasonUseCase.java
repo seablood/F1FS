@@ -5,4 +5,5 @@ import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 public interface CurrentSeasonUseCase {
     void updateCurrentSeasonForRace(CurrentSeason currentSeason, int position, int points, boolean isFastestLap);
     void updateCurrentSeasonForQualifying(CurrentSeason currentSeason, int position);
+    void updateChampionshipRank(CurrentSeason currentSeason, int championshipRank);
 }

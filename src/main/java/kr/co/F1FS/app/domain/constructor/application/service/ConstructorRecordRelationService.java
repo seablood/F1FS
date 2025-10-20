@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.constructor.application.service;
 
 import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorRecordRelationMapper;
 import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
+import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorRecordPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.ResponseConstructorStandingDTO;
@@ -24,6 +25,7 @@ import java.util.List;
 public class ConstructorRecordRelationService implements ConstructorRecordRelationUseCase {
     private final CurrentSeasonUseCase currentSeasonUseCase;
     private final SinceDebutUseCase sinceDebutUseCase;
+    private final ConstructorRecordPort recordPort;
     private final ConstructorRecordRelationMapper relationMapper;
     private final ConstructorRecordRelationRepository relationRepository;
 
@@ -64,5 +66,21 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
     public void updateRecordForQualifying(ConstructorRecordRelation relation, int position){
         currentSeasonUseCase.updateCurrentSeasonForQualifying(relation.getCurrentSeason(), position);
         sinceDebutUseCase.updateSinceDebutForQualifying(relation.getSinceDebut(), position);
+    }
+
+    @Override
+    public void updateChampionshipRank(String racingClassCode){
+        RacingClass racingClass = RacingClass.valueOf(racingClassCode);
+        List<ConstructorRecordRelation> relationList = relationRepository.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(
+                racingClass, true
+                ).stream().sorted((o1, o2) -> Integer.compare(o2.getCurrentSeason().getChampionshipPoint(), o1.getCurrentSeason().getChampionshipPoint()))
+                .toList();
+
+        int rank = 1;
+        for (ConstructorRecordRelation relation : relationList){
+            CurrentSeason record = relation.getCurrentSeason();
+            currentSeasonUseCase.updateChampionshipRank(record, rank++);
+            recordPort.saveAndFlush(record);
+        }
     }
 }

@@ -19,4 +19,9 @@ public class DriverRecordAdapter implements DriverRecordPort {
         currentSeasonRepository.save(currentSeason);
         sinceDebutRepository.save(sinceDebut);
     }
+
+    @Override
+    public void saveAndFlush(CurrentSeason currentSeason) {
+        currentSeasonRepository.saveAndFlush(currentSeason);
+    }
 }

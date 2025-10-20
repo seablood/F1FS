@@ -1,0 +1,41 @@
+{
+  "properties": {
+    "name": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "autocomplete_standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "description": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "autocomplete_standard",
+          "search_analyzer": "standard"
+        }
+      }
+    },
+    "memberCount": {
+      "type": "integer"
+    },
+    "createTime": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm||yyyy-MM-dd"
+    }
+  }
+}

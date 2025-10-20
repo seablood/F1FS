@@ -21,8 +21,9 @@ public class AdminSessionResultController {
 
     @PostMapping("/save/{id}")
     @Operation(summary = "세션 결과 저장", description = "특정 세션의 결과를 저장")
-    public ResponseEntity<Void> save(@Valid @RequestBody List<CreateSessionResultDTO> dtoList, @PathVariable Long id){
-        adminSessionResultService.saveSessionResult(dtoList, id);
+    public ResponseEntity<Void> save(@Valid @RequestBody List<CreateSessionResultDTO> dtoList, @PathVariable Long id,
+                                     @RequestParam(value = "racingClassCode") String racingClassCode){
+        adminSessionResultService.saveSessionResult(dtoList, id, racingClassCode);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

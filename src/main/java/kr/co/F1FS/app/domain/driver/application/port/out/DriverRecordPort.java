@@ -5,4 +5,5 @@ import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 
 public interface DriverRecordPort {
     void save(CurrentSeason currentSeason, SinceDebut sinceDebut);
+    void saveAndFlush(CurrentSeason currentSeason);
 }

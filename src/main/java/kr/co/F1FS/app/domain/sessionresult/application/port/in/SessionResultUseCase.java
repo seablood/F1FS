@@ -7,6 +7,6 @@ import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResul
 import java.util.List;
 
 public interface SessionResultUseCase {
-    void save(List<CreateSessionResultCommand> commandList, Long id);
+    void save(List<CreateSessionResultCommand> commandList, Long id, String racingClassCode);
     List<ResponseSessionResultDTO> getSessionResultBySession(Session session);
 }

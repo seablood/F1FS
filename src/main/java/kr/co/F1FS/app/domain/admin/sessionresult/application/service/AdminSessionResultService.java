@@ -19,10 +19,10 @@ public class AdminSessionResultService implements AdminSessionResultUseCase {
 
     @Override
     @Transactional
-    public void saveSessionResult(List<CreateSessionResultDTO> dtoList, Long id){
+    public void saveSessionResult(List<CreateSessionResultDTO> dtoList, Long id, String racingClassCode){
         List<CreateSessionResultCommand> commandList = dtoList.stream()
                 .map(dto -> adminSessionResultMapper.toCreateSessionResultCommand(dto))
                 .toList();
-        sessionResultUseCase.save(commandList, id);
+        sessionResultUseCase.save(commandList, id, racingClassCode);
     }
 }

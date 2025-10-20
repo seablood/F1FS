@@ -28,6 +28,10 @@ public class CurrentSeason {
         this.polePosition = 0;
     }
 
+    public void updateChampionshipRank(int championshipRank){
+        this.championshipRank = championshipRank;
+    }
+
     public void updateChampionshipPoint(int points){
         this.championshipPoint+=points;
     }

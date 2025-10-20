@@ -1,7 +1,9 @@
 package kr.co.F1FS.app.domain.sessionresult.application.service;
 
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
 import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverRecordRelationUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.session.domain.Session;
@@ -28,6 +30,8 @@ public class SessionResultService implements SessionResultUseCase {
     private final SessionResultConstructorPort constructorPort;
     private final DriverUseCase driverUseCase;
     private final ConstructorUseCase constructorUseCase;
+    private final DriverRecordRelationUseCase driverRecordRelationUseCase;
+    private final ConstructorRecordRelationUseCase constructorRecordRelationUseCase;
     private final SessionResultDriverPort driverPort;
     private final SessionResultSessionPort sessionPort;
     private final SessionResultRepository sessionResultRepository;
@@ -35,7 +39,7 @@ public class SessionResultService implements SessionResultUseCase {
     private final CacheEvictUtil cacheEvictUtil;
 
     @Override
-    public void save(List<CreateSessionResultCommand> commandList, Long id){
+    public void save(List<CreateSessionResultCommand> commandList, Long id, String racingClassCode){
         Session session = sessionPort.getSessionByIdNotDTO(id);
         switch (session.getSessionType()){
             case PRACTICE_1, PRACTICE_2, PRACTICE_3 -> {
@@ -66,6 +70,8 @@ public class SessionResultService implements SessionResultUseCase {
 
                     sessionResultRepository.save(sessionResult);
                 }
+                driverRecordRelationUseCase.updateChampionshipRank(racingClassCode);
+                constructorRecordRelationUseCase.updateChampionshipRank(racingClassCode);
             }
             case SPRINT_QUALIFYING, QUALIFYING -> {
                 for (CreateSessionResultCommand command : commandList){

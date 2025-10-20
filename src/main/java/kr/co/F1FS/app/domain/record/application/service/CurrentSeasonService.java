@@ -30,4 +30,9 @@ public class CurrentSeasonService implements CurrentSeasonUseCase {
         if(position == 1) currentSeason.updatePolePosition();
         currentSeasonRepository.saveAndFlush(currentSeason);
     }
+
+    @Override
+    public void updateChampionshipRank(CurrentSeason currentSeason, int championshipRank){
+        currentSeason.updateChampionshipRank(championshipRank);
+    }
 }

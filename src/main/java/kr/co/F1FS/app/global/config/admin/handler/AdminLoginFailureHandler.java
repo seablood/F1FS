@@ -2,7 +2,6 @@ package kr.co.F1FS.app.global.config.admin.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

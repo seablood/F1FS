@@ -14,4 +14,5 @@ public interface ConstructorRecordRelationUseCase {
     ConstructorRecordRelation findByConstructor(Constructor constructor);
     void updateRecordForRace(ConstructorRecordRelation relation, int position, int points, boolean isFastestLap);
     void updateRecordForQualifying(ConstructorRecordRelation relation, int position);
+    void updateChampionshipRank(String racingClassCode);
 }

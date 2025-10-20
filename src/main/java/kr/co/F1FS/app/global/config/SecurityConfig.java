@@ -16,7 +16,6 @@ import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.global.config.oauth2.service.CustomOAuth2UserService;
 import kr.co.F1FS.app.global.config.oauth2.util.OAuth2CookieRepository;
 import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
-import kr.co.F1FS.app.global.config.redis.RedisConfig;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -100,7 +99,9 @@ public class SecurityConfig {
                                     "/api/v1/suggest/**",
                                     "/api/v1/grand-prix/**",
                                     "/api/v1/session/**",
-                                    "/api/v1/search-grand-prix/**").permitAll()
+                                    "/api/v1/search-grand-prix/**",
+                                    "/ws/stomp",
+                                    "/api/v1/search-chat-room/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->

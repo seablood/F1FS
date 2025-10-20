@@ -9,4 +9,5 @@ import java.util.List;
 public interface DriverRecordRelationUseCase {
     void save(Driver driver, CurrentSeason currentSeason);
     List<ResponseDriverStandingDTO> getDriverStandingList(String racingClassCode);
+    void updateChampionshipRank(String racingClassCode);
 }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 public class RedisHandler {
     @Qualifier("notificationRedisTemplate")
     private final RedisTemplate<String, NotificationRedis> notificationRedisTemplate;
-    @Qualifier("redisTemplate")
+    @Qualifier("redisObjectTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RedisTemplate<String, NotificationRedis> getNotificationRedisTemplate() {
@@ -37,6 +37,10 @@ public class RedisHandler {
 
     public ListOperations<String, NotificationRedis> getNotificationRedisListOperations(){
         return notificationRedisTemplate.opsForList();
+    }
+
+    public void deleteKey(String key){
+        redisTemplate.delete(key);
     }
 
     public void executeOperations(Runnable operations){

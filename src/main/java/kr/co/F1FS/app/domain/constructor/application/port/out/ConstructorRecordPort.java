@@ -5,4 +5,5 @@ import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 
 public interface ConstructorRecordPort {
     void save(CurrentSeason currentSeason, SinceDebut sinceDebut);
+    void saveAndFlush(CurrentSeason currentSeason);
 }

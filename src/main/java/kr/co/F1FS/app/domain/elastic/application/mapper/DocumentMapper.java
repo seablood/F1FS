@@ -1,10 +1,8 @@
 package kr.co.F1FS.app.domain.elastic.application.mapper;
 
-import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
-import kr.co.F1FS.app.domain.elastic.domain.DriverDocument;
-import kr.co.F1FS.app.domain.elastic.domain.GrandPrixDocument;
-import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
+import kr.co.F1FS.app.domain.elastic.domain.*;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
@@ -48,6 +46,15 @@ public class DocumentMapper {
                 .korName(grandPrixDocument.getKorName())
                 .engName(grandPrixDocument.getEngName())
                 .season(grandPrixDocument.getSeason())
+                .build();
+    }
+
+    public ResponseChatRoomDocumentDTO toResponseChatRoomDocumentDTO(ChatRoomDocument chatRoomDocument){
+        return ResponseChatRoomDocumentDTO.builder()
+                .id(chatRoomDocument.getId())
+                .name(chatRoomDocument.getName())
+                .description(chatRoomDocument.getDescription())
+                .memberCount(chatRoomDocument.getMemberCount())
                 .build();
     }
 }
