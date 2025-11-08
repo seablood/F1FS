@@ -4,14 +4,12 @@ import kr.co.F1FS.app.domain.grandprix.application.port.in.GrandPrixUseCase;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.session.application.mapper.SessionMapper;
 import kr.co.F1FS.app.domain.session.application.port.in.SessionUseCase;
+import kr.co.F1FS.app.domain.session.application.port.out.SessionJpaPort;
 import kr.co.F1FS.app.domain.session.domain.Session;
-import kr.co.F1FS.app.domain.session.infrastructure.repository.SessionRepository;
 import kr.co.F1FS.app.domain.sessionresult.application.port.in.SessionResultUseCase;
 import kr.co.F1FS.app.global.presentation.dto.session.ResponseSessionDTO;
 import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import kr.co.F1FS.app.global.util.SessionType;
-import kr.co.F1FS.app.global.util.exception.session.SessionException;
-import kr.co.F1FS.app.global.util.exception.session.SessionExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,7 @@ import java.util.List;
 public class SessionService implements SessionUseCase {
     private final GrandPrixUseCase grandPrixUseCase;
     private final SessionResultUseCase sessionResultUseCase;
-    private final SessionRepository sessionRepository;
+    private final SessionJpaPort sessionJpaPort;
     private final SessionMapper sessionMapper;
 
     private static final SessionType[] sessionList = {SessionType.PRACTICE_1, SessionType.PRACTICE_2,
@@ -40,8 +38,7 @@ public class SessionService implements SessionUseCase {
     @Override
     @Cacheable(value = "SessionDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSessionDTO getSessionByID(Long id){
-        Session session = sessionRepository.findById(id)
-                .orElseThrow(() -> new SessionException(SessionExceptionType.SESSION_NOT_FOUND));
+        Session session = sessionJpaPort.findById(id);
         List<ResponseSessionResultDTO> resultList = sessionResultUseCase.getSessionResultBySession(session);
 
         return sessionMapper.toResponseSessionDTO(session, resultList);
@@ -53,7 +50,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getFirstPracticeTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getFirstPracticeTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setFirstPractice(grandPrix, session.getId());
                 }
             }
@@ -61,7 +58,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getSecondPracticeTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getSecondPracticeTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setSecondPractice(grandPrix, session.getId());
                 }
             }
@@ -69,7 +66,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getThirdPracticeTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getThirdPracticeTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setThirdPractice(grandPrix, session.getId());
                 }
             }
@@ -77,7 +74,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getSprintQualifyingTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintQualifyingTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setSprintQualifying(grandPrix, session.getId());
                 }
             }
@@ -85,7 +82,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getQualifyingTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getQualifyingTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setQualifying(grandPrix, session.getId());
                 }
             }
@@ -93,7 +90,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getSprintTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getSprintTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setSprint(grandPrix, session.getId());
                 }
             }
@@ -101,7 +98,7 @@ public class SessionService implements SessionUseCase {
                 if (grandPrix.getRaceTime() != null) {
                     Session session = sessionMapper.toSession(sessionType, grandPrix.getRaceTime(),
                             grandPrix.getRacingClass());
-                    session = sessionRepository.save(session);
+                    session = sessionJpaPort.save(session);
                     grandPrixUseCase.setRace(grandPrix, session.getId());
                 }
             }

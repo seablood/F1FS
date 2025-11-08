@@ -3,16 +3,14 @@ package kr.co.F1FS.app.domain.complain.user.application.service;
 import jakarta.transaction.Transactional;
 import kr.co.F1FS.app.domain.complain.user.application.mapper.UserComplainMapper;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
-import kr.co.F1FS.app.domain.complain.user.application.port.out.ComplainUserPort;
+import kr.co.F1FS.app.domain.complain.user.application.port.out.UserComplainJpaPort;
+import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
-import kr.co.F1FS.app.domain.complain.user.infrastructure.repository.UserComplainRepository;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -21,27 +19,25 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class UserComplainService implements UserComplainUseCase {
-    private final ComplainUserPort userPort;
+    private final UserComplainJpaPort userComplainJpaPort;
+    private final UserUseCase userUseCase;
     private final UserComplainMapper complainMapper;
     private final SlackService slackService;
-    private final UserComplainRepository complainRepository;
 
+    @Override
     public void save(UserComplain complain){
-        complainRepository.save(complain);
+        userComplainJpaPort.save(complain);
     }
 
+    @Override
     @Transactional
     public void userComplain(User user, CreateUserComplainDTO dto){
-        User toUser = userPort.findByNickname(dto.getToUserNickname());
+        User toUser = userUseCase.findByNicknameNotDTONotCache(dto.getToUserNickname());
         UserComplain complain = complainMapper.toUserComplain(dto, toUser, user);
 
         save(complain);
         sendMessage(complain);
         log.info("유저 신고 접수 완료 : {} -> {}", complain.getFromUser().getNickname(), complain.getToUser().getNickname());
-    }
-
-    public Page<UserComplain> findAll(Pageable pageable){
-        return complainRepository.findAll(pageable);
     }
 
     public void sendMessage(UserComplain complain){

@@ -5,10 +5,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.domain.auth.application.mapper.AuthMapper;
 import kr.co.F1FS.app.domain.auth.application.port.in.AuthUseCase;
-import kr.co.F1FS.app.domain.auth.application.port.out.AuthUserPort;
+import kr.co.F1FS.app.domain.auth.application.port.out.AuthJpaPort;
 import kr.co.F1FS.app.domain.auth.presentation.dto.AuthorizationUserDTO;
 import kr.co.F1FS.app.domain.email.application.port.in.EmailUseCase;
-import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
@@ -17,7 +16,6 @@ import kr.co.F1FS.app.domain.auth.presentation.dto.CreateUserDTO;
 import kr.co.F1FS.app.domain.auth.presentation.dto.ModifyPasswordDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.auth.domain.VerificationCode;
-import kr.co.F1FS.app.domain.auth.infrastructure.repository.VerificationCodeRepository;
 import kr.co.F1FS.app.global.util.CookieUtil;
 import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.global.application.service.ValidationService;
@@ -30,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -38,10 +37,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AuthService implements AuthUseCase {
     private final UserUseCase userUseCase;
     private final EmailUseCase emailUseCase;
-    private final AuthUserPort authUserPort;
     private final AuthMapper authMapper;
-    private final UserMapper userMapper;
-    private final VerificationCodeRepository verificationCodeRepository;
+    private final AuthJpaPort authJpaPort;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ValidationService validationService;
     private final BlackListService blackListService;
@@ -51,14 +48,19 @@ public class AuthService implements AuthUseCase {
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO){
         userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-        User user = userMapper.toUser(authMapper.toCreateUserCommand(userDTO));
+        User user = userUseCase.createUser(authMapper.toCreateUserCommand(userDTO));
         validationService.checkValid(user);
         userUseCase.updateLastLoginDate(user);
 
-        authUserPort.save(user);
+        userUseCase.save(user);
         sendEmail(user, "create_account");
 
-        return userMapper.toResponseUserDTO(user);
+        return userUseCase.toResponseUserDTO(user);
+    }
+
+    @Override
+    public List<VerificationCode> findAll() {
+        return authJpaPort.findAll();
     }
 
     public void sendEmail(User user, String option){
@@ -67,7 +69,7 @@ public class AuthService implements AuthUseCase {
     }
 
     public void sendEmail(AuthorizationUserDTO dto, String option){
-        User user = authUserPort.findByEmailAndPassword(dto.getEmail(), dto.getPassword());
+        User user = userUseCase.findByEmailAndPassword(dto.getEmail(), dto.getPassword());
         VerificationCode code = createVerificationCode(user);
         emailUseCase.sendAuthEmail(user, code.getCode(), option);
     }
@@ -79,7 +81,7 @@ public class AuthService implements AuthUseCase {
                 .code(code)
                 .build();
 
-        return verificationCodeRepository.save(verificationCode);
+        return authJpaPort.save(verificationCode);
     }
 
     public String generateVerificationCode(){
@@ -97,18 +99,17 @@ public class AuthService implements AuthUseCase {
 
     @Transactional
     public void verifyCode(String email, String code){
-        VerificationCode verificationCode = verificationCodeRepository.findVerificationCodeByEmailAndCode(email, code)
-                .orElseThrow(() -> new IllegalArgumentException("인증 오류"));
+        VerificationCode verificationCode = authJpaPort.findVerificationCodeByEmailAndCode(email, code);
 
         if(verificationCode.isExpired()){
             throw new IllegalArgumentException("인증 만료");
         } else {
-            User user = authUserPort.findUserByEmail(verificationCode.getEmail());
+            User user = userUseCase.findUserByEmail(verificationCode.getEmail());
             userUseCase.updateRole(user, Role.USER);
-            authUserPort.saveAndFlush(user);
+            userUseCase.saveAndFlush(user);
         }
 
-        verificationCodeRepository.delete(verificationCode);
+        authJpaPort.delete(verificationCode);
         log.info("인증 완료 및 인증 코드 삭제 : {}", email);
     }
 
@@ -116,7 +117,7 @@ public class AuthService implements AuthUseCase {
     public void updatePassword(User user, ModifyPasswordDTO passwordDTO){
         cacheEvictUtil.evictCachingUser(user);
         userUseCase.updatePassword(user, bCryptPasswordEncoder.encode(passwordDTO.getNewPassword()));
-        authUserPort.saveAndFlush(user);
+        userUseCase.saveAndFlush(user);
     }
 
     @Transactional
@@ -127,7 +128,7 @@ public class AuthService implements AuthUseCase {
             setBlackList(refreshToken);
             CookieUtil.deleteCookie(request, response, "refresh_token");
             userUseCase.updateRefreshToken(user, "");
-            authUserPort.saveAndFlush(user);
+            userUseCase.saveAndFlush(user);
         } catch (Exception e) {
             throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);
         }
@@ -141,7 +142,7 @@ public class AuthService implements AuthUseCase {
             setBlackList(refreshToken);
             CookieUtil.deleteCookie(request, response, "refresh_token");
             cacheEvictUtil.evictCachingUser(user);
-            authUserPort.delete(user);
+            userUseCase.delete(user);
         } catch (Exception e) {
             throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);
         }
@@ -157,5 +158,10 @@ public class AuthService implements AuthUseCase {
         if (expirationMillis > 0) {
             blackListService.addBlackList(token, expirationMillis);
         }
+    }
+
+    @Override
+    public void delete(VerificationCode code) {
+        authJpaPort.delete(code);
     }
 }

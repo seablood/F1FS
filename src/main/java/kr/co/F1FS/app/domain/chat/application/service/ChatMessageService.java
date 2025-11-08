@@ -2,8 +2,8 @@ package kr.co.F1FS.app.domain.chat.application.service;
 
 import kr.co.F1FS.app.domain.chat.application.mapper.ChatMessageMapper;
 import kr.co.F1FS.app.domain.chat.application.port.in.ChatMessageUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.out.ChatMessageJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatMessage;
-import kr.co.F1FS.app.domain.chat.infrastructure.repository.ChatMessageRepository;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatMessageDTO;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatMessageDTO;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 public class ChatMessageService implements ChatMessageUseCase {
     private final ChatSubscribeService chatSubscribeService;
     private final ChatRoomService chatRoomService;
-    private final ChatMessageRepository chatMessageRepository;
+    private final ChatMessageJpaPort chatMessageJpaPort;
     private final ChatMessageMapper chatMessageMapper;
 
     @Override
@@ -27,7 +27,7 @@ public class ChatMessageService implements ChatMessageUseCase {
         dto.setContent(username + "님이 입장하였습니다.");
         ChatMessage chatMessage = chatMessageMapper.toChatMessage(roomId, dto, username);
         if(chatRoomService.enterChatRoom(roomId, username, chatMessage.getSendTime())){
-            chatMessageRepository.save(chatMessage);
+            chatMessageJpaPort.save(chatMessage);
 
             return chatMessageMapper.toResponseChatMessageDTO(chatMessage);
         }
@@ -41,7 +41,7 @@ public class ChatMessageService implements ChatMessageUseCase {
         ChatMessage chatMessage = chatMessageMapper.toChatMessage(roomId, dto, username);
         chatRoomService.sendMessage(roomId, chatMessage.getSendTime());
 
-        chatMessageRepository.save(chatMessage);
+        chatMessageJpaPort.save(chatMessage);
         return chatMessageMapper.toResponseChatMessageDTO(chatMessage);
     }
 
@@ -52,7 +52,7 @@ public class ChatMessageService implements ChatMessageUseCase {
         ChatMessage chatMessage = chatMessageMapper.toChatMessage(roomId, dto, username);
         chatRoomService.leaveChatRoom(roomId, username, chatMessage.getSendTime());
 
-        chatMessageRepository.save(chatMessage);
+        chatMessageJpaPort.save(chatMessage);
         return chatMessageMapper.toResponseChatMessageDTO(chatMessage);
     }
 
@@ -61,8 +61,6 @@ public class ChatMessageService implements ChatMessageUseCase {
         String lastEnterTimeStr = chatSubscribeService.getLastEnterTime(roomId, username);
         LocalDateTime lastEnterTime = lastEnterTimeStr != null ? LocalDateTime.parse(lastEnterTimeStr) : LocalDateTime.MIN;
 
-        return chatMessageRepository.findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(roomId, lastEnterTime)
-                .stream().map(chatMessage -> chatMessageMapper.toResponseChatMessageDTO(chatMessage))
-                .toList();
+        return chatMessageJpaPort.findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(roomId, lastEnterTime);
     }
 }

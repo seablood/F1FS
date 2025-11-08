@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.elastic.application.service;
 
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.GrandPrixSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.out.GrandPrixSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.GrandPrixDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.GrandPrixSearchRepository;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
@@ -26,11 +27,30 @@ import java.util.List;
 public class GrandPrixSearchService implements GrandPrixSearchUseCase {
     private final DocumentMapper documentMapper;
     private final GrandPrixSearchRepository grandPrixSearchRepository;
+    private final GrandPrixSearchRepoPort grandPrixSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     @Override
     public GrandPrixDocument save(GrandPrix grandPrix){
-        return GrandPrixDocument.builder().grandPrix(grandPrix).build();
+        GrandPrixDocument document = GrandPrixDocument.builder().grandPrix(grandPrix).build();
+
+        return grandPrixSearchRepoPort.save(document);
+    }
+
+    @Override
+    public GrandPrixDocument save(GrandPrixDocument document) {
+        return grandPrixSearchRepoPort.save(document);
+    }
+
+    @Override
+    public GrandPrixDocument findById(Long id) {
+        return grandPrixSearchRepoPort.findById(id);
+    }
+
+    @Override
+    public void modify(GrandPrixDocument document, GrandPrix grandPrix) {
+        document.modify(grandPrix);
+        grandPrixSearchRepoPort.save(document);
     }
 
     @Override

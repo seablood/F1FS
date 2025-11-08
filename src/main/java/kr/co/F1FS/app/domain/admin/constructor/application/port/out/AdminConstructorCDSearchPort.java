@@ -4,4 +4,5 @@ import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
 
 public interface AdminConstructorCDSearchPort {
     void save(ConstructorDocument constructorDocument);
+    ConstructorDocument findById(Long id);
 }

@@ -4,11 +4,11 @@ import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowConstructorUseCase;
+import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorJpaPort;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowConstructor;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowConstructorDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowConstructorRepository;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowConstructorService implements FollowConstructorUseCase {
     private final FollowMapper followMapper;
-    private final FollowConstructorRepository followConstructorRepository;
+    private final FollowConstructorJpaPort followConstructorJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
     private final ConstructorUseCase constructorUseCase;
     private final FollowConstructorPort followConstructorPort;
@@ -34,16 +34,16 @@ public class FollowConstructorService implements FollowConstructorUseCase {
         cacheEvictUtil.evictCachingConstructor(constructor);
 
         if(isFollowed(user, constructor)){
-            FollowConstructor followConstructor = followConstructorRepository.findByFollowerUserAndFolloweeConstructor(
+            FollowConstructor followConstructor = followConstructorJpaPort.findByFollowerUserAndFolloweeConstructor(
                     user, constructor
             );
-            followConstructorRepository.delete(followConstructor);
+            followConstructorJpaPort.delete(followConstructor);
             constructorUseCase.decreaseFollower(constructor);
             return;
         }
 
         FollowConstructor followConstructor = followMapper.toFollowConstructor(user, constructor);
-        followConstructorRepository.save(followConstructor);
+        followConstructorJpaPort.save(followConstructor);
         constructorUseCase.increaseFollower(constructor);
 
         followConstructorPort.saveAndFlush(constructor);
@@ -51,14 +51,11 @@ public class FollowConstructorService implements FollowConstructorUseCase {
 
     @Cacheable(value = "FollowingConstructor", key = "#user.id", cacheManager = "redisLongCacheManager")
     public List<ResponseFollowConstructorDTO> getFollowingConstructor(User user){
-        return followConstructorRepository.findByFollowerUser(user).stream()
-                .map(followConstructor -> followConstructor.getFolloweeConstructor())
-                .map(followeeConstructor -> followMapper.toResponseFollowConstructorDTO(followeeConstructor))
-                .toList();
+        return followConstructorJpaPort.findByFollowerUser(user);
     }
 
     public boolean isFollowed(User user, Constructor constructor){
-        return followConstructorRepository.existsFollowConstructorByFollowerUserAndFolloweeConstructor(
+        return followConstructorJpaPort.existsFollowConstructorByFollowerUserAndFolloweeConstructor(
                 user, constructor);
     }
 }

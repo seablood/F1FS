@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.elastic.application.service;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.ChatRoomSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.out.ChatRoomSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.ChatRoomDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.ChatRoomSearchRepository;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ChatRoomSearchService implements ChatRoomSearchUseCase {
     private final DocumentMapper documentMapper;
     private final ChatRoomSearchRepository chatRoomSearchRepository;
+    private final ChatRoomSearchRepoPort chatRoomSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     @Override
@@ -32,33 +34,40 @@ public class ChatRoomSearchService implements ChatRoomSearchUseCase {
         ChatRoomDocument chatRoomDocument = ChatRoomDocument.builder()
                 .chatRoom(chatRoom).build();
 
-        chatRoomSearchRepository.save(chatRoomDocument);
+        chatRoomSearchRepoPort.save(chatRoomDocument);
     }
 
     @Override
     public void save(ChatRoomDocument chatRoomDocument) {
-        chatRoomSearchRepository.save(chatRoomDocument);
+        chatRoomSearchRepoPort.save(chatRoomDocument);
     }
 
     @Override
     public ChatRoomDocument findById(Long id) {
-        return chatRoomSearchRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("채팅방 없음"));
+        return chatRoomSearchRepoPort.findById(id);
     }
 
     @Override
     public void modify(ChatRoomDocument document, ChatRoom chatRoom) {
         document.modify(chatRoom);
+        chatRoomSearchRepoPort.save(document);
+    }
+
+    @Override
+    public void delete(ChatRoomDocument document) {
+        chatRoomSearchRepoPort.delete(document);
     }
 
     @Override
     public void increaseMemberCount(ChatRoomDocument chatRoomDocument) {
         chatRoomDocument.increaseMemberCount();
+        chatRoomSearchRepoPort.save(chatRoomDocument);
     }
 
     @Override
     public void decreaseMemberCount(ChatRoomDocument chatRoomDocument) {
         chatRoomDocument.decreaseMemberCount();
+        chatRoomSearchRepoPort.save(chatRoomDocument);
     }
 
     @Override

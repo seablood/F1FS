@@ -2,8 +2,8 @@ package kr.co.F1FS.app.domain.chat.application.service;
 
 import kr.co.F1FS.app.domain.chat.application.mapper.ChatRoomMapper;
 import kr.co.F1FS.app.domain.chat.application.port.in.ChatRoomUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.out.ChatRoomJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
-import kr.co.F1FS.app.domain.chat.infrastructure.repository.ChatRoomRepository;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
 import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
 import kr.co.F1FS.app.domain.elastic.application.port.in.ChatRoomSearchUseCase;
@@ -28,7 +28,7 @@ import java.util.List;
 public class ChatRoomService implements ChatRoomUseCase {
     private final ChatSubscribeService chatSubscribeService;
     private final ChatRoomSearchUseCase searchUseCase;
-    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomJpaPort chatRoomJpaPort;
     private final ChatRoomMapper chatRoomMapper;
 
     @Override
@@ -36,7 +36,7 @@ public class ChatRoomService implements ChatRoomUseCase {
     public void save(CreateChatRoomDTO dto, String masterUser){
         ChatRoom chatRoom = chatRoomMapper.toChatRoom(dto, masterUser);
 
-        chatRoomRepository.save(chatRoom);
+        chatRoomJpaPort.save(chatRoom);
         searchUseCase.save(chatRoom);
     }
 
@@ -44,7 +44,7 @@ public class ChatRoomService implements ChatRoomUseCase {
     public Page<ResponseChatRoomDTO> findAll(int page, int size, String condition) {
         Pageable pageable = conditionSwitch(page, size, condition);
 
-        return chatRoomRepository.findAll(pageable).map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
+        return chatRoomJpaPort.findAll(pageable);
     }
 
     @Override
@@ -52,22 +52,21 @@ public class ChatRoomService implements ChatRoomUseCase {
         Pageable pageable = conditionSwitch(page, size, condition);
         List<Long> roomIds = chatSubscribeService.findSubscribeChatRoom(username);
 
-        return chatRoomRepository.findByIdIn(roomIds, pageable)
-                .map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
+        return chatRoomJpaPort.findByIdIn(roomIds, pageable);
     }
 
     @Override
     public boolean enterChatRoom(Long roomId, String username, LocalDateTime lastEnterTime) {
         if(!chatSubscribeService.isSubscribe(roomId, username)){
-            ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                    .orElseThrow(() -> new ChatRoomException(ChatRoomExceptionType.CHAT_ROOM_NOT_FOUND));
+            ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
             ChatRoomDocument document = searchUseCase.findById(roomId);
+
             chatRoom.increaseMember();
             searchUseCase.increaseMemberCount(document);
             chatRoom.updateLastChatMessage(lastEnterTime);
 
             chatSubscribeService.addSubscriber(roomId, username, lastEnterTime);
-            chatRoomRepository.saveAndFlush(chatRoom);
+            chatRoomJpaPort.saveAndFlush(chatRoom);
             searchUseCase.save(document);
 
             return true;
@@ -78,32 +77,30 @@ public class ChatRoomService implements ChatRoomUseCase {
 
     @Override
     public void sendMessage(Long roomId, LocalDateTime sendTime) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new ChatRoomException(ChatRoomExceptionType.CHAT_ROOM_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
         chatRoom.updateLastChatMessage(sendTime);
 
-        chatRoomRepository.saveAndFlush(chatRoom);
+        chatRoomJpaPort.saveAndFlush(chatRoom);
     }
 
     @Override
     public void leaveChatRoom(Long roomId, String username, LocalDateTime sendTime) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new ChatRoomException(ChatRoomExceptionType.CHAT_ROOM_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
         ChatRoomDocument document = searchUseCase.findById(roomId);
+
         searchUseCase.decreaseMemberCount(document);
         chatRoom.decreaseMember();
         chatRoom.updateLastChatMessage(sendTime);
 
         chatSubscribeService.removeSubscriber(roomId, username);
-        chatRoomRepository.saveAndFlush(chatRoom);
+        chatRoomJpaPort.saveAndFlush(chatRoom);
         searchUseCase.save(document);
     }
 
     @Override
     @Transactional
     public void modify(Long roomId, ModifyChatRoomDTO dto, String username){
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new ChatRoomException(ChatRoomExceptionType.CHAT_ROOM_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
         ChatRoomDocument document = searchUseCase.findById(roomId);
 
         if(!AuthorCertification.certification(username, chatRoom.getMasterUser())){
@@ -112,22 +109,23 @@ public class ChatRoomService implements ChatRoomUseCase {
         chatRoom.modify(dto);
         searchUseCase.modify(document, chatRoom);
 
-        chatRoomRepository.saveAndFlush(chatRoom);
+        chatRoomJpaPort.saveAndFlush(chatRoom);
         searchUseCase.save(document);
     }
 
     @Override
     @Transactional
     public void delete(Long roomId, String username) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new ChatRoomException(ChatRoomExceptionType.CHAT_ROOM_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
+        ChatRoomDocument document = searchUseCase.findById(roomId);
 
         if(!AuthorCertification.certification(username, chatRoom.getMasterUser())){
             throw new ChatRoomException(ChatRoomExceptionType.NOT_AUTHORITY_UPDATE_CHAT_ROOM);
         }
         chatSubscribeService.deleteChatRoom(roomId);
 
-        chatRoomRepository.delete(chatRoom);
+        chatRoomJpaPort.delete(chatRoom);
+        searchUseCase.delete(document);
     }
 
     public Pageable conditionSwitch(int page, int size, String condition){

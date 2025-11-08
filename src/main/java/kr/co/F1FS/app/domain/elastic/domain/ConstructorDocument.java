@@ -27,6 +27,11 @@ public class ConstructorDocument {
     @Field(type = FieldType.Text)
     private String racingClass;
 
+    public void modify(Constructor constructor){
+        this.korName = constructor.getName();
+        this.engName = constructor.getEngName();
+    }
+
     @Builder
     public ConstructorDocument(Constructor constructor){
         this.id = constructor.getId();

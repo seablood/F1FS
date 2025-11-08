@@ -2,9 +2,9 @@ package kr.co.F1FS.app.domain.note.application.service;
 
 import kr.co.F1FS.app.domain.note.application.mapper.NoteMapper;
 import kr.co.F1FS.app.domain.note.application.port.in.NoteUseCase;
+import kr.co.F1FS.app.domain.note.application.port.out.NoteJpaPort;
 import kr.co.F1FS.app.domain.note.application.port.out.NoteUserPort;
 import kr.co.F1FS.app.domain.note.domain.Note;
-import kr.co.F1FS.app.domain.note.infrastructure.repository.NoteRepository;
 import kr.co.F1FS.app.domain.note.presentation.dto.CreateNoteDTO;
 import kr.co.F1FS.app.domain.note.presentation.dto.ModifyNoteDTO;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMLiveUseCase;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class NoteService implements NoteUseCase {
-    private final NoteRepository noteRepository;
+    private final NoteJpaPort noteJpaPort;
     private final NoteUserPort userPort;
     private final NotificationRedisUseCase redisUseCase;
     private final FCMLiveUseCase fcmLiveUseCase;
@@ -43,34 +43,27 @@ public class NoteService implements NoteUseCase {
         User toUser = userPort.findByNicknameNotDTO(nickname);
         Note note = noteMapper.toNote(dto, toUser, user);
 
-        noteRepository.save(note);
+        noteJpaPort.save(note);
 
         sendNotification(toUser, user, note);
 
-        return noteMapper.toResponseNoteDTO(noteRepository.save(note));
+        return noteMapper.toResponseNoteDTO(noteJpaPort.save(note));
     }
 
     public Page<ResponseSimpleNoteDTO> getNoteByToUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return noteRepository.findAllByToUser(user, pageable).map(note -> {
-            String fromNickname = note.getFromUser() == null ? "알 수 없음" : note.getFromUser().getNickname();
-            return noteMapper.toResponseSimpleNoteDTO(note, fromNickname+"님으로부터 온 쪽지");
-        });
+        return noteJpaPort.findAllByToUser(user, pageable);
     }
 
     public Page<ResponseSimpleNoteDTO> getNoteByFromUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return noteRepository.findAllByFromUser(user, pageable).map(note -> {
-            String toNickname = note.getToUser() == null ? "알 수 없음" : note.getToUser().getNickname();
-            return noteMapper.toResponseSimpleNoteDTO(note, toNickname+"님에게 보낸 쪽지");
-        });
+        return noteJpaPort.findAllByFromUser(user, pageable);
     }
 
     public Note findByIdNotDTO(Long id){
-        return noteRepository.findById(id)
-                .orElseThrow(() -> new NoteException(NoteExceptionType.NOTE_NOT_FOUND));
+        return noteJpaPort.findById(id);
     }
 
     @Cacheable(value = "NoteDTO", key = "#id", cacheManager = "redisLongCacheManager")
@@ -84,7 +77,7 @@ public class NoteService implements NoteUseCase {
     @Transactional
     public void updateIsRead(Note note){
         if(!note.isRead()) note.updateIsRead();
-        noteRepository.saveAndFlush(note);
+        noteJpaPort.saveAndFlush(note);
     }
 
     @Transactional
@@ -93,7 +86,7 @@ public class NoteService implements NoteUseCase {
         cacheEvictUtil.evictCachingNote(note);
 
         note.modify(dto);
-        noteRepository.saveAndFlush(note);
+        noteJpaPort.saveAndFlush(note);
 
         return noteMapper.toResponseNoteDTO(note);
     }
@@ -106,7 +99,7 @@ public class NoteService implements NoteUseCase {
         }
         cacheEvictUtil.evictCachingNote(note);
 
-        noteRepository.delete(note);
+        noteJpaPort.delete(note);
     }
 
     public void sendNotification(User toUser, User fromUser, Note note){

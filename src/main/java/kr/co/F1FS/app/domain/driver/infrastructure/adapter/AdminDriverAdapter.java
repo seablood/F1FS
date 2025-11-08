@@ -1,17 +1,22 @@
 package kr.co.F1FS.app.domain.driver.infrastructure.adapter;
 
 import kr.co.F1FS.app.domain.admin.driver.application.port.out.AdminDriverPort;
+import kr.co.F1FS.app.domain.driver.application.mapper.DriverMapper;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.infrastructure.repository.DriverRepository;
+import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
 import kr.co.F1FS.app.global.util.exception.driver.DriverException;
 import kr.co.F1FS.app.global.util.exception.driver.DriverExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class AdminDriverAdapter implements AdminDriverPort {
     private final DriverRepository driverRepository;
+    private final DriverMapper driverMapper;
 
     @Override
     public Driver save(Driver driver) {
@@ -21,6 +26,11 @@ public class AdminDriverAdapter implements AdminDriverPort {
     @Override
     public void saveAndFlush(Driver driver) {
         driverRepository.saveAndFlush(driver);
+    }
+
+    @Override
+    public Page<SimpleResponseDriverDTO> findAll(Pageable pageable) {
+        return driverRepository.findAll(pageable).map(driver -> driverMapper.toSimpleResponseDriverDTO(driver));
     }
 
     @Override

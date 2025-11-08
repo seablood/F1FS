@@ -2,17 +2,15 @@ package kr.co.F1FS.app.domain.complain.post.application.service;
 
 import kr.co.F1FS.app.domain.complain.post.application.mapper.PostComplainMapper;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
-import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainPort;
+import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
-import kr.co.F1FS.app.domain.complain.post.infrastructure.repository.PostComplainRepository;
+import kr.co.F1FS.app.domain.post.application.port.in.PostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.complain.post.presentation.dto.CreatePostComplainDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,27 +20,25 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Slf4j
 public class PostComplainService implements PostComplainUseCase {
-    private final PostComplainPort postPort;
+    private final PostUseCase postUseCase;
+    public final PostComplainJpaPort postComplainJpaPort;
     private final PostComplainMapper complainMapper;
     private final SlackService slackService;
-    private final PostComplainRepository complainRepository;
 
+    @Override
     public void save(PostComplain complain){
-        complainRepository.save(complain);
+        postComplainJpaPort.save(complain);
     }
 
+    @Override
     @Transactional
     public void postComplain(Long id, User user, CreatePostComplainDTO dto){
-        Post post = postPort.findByIdNotDTO(id);
+        Post post = postUseCase.findByIdNotDTONotCache(id);
         PostComplain complain = complainMapper.toPostComplain(post, user, dto);
 
         save(complain);
         sendMessage(complain);
         log.info("게시글 신고 완료 : {}", post.getTitle());
-    }
-
-    public Page<PostComplain> findAll(Pageable pageable){
-        return complainRepository.findAll(pageable);
     }
 
     public void sendMessage(PostComplain complain){

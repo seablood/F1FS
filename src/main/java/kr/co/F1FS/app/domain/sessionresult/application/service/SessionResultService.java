@@ -11,9 +11,9 @@ import kr.co.F1FS.app.domain.sessionresult.application.mapper.SessionResultMappe
 import kr.co.F1FS.app.domain.sessionresult.application.port.in.SessionResultUseCase;
 import kr.co.F1FS.app.domain.sessionresult.application.port.out.SessionResultConstructorPort;
 import kr.co.F1FS.app.domain.sessionresult.application.port.out.SessionResultDriverPort;
+import kr.co.F1FS.app.domain.sessionresult.application.port.out.SessionResultJpaPort;
 import kr.co.F1FS.app.domain.sessionresult.application.port.out.SessionResultSessionPort;
 import kr.co.F1FS.app.domain.sessionresult.domain.SessionResult;
-import kr.co.F1FS.app.domain.sessionresult.infrastructure.repository.SessionResultRepository;
 import kr.co.F1FS.app.domain.sessionresult.presentation.dto.CreateSessionResultCommand;
 import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
@@ -34,7 +34,7 @@ public class SessionResultService implements SessionResultUseCase {
     private final ConstructorRecordRelationUseCase constructorRecordRelationUseCase;
     private final SessionResultDriverPort driverPort;
     private final SessionResultSessionPort sessionPort;
-    private final SessionResultRepository sessionResultRepository;
+    private final SessionResultJpaPort sessionResultJpaPort;
     private final SessionResultMapper sessionResultMapper;
     private final CacheEvictUtil cacheEvictUtil;
 
@@ -49,7 +49,7 @@ public class SessionResultService implements SessionResultUseCase {
 
                     SessionResult sessionResult = sessionResultMapper.toSessionResult(command, session, driver, constructor);
 
-                    sessionResultRepository.save(sessionResult);
+                    sessionResultJpaPort.save(sessionResult);
                 }
             }
             case SPRINT_RACE, RACE -> {
@@ -68,7 +68,7 @@ public class SessionResultService implements SessionResultUseCase {
 
                     SessionResult sessionResult = sessionResultMapper.toSessionResult(command, session, driver, constructor);
 
-                    sessionResultRepository.save(sessionResult);
+                    sessionResultJpaPort.save(sessionResult);
                 }
                 driverRecordRelationUseCase.updateChampionshipRank(racingClassCode);
                 constructorRecordRelationUseCase.updateChampionshipRank(racingClassCode);
@@ -87,7 +87,7 @@ public class SessionResultService implements SessionResultUseCase {
 
                     SessionResult sessionResult = sessionResultMapper.toSessionResult(command, session, driver, constructor);
 
-                    sessionResultRepository.save(sessionResult);
+                    sessionResultJpaPort.save(sessionResult);
                 }
             }
         }
@@ -95,7 +95,7 @@ public class SessionResultService implements SessionResultUseCase {
 
     @Override
     public List<ResponseSessionResultDTO> getSessionResultBySession(Session session){
-        List<SessionResult> resultList = sessionResultRepository.findSessionResultsBySession(session);
+        List<SessionResult> resultList = sessionResultJpaPort.findSessionResultsBySession(session);
         List<ResponseSessionResultDTO> dtoList = resultList.stream()
                 .map(sessionResult -> sessionResultMapper.toResponseSessionResultDTO(sessionResult))
                 .sorted(Comparator.comparingInt(ResponseSessionResultDTO::getPosition))

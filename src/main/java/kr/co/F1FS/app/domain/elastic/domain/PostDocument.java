@@ -38,6 +38,11 @@ public class PostDocument {
     @Field(type = FieldType.Integer)
     private int likeNum;
 
+    public void modify(Post post){
+        this.title = post.getTitle();
+        this.content = post.getContent();
+    }
+
     public void increaseLikeNum(){
         this.likeNum++;
     }

@@ -10,7 +10,10 @@ import org.springframework.data.domain.Page;
 public interface CircuitUseCase {
     Circuit createCircuit(CreateCircuitCommand command);
     Page<SimpleResponseCircuitDTO> findAll(int page, int size);
+    Circuit findById(Long id);
     ResponseCircuitDTO getCircuitById(Long id);
     SimpleResponseCircuitDTO getSimpleCircuitById(Long id);
     Circuit modify(ModifyCircuitCommand command, Circuit circuit);
+    ResponseCircuitDTO toResponseCircuitDTO(Circuit circuit);
+    SimpleResponseCircuitDTO toSimpleResponseCircuitDTO(Circuit circuit);
 }

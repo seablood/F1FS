@@ -1,9 +1,7 @@
 package kr.co.F1FS.app.domain.admin.auth.application.service;
 
 import kr.co.F1FS.app.domain.admin.auth.application.port.in.AdminAuthUseCase;
-import kr.co.F1FS.app.domain.admin.auth.application.port.out.AdminAuthUserPort;
-import kr.co.F1FS.app.domain.admin.auth.application.port.out.AdminAuthVerificationCodePort;
-import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
+import kr.co.F1FS.app.domain.auth.application.port.in.AuthUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -25,24 +23,22 @@ import java.util.List;
 @Slf4j
 public class AdminAuthService implements AdminAuthUseCase {
     private final UserUseCase userUseCase;
-    private final AdminAuthUserPort userPort;
-    private final AdminAuthVerificationCodePort verificationCodePort;
-    private final UserMapper userMapper;
+    private final AuthUseCase authUseCase;
     private final BCryptPasswordEncoder passwordEncoder;
     private final ValidationService validationService;
 
     @Transactional
     public ResponseUserDTO save(CreateAdminUserDTO dto){
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        User newAdminUser = userMapper.toUser(dto);
+        User newAdminUser = userUseCase.toAdminUser(dto);
         validationService.checkValid(newAdminUser);
         userUseCase.updateLastLoginDate(newAdminUser);
 
         userUseCase.updateRole(newAdminUser, Role.ADMIN);
         log.info("관리자 계정 전환(생성) 완료 : {}", newAdminUser.getUsername());
 
-        userPort.save(newAdminUser);
-        return userMapper.toResponseUserDTO(newAdminUser);
+        userUseCase.save(newAdminUser);
+        return userUseCase.toResponseUserDTO(newAdminUser);
     }
 
     // 5분에 한번씩 만료된 인증 코드 삭제
@@ -51,9 +47,9 @@ public class AdminAuthService implements AdminAuthUseCase {
     public void deleteVerificationCode(){
         log.info("만료 인증코드 삭제");
 
-        verificationCodePort.findAll().stream()
+        authUseCase.findAll().stream()
                 .filter(verificationCode -> verificationCode.isExpired())
-                .forEach(verificationCode -> verificationCodePort.delete(verificationCode));
+                .forEach(verificationCode -> authUseCase.delete(verificationCode));
     }
 
     @Transactional
@@ -63,14 +59,13 @@ public class AdminAuthService implements AdminAuthUseCase {
 
         LocalDateTime sixMonthAgo = LocalDateTime.now().minusMonths(6);
 
-        List<User> list = userPort.findAllByLastLoginDateBeforeOrLastLoginDateIsNull(sixMonthAgo)
-                .stream().filter(user -> user.getRole().equals(Role.USER)).toList();
+        List<User> list = userUseCase.findAllByLastLoginDateBeforeOrLastLoginDateIsNull(sixMonthAgo);
 
         for (User user : list){
             userUseCase.updateRole(user, Role.DORMANT);
         }
 
-        userPort.saveAllAndFlush(list);
+        userUseCase.saveAllAndFlush(list);
 
         log.info("휴면 전환 완료: {}명", list.size());
     }

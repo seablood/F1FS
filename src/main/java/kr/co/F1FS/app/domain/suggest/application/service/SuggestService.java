@@ -2,9 +2,9 @@ package kr.co.F1FS.app.domain.suggest.application.service;
 
 import kr.co.F1FS.app.domain.suggest.application.mapper.SuggestMapper;
 import kr.co.F1FS.app.domain.suggest.application.port.in.SuggestUseCase;
+import kr.co.F1FS.app.domain.suggest.application.port.out.SuggestJpaPort;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.suggest.infrastructure.repository.SuggestRepository;
 import kr.co.F1FS.app.global.util.AuthorCertification;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.global.util.exception.suggest.SuggestException;
@@ -27,55 +27,54 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SuggestService implements SuggestUseCase {
     private final SuggestMapper suggestMapper;
-    private final SuggestRepository suggestRepository;
+    private final SuggestJpaPort suggestJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
 
     @Transactional
     public ResponseSuggestDTO save(User user, CreateSuggestDTO dto){
-        Suggest suggest = suggestRepository.save(suggestMapper.toSuggest(user, dto));
+        Suggest suggest = suggestJpaPort.save(suggestMapper.toSuggest(user, dto));
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
     @Cacheable(value = "SuggestDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSuggestDTO getSuggestById(Long id){
-        Suggest suggest = suggestRepository.findById(id)
-                .orElseThrow(() -> new SuggestException(SuggestExceptionType.SUGGEST_NOT_FOUND));
+        Suggest suggest = suggestJpaPort.findById(id);
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
     public Page<ResponseSuggestDTO> getSuggestByUser(int page, int size, User user){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return suggestRepository.findAllByFromUser(user, pageable).map(suggest -> suggestMapper.toResponseSuggestDTO(suggest));
+        return suggestJpaPort.findAllByFromUser(user, pageable);
     }
 
     public void updateConfirmed(Suggest suggest, boolean isConfirmed){
         cacheEvictUtil.evictCachingSuggest(suggest);
         suggest.updateConfirmed(isConfirmed);
+
+        suggestJpaPort.saveAndFlush(suggest);
     }
 
     @Transactional
     public ResponseSuggestDTO modify(Long id, ModifySuggestDTO dto, User user){
-        Suggest suggest = suggestRepository.findById(id)
-                .orElseThrow(() -> new SuggestException(SuggestExceptionType.SUGGEST_NOT_FOUND));
+        Suggest suggest = suggestJpaPort.findById(id);
         cacheEvictUtil.evictCachingSuggest(suggest);
 
         if(!AuthorCertification.certification(user.getUsername(), suggest.getFromUser().getUsername())){
             throw new SuggestException(SuggestExceptionType.NOT_AUTHORITY_UPDATE_SUGGEST);
         }
         suggest.modify(dto);
-        suggestRepository.saveAndFlush(suggest);
+        suggestJpaPort.saveAndFlush(suggest);
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
     @Transactional
     public void delete(Long id, User user){
-        Suggest suggest = suggestRepository.findById(id)
-                .orElseThrow(() -> new SuggestException(SuggestExceptionType.SUGGEST_NOT_FOUND));
+        Suggest suggest = suggestJpaPort.findById(id);
         cacheEvictUtil.evictCachingSuggest(suggest);
 
         if(!AuthorCertification.certification(user.getUsername(), suggest.getFromUser().getUsername())){
             throw new SuggestException(SuggestExceptionType.NOT_AUTHORITY_DELETE_SUGGEST);
         }
-        suggestRepository.delete(suggest);
+        suggestJpaPort.delete(suggest);
     }
 }

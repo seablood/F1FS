@@ -33,6 +33,11 @@ public class DriverDocument {
     @Field(type = FieldType.Text)
     private String racingClass;
 
+    public void modify(Driver driver){
+        this.korName = driver.getName();
+        this.engName = driver.getEngName();
+    }
+
     @Builder
     public DriverDocument(Driver driver){
         this.id = driver.getId();

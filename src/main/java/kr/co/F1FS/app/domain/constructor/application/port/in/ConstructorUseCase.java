@@ -15,6 +15,8 @@ import java.util.List;
 public interface ConstructorUseCase {
     Constructor save(CreateConstructorDTO constructorDTO, CreateCurrentSeasonDTO currentSeasonDTO,
                      CreateSinceDebutDTO sinceDebutDTO);
+    Constructor save(Constructor constructor);
+    Constructor saveAndFlush(Constructor constructor);
     Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition);
     ResponseConstructorDTO findById(Long id);
     Constructor findByIdNotDTO(Long id);

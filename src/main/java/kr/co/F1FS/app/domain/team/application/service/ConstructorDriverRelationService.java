@@ -10,7 +10,6 @@ import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import kr.co.F1FS.app.domain.team.application.mapper.ConstructorDriverRelationMapper;
 import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationUseCase;
 import kr.co.F1FS.app.domain.team.application.port.out.*;
-import kr.co.F1FS.app.domain.team.infrastructure.repository.ConstructorDriverRelationRepository;
 import kr.co.F1FS.app.domain.team.domain.ConstructorDriverRelation;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.global.util.RacingClass;
@@ -33,7 +32,7 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
     private final CDRelationDriverDebutPort driverDebutPort;
     private final CDRelationConstructorPort constructorPort;
     private final CDRelationDriverPort driverPort;
-    private final ConstructorDriverRelationRepository relationRepository;
+    private final CDRelationJpaPort cdRelationJpaPort;
     private final CDRelationRecordPort recordPort;
     private final ConstructorDriverRelationMapper relationMapper;
     private final CacheEvictUtil cacheEvictUtil;
@@ -43,6 +42,11 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
         return relation;
     }
 
+    @Override
+    public List<ConstructorDriverRelation> findConstructorDriverRelationByConstructor(Constructor constructor) {
+        return cdRelationJpaPort.findConstructorDriverRelationByConstructor(constructor);
+    }
+
     @Transactional
     public void transfer(Integer number, String constructorName){
         Driver driver = driverPort.findByNumber(number);
@@ -50,19 +54,19 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
         cacheEvictUtil.evictCachingDriver(driver);
         cacheEvictUtil.evictCachingConstructor(constructor);
 
-        if(relationRepository.existsConstructorDriverRelationByDriverAndRacingClass(driver, constructor.getRacingClass())){
-            if(relationRepository.existsConstructorDriverRelationByDriverAndConstructor(driver, constructor)){
+        if(cdRelationJpaPort.existsConstructorDriverRelationByDriverAndRacingClass(driver, constructor.getRacingClass())){
+            if(cdRelationJpaPort.existsConstructorDriverRelationByDriverAndConstructor(driver, constructor)){
                 driverUseCase.updateTeam(driver, constructor.getName(), constructor.getEngName());
                 modifyRacingClass(driver, constructor.getRacingClass());
             } else {
-                ConstructorDriverRelation relation = relationRepository.findConstructorDriverRelationByDriverAndRacingClass(
+                ConstructorDriverRelation relation = cdRelationJpaPort.findConstructorDriverRelationByDriverAndRacingClass(
                         driver, constructor.getRacingClass()
-                ).orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_TRANSFER_ERROR));
+                );
                 relation.updateConstructor(constructor);
                 driverUseCase.updateTeam(driver, constructor.getName(), constructor.getEngName());
                 modifyRacingClass(driver, constructor.getRacingClass());
 
-                relationRepository.saveAndFlush(relation);
+                cdRelationJpaPort.saveAndFlush(relation);
             }
         } else {
             ConstructorDriverRelation relation = ConstructorDriverRelation.builder()
@@ -74,7 +78,7 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
             modifyRacingClass(driver, constructor.getRacingClass());
 
             driverPort.saveAndFlush(driver);
-            relationRepository.saveAndFlush(relation);
+            cdRelationJpaPort.saveAndFlush(relation);
         }
     }
 
@@ -112,27 +116,27 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
 
         switch (option){
             case "currentTeam" :
-                relation = relationRepository.findConstructorDriverRelationByDriverAndRacingClass(
+                relation = cdRelationJpaPort.findConstructorDriverRelationByDriverAndRacingClass(
                         driver, driver.getRacingClass()
-                ).orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_TRANSFER_ERROR));
+                );
                 cacheEvictUtil.evictCachingConstructor(relation.getConstructor());
-                relationRepository.delete(relation);
+                cdRelationJpaPort.delete(relation);
                 break;
 
             case "F1", "F2", "F3", "F1_ACADEMY", "RESERVE" :
                 RacingClass racingClass = RacingClass.valueOf(option);
-                relation = relationRepository.findConstructorDriverRelationByDriverAndRacingClass(
+                relation = cdRelationJpaPort.findConstructorDriverRelationByDriverAndRacingClass(
                         driver, racingClass
-                ).orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_TRANSFER_ERROR));
+                );
                 cacheEvictUtil.evictCachingConstructor(relation.getConstructor());
-                relationRepository.delete(relation);
+                cdRelationJpaPort.delete(relation);
                 break;
 
             case "all" :
-                List<ConstructorDriverRelation> list = relationRepository.findConstructorDriverRelationByDriver(driver);
+                List<ConstructorDriverRelation> list = cdRelationJpaPort.findConstructorDriverRelationByDriver(driver);
                 list.stream().forEach(relation1 -> {
                     cacheEvictUtil.evictCachingConstructor(relation1.getConstructor());
-                    relationRepository.delete(relation1);
+                    cdRelationJpaPort.delete(relation1);
                 });
                 break;
 

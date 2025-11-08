@@ -4,4 +4,5 @@ import kr.co.F1FS.app.domain.elastic.domain.GrandPrixDocument;
 
 public interface AdminGrandPrixSearchPort {
     void save(GrandPrixDocument grandPrixDocument);
+    GrandPrixDocument getGrandPrixDocumentById(Long id);
 }

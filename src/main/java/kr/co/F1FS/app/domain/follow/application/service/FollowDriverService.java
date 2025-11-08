@@ -4,11 +4,11 @@ import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowDriverUseCase;
+import kr.co.F1FS.app.domain.follow.application.port.out.FollowDriverJpaPort;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowDriverPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowDriver;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowDriverRepository;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowDriverService implements FollowDriverUseCase {
     private final FollowMapper followMapper;
-    private final FollowDriverRepository followDriverRepository;
+    private final FollowDriverJpaPort followDriverJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
     private final DriverUseCase driverUseCase;
     private final FollowDriverPort followDriverPort;
@@ -34,14 +34,14 @@ public class FollowDriverService implements FollowDriverUseCase {
         cacheEvictUtil.evictCachingDriver(driver);
 
         if(isFollowed(user, driver)){
-            FollowDriver followDriver = followDriverRepository.findByFollowerUserAndFolloweeDriver(user, driver);
-            followDriverRepository.delete(followDriver);
+            FollowDriver followDriver = followDriverJpaPort.findByFollowerUserAndFolloweeDriver(user, driver);
+            followDriverJpaPort.delete(followDriver);
             driverUseCase.decreaseFollower(driver);
             return;
         }
 
         FollowDriver followDriver = followMapper.toFollowDriver(user, driver);
-        followDriverRepository.save(followDriver);
+        followDriverJpaPort.save(followDriver);
         driverUseCase.increaseFollower(driver);
 
         followDriverPort.saveAndFlush(driver);
@@ -49,13 +49,10 @@ public class FollowDriverService implements FollowDriverUseCase {
 
     @Cacheable(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
     public List<ResponseFollowDriverDTO> getFollowingDriver(User user){
-        return followDriverRepository.findByFollowerUser(user).stream()
-                .map(followDriver -> followDriver.getFolloweeDriver())
-                .map(followeeDriver -> followMapper.toResponseFollowDriverDTO(followeeDriver))
-                .toList();
+        return followDriverJpaPort.findByFollowerUser(user);
     }
 
     public boolean isFollowed(User user, Driver driver){
-        return followDriverRepository.existsFollowDriverByFollowerUserAndFolloweeDriver(user, driver);
+        return followDriverJpaPort.existsFollowDriverByFollowerUserAndFolloweeDriver(user, driver);
     }
 }

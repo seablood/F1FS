@@ -3,8 +3,7 @@ package kr.co.F1FS.app.domain.admin.post.application.service;
 import kr.co.F1FS.app.domain.admin.post.application.port.in.AdminPostUseCase;
 import kr.co.F1FS.app.domain.admin.post.application.port.out.AdminPostPort;
 import kr.co.F1FS.app.domain.admin.post.presentation.dto.AdminResponsePostComplainDTO;
-import kr.co.F1FS.app.domain.complain.post.application.mapper.PostComplainMapper;
-import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
+import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
 import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
@@ -25,10 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AdminPostService implements AdminPostUseCase {
     private final UserUseCase userUseCase;
-    private final PostComplainUseCase postComplainUseCase;
+    private final PostComplainJpaPort complainJpaPort;
     private final AdminPostPort postPort;
     private final PostMapper postMapper;
-    private final PostComplainMapper complainMapper;
     private final CacheEvictUtil cacheEvictUtil;
 
     public Page<ResponseSimplePostDTO> getPostByUser(int page, int size, String condition, String nickname){
@@ -42,9 +40,7 @@ public class AdminPostService implements AdminPostUseCase {
     public Page<AdminResponsePostComplainDTO> getAllComplain(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
-        return postComplainUseCase.findAll(pageable).map(postComplain -> complainMapper.toAdminResponsePostComplainDTO(
-                postComplain
-        ));
+        return complainJpaPort.findAll(pageable);
     }
 
     @Transactional

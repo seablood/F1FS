@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.elastic.application.service;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.CDSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.out.CDSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
 import kr.co.F1FS.app.domain.elastic.domain.DriverDocument;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
@@ -31,20 +32,53 @@ public class CDSearchService implements CDSearchUseCase {
     private final DocumentMapper documentMapper;
     private final ConstructorSearchRepository constructorSearchRepository;
     private final DriverSearchRepository driverSearchRepository;
+    private final CDSearchRepoPort cdSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     public ConstructorDocument save(Constructor constructor){
         ConstructorDocument constructorDocument = ConstructorDocument.builder()
                 .constructor(constructor).build();
 
-        return constructorDocument;
+        return cdSearchRepoPort.save(constructorDocument);
+    }
+
+    @Override
+    public ConstructorDocument save(ConstructorDocument document) {
+        return cdSearchRepoPort.save(document);
     }
 
     public DriverDocument save(Driver driver){
         DriverDocument driverDocument = DriverDocument.builder()
                 .driver(driver).build();
 
-        return driverDocument;
+        return cdSearchRepoPort.save(driverDocument);
+    }
+
+    @Override
+    public DriverDocument save(DriverDocument document) {
+        return cdSearchRepoPort.save(document);
+    }
+
+    @Override
+    public ConstructorDocument findConstructorDocumentById(Long id) {
+        return cdSearchRepoPort.findConstructorDocumentById(id);
+    }
+
+    @Override
+    public DriverDocument findDriverDocumentById(Long id) {
+        return cdSearchRepoPort.findDriverDocumentById(id);
+    }
+
+    @Override
+    public void modify(DriverDocument document, Driver driver) {
+        document.modify(driver);
+        cdSearchRepoPort.save(document);
+    }
+
+    @Override
+    public void modify(ConstructorDocument document, Constructor constructor) {
+        document.modify(constructor);
+        cdSearchRepoPort.save(document);
     }
 
     public List<CDSearchSuggestionDTO> suggestCD(String keyword){

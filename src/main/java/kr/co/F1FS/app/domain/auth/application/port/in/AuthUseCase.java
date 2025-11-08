@@ -9,8 +9,11 @@ import kr.co.F1FS.app.domain.auth.presentation.dto.CreateUserDTO;
 import kr.co.F1FS.app.domain.auth.presentation.dto.ModifyPasswordDTO;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 
+import java.util.List;
+
 public interface AuthUseCase {
     ResponseUserDTO save(CreateUserDTO userDTO);
+    List<VerificationCode> findAll();
     void sendEmail(User user, String option);
     void sendEmail(AuthorizationUserDTO dto, String option);
     VerificationCode createVerificationCode(User user);
@@ -22,4 +25,5 @@ public interface AuthUseCase {
     void secession(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response,
                    User user);
     void setBlackList(String token);
+    void delete(VerificationCode code);
 }

@@ -7,7 +7,7 @@ import kr.co.F1FS.app.domain.admin.user.application.port.out.AdminUserPort;
 import kr.co.F1FS.app.domain.admin.user.application.port.out.AdminUserSuspensionLogPort;
 import kr.co.F1FS.app.domain.admin.user.presentation.dto.AdminResponseUserComplainDTO;
 import kr.co.F1FS.app.domain.complain.user.application.mapper.UserComplainMapper;
-import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
+import kr.co.F1FS.app.domain.complain.user.application.port.out.UserComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
 import kr.co.F1FS.app.domain.suspend.application.mapper.SuspensionLogMapper;
 import kr.co.F1FS.app.domain.suspend.domain.SuspensionLog;
@@ -28,7 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AdminUserService implements AdminUserUseCase {
     private final UserUseCase userUseCase;
-    private final UserComplainUseCase complainUseCase;
+    private final UserComplainJpaPort complainJpaPort;
     private final AdminUserPort userPort;
     private final AdminUserSuspensionLogPort suspensionLogPort;
     private final AdminUserComplainPort complainPort;
@@ -39,7 +39,7 @@ public class AdminUserService implements AdminUserUseCase {
     public Page<AdminResponseUserComplainDTO> findAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
-        return complainUseCase.findAll(pageable).map(userComplain -> complainMapper.toAdminResponseUserComplainDTO(userComplain));
+        return complainJpaPort.findAll(pageable);
     }
 
     public Page<AdminResponseUserComplainDTO> getComplainByUser(int page, int size, String condition, String search){

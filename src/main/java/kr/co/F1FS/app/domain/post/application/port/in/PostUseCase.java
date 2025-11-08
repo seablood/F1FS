@@ -14,6 +14,7 @@ public interface PostUseCase {
     Page<ResponseSimplePostDTO> findAll(int page, int size, String condition);
     ResponsePostDTO findById(Long id);
     Post findByIdNotDTO(Long id);
+    Post findByIdNotDTONotCache(Long id);
     ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user);
     void delete(Long id, User user);
     Pageable conditionSwitch(int page, int size, String condition);

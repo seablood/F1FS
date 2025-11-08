@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisU
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.reply.application.mapper.ReplyMapper;
 import kr.co.F1FS.app.domain.reply.application.port.in.ReplyUseCase;
+import kr.co.F1FS.app.domain.reply.application.port.out.ReplyJpaPort;
 import kr.co.F1FS.app.domain.reply.application.port.out.ReplyPostPort;
 import kr.co.F1FS.app.global.util.FCMUtil;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
@@ -14,7 +15,6 @@ import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyDTO;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.reply.infrastructure.repository.ReplyRepository;
 import kr.co.F1FS.app.global.util.AuthorCertification;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import kr.co.F1FS.app.global.application.service.ValidationService;
@@ -30,7 +30,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReplyService implements ReplyUseCase {
-    private final ReplyRepository replyRepository;
+    private final ReplyJpaPort replyJpaPort;
     private final ValidationService validationService;
     private final ReplyPostPort postPort;
     private final FCMLiveUseCase fcmLiveUseCase;
@@ -47,23 +47,20 @@ public class ReplyService implements ReplyUseCase {
         cacheEvictUtil.evictCachingReply(post);
 
         pushNotification(user, reply, post, id);
-        return replyRepository.save(reply);
+        return replyJpaPort.save(reply);
     }
 
     @Cacheable(value = "PostReplyList", key = "#id", cacheManager = "redisLongCacheManager")
     public List<ResponseReplyDTO> findByPost(Long id){
         Post post = postPort.findByIdNotDTO(id);
-        List<ResponseReplyDTO> dtoList = replyRepository.findAllByPost(post).stream()
-                .map(reply -> replyMapper.toResponseReplyDTO(reply))
-                .toList();
+        List<ResponseReplyDTO> dtoList = replyJpaPort.findAllByPost(post);
 
         return dtoList;
     }
 
     @Transactional
     public ResponseReplyDTO modify(Long replyId, ModifyReplyDTO dto, User user){
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new ReplyException(ReplyExceptionType.REPLY_NOT_FOUND));
+        Reply reply = replyJpaPort.findById(replyId);
         cacheEvictUtil.evictCachingReply(reply.getPost());
 
         if(!AuthorCertification.certification(user.getUsername(), reply.getUser().getUsername())){
@@ -71,20 +68,19 @@ public class ReplyService implements ReplyUseCase {
         }
 
         reply.modify(dto.getContent());
-        replyRepository.saveAndFlush(reply);
+        replyJpaPort.saveAndFlush(reply);
         return replyMapper.toResponseReplyDTO(reply);
     }
 
     @Transactional
     public void delete(Long replyId, User user){
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new ReplyException(ReplyExceptionType.REPLY_NOT_FOUND));
+        Reply reply = replyJpaPort.findById(replyId);
         if(!AuthorCertification.certification(user.getUsername(), reply.getUser().getUsername())){
             throw new ReplyException(ReplyExceptionType.NOT_AUTHORITY_DELETE_POST);
         }
         cacheEvictUtil.evictCachingReply(reply.getPost());
 
-        replyRepository.delete(reply);
+        replyJpaPort.delete(reply);
     }
 
     public void pushNotification(User user, Reply reply, Post post, Long id){

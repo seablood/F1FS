@@ -16,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 public interface DriverUseCase {
     Driver save(CreateDriverDTO driverDTO, CreateCurrentSeasonDTO currentSeasonDTO,
                 CreateSinceDebutDTO sinceDebutDTO);
+    Driver save(Driver driver);
+    Driver saveAndFlush(Driver driver);
     Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition);
     ResponseDriverDTO findById(Long id);
     ResponseDriverDTO findByEngName(String engName);

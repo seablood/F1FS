@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.elastic.application.service;
 
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.PostSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.out.PostSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.PostSearchRepository;
@@ -25,30 +26,43 @@ import java.util.List;
 public class PostSearchService implements PostSearchUseCase {
     private final DocumentMapper documentMapper;
     private final PostSearchRepository postSearchRepository;
+    private final PostSearchRepoPort postSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     public void save(Post post){
         PostDocument postDocument = PostDocument.builder()
                 .post(post).build();
 
-        postSearchRepository.save(postDocument);
+        postSearchRepoPort.save(postDocument);
     }
 
     public void save(PostDocument postDocument){
-        postSearchRepository.save(postDocument);
+        postSearchRepoPort.save(postDocument);
     }
 
     public PostDocument findById(Long id){
-        return postSearchRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("게시글 없음"));
+        return postSearchRepoPort.findById(id);
+    }
+
+    @Override
+    public void modify(PostDocument document, Post post) {
+        document.modify(post);
+        postSearchRepoPort.save(document);
+    }
+
+    @Override
+    public void delete(PostDocument document) {
+        postSearchRepoPort.delete(document);
     }
 
     public void increaseLikeNum(PostDocument postDocument){
         postDocument.increaseLikeNum();
+        postSearchRepoPort.save(postDocument);
     }
 
     public void decreaseLikeNum(PostDocument postDocument){
         postDocument.decreaseLikeNum();
+        postSearchRepoPort.save(postDocument);
     }
 
     public NativeQuery setQueryTitle(String keyword){

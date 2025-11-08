@@ -5,16 +5,15 @@ import kr.co.F1FS.app.domain.circuit.domain.Circuit;
 import kr.co.F1FS.app.domain.grandprix.application.mapper.GrandPrixMapper;
 import kr.co.F1FS.app.domain.grandprix.application.port.in.GrandPrixUseCase;
 import kr.co.F1FS.app.domain.grandprix.application.port.out.GrandPrixCircuitPort;
+import kr.co.F1FS.app.domain.grandprix.application.port.out.GrandPrixJpaPort;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
-import kr.co.F1FS.app.domain.grandprix.infrastructure.repository.GrandPrixRepository;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.CreateGrandPrixCommand;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.ModifyGrandPrixCommand;
 import kr.co.F1FS.app.global.application.service.ValidationService;
+import kr.co.F1FS.app.global.presentation.dto.circuit.SimpleResponseCircuitDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
-import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
-import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class GrandPrixService implements GrandPrixUseCase {
-    private final GrandPrixRepository grandPrixRepository;
+    private final GrandPrixJpaPort grandPrixJpaPort;
     private final GrandPrixCircuitPort circuitPort;
     private final GrandPrixMapper grandPrixMapper;
     private final CircuitMapper circuitMapper;
@@ -40,18 +39,30 @@ public class GrandPrixService implements GrandPrixUseCase {
     }
 
     @Override
+    public GrandPrix save(GrandPrix grandPrix) {
+        return grandPrixJpaPort.save(grandPrix);
+    }
+
+    @Override
+    public GrandPrix saveAndFlush(GrandPrix grandPrix) {
+        return grandPrixJpaPort.saveAndFlush(grandPrix);
+    }
+
+    @Override
     @Cacheable(value = "GrandPrixList", key = "#season", cacheManager = "redisLongCacheManager")
     public List<SimpleResponseGrandPrixDTO> findAll(Integer season){
-        return grandPrixRepository.findGrandPrixesBySeason(season).stream()
-                .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix))
-                .toList();
+        return grandPrixJpaPort.findGrandPrixesBySeason(season);
+    }
+
+    @Override
+    public GrandPrix findByIdNotDTONotCache(Long id) {
+        return grandPrixJpaPort.findById(id);
     }
 
     @Override
     @Cacheable(value = "GrandPrixDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseGrandPrixDTO getGrandPrixById(Long id) {
-        GrandPrix grandPrix = grandPrixRepository.findById(id)
-                .orElseThrow(() -> new GrandPrixException(GrandPrixExceptionType.GRAND_PRIX_NOT_FOUND));
+        GrandPrix grandPrix = grandPrixJpaPort.findById(id);
         Circuit circuit = circuitPort.getCircuitByIdNotDTO(grandPrix.getCircuitId());
 
         return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
@@ -99,5 +110,10 @@ public class GrandPrixService implements GrandPrixUseCase {
     @Override
     public void setRace(GrandPrix grandPrix, Long race) {
         grandPrix.setRace(race);
+    }
+
+    @Override
+    public ResponseGrandPrixDTO toResponseGrandPrixDTO(GrandPrix grandPrix, SimpleResponseCircuitDTO dto) {
+        return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, dto);
     }
 }

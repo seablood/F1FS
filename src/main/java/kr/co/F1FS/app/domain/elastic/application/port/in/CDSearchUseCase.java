@@ -11,7 +11,13 @@ import java.util.List;
 
 public interface CDSearchUseCase {
     ConstructorDocument save(Constructor constructor);
+    ConstructorDocument save(ConstructorDocument document);
     DriverDocument save(Driver driver);
+    DriverDocument save(DriverDocument document);
+    ConstructorDocument findConstructorDocumentById(Long id);
+    DriverDocument findDriverDocumentById(Long id);
+    void modify(DriverDocument document, Driver driver);
+    void modify(ConstructorDocument document, Constructor constructor);
     List<CDSearchSuggestionDTO> suggestCD(String keyword);
     Page<CDSearchSuggestionDTO> searchCDWithPaging(int page, int size, String condition, String keyword);
 }

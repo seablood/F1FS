@@ -10,6 +10,7 @@ public interface ChatRoomSearchUseCase {
     void save(ChatRoomDocument chatRoomDocument);
     ChatRoomDocument findById(Long id);
     void modify(ChatRoomDocument document, ChatRoom chatRoom);
+    void delete(ChatRoomDocument document);
     void increaseMemberCount(ChatRoomDocument chatRoomDocument);
     void decreaseMemberCount(ChatRoomDocument chatRoomDocument);
     Page<ResponseChatRoomDocumentDTO> getChatRoomList(int page, int size, String condition, String keyword);

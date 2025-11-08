@@ -24,6 +24,11 @@ public class GrandPrixDocument {
     @Field(type = FieldType.Integer)
     private Integer season;
 
+    public void modify(GrandPrix grandPrix){
+        this.korName = grandPrix.getName();
+        this.engName = grandPrix.getEngName();
+    }
+
     @Builder
     public GrandPrixDocument(GrandPrix grandPrix){
         this.id = grandPrix.getId();

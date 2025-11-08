@@ -3,11 +3,9 @@ package kr.co.F1FS.app.domain.notification.application.service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import kr.co.F1FS.app.domain.notification.application.mapper.FCMTokenMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMTokenUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.out.FCMTokenJpaPort;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
-import kr.co.F1FS.app.domain.notification.infrastructure.repository.FCMTokenRepository;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.global.util.exception.user.UserException;
-import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class FCMTokenService implements FCMTokenUseCase {
-    private final FCMTokenRepository fcmTokenRepository;
+    private final FCMTokenJpaPort fcmTokenJpaPort;
     private final NotificationRedisService redisService;
     private final FCMTokenMapper fcmTokenMapper;
 
@@ -41,20 +39,18 @@ public class FCMTokenService implements FCMTokenUseCase {
             }
         }
 
-        fcmTokenRepository.save(fcmToken);
+        fcmTokenJpaPort.save(fcmToken);
     }
 
     @Override
     public FCMToken findByUserIdOrNull(Long userId) {
-        return fcmTokenRepository.findByUserId(userId)
-                .orElse(null);
+        return fcmTokenJpaPort.findByUserIdOrNull(userId);
     }
 
     @Override
     @Transactional
     public void deleteToken(User user) {
-        FCMToken fcmToken = fcmTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new UserException(UserExceptionType.TOKEN_NOT_FOUND));
+        FCMToken fcmToken = fcmTokenJpaPort.findByUserId(user.getId());
 
         for (String topic : TOPIC_LIST){
             if(redisService.isSubscribe(user.getId(), topic)){
@@ -67,6 +63,6 @@ public class FCMTokenService implements FCMTokenUseCase {
             }
         }
 
-        fcmTokenRepository.delete(fcmToken);
+        fcmTokenJpaPort.delete(fcmToken);
     }
 }
