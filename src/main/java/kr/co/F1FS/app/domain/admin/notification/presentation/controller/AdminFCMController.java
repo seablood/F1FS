@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.admin.notification.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.admin.notification.application.service.AdminNotificationService;
+import kr.co.F1FS.app.domain.admin.notification.application.port.in.AdminNotificationUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMGroupUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMLiveUseCase;
 import kr.co.F1FS.app.domain.admin.notification.presentation.dto.ModifyNotificationDTO;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminFCMController {
     private final FCMGroupUseCase fcmGroupUseCase;
     private final FCMLiveUseCase fcmLiveUseCase;
-    private final AdminNotificationService adminNotificationService;
+    private final AdminNotificationUseCase adminNotificationUseCase;
 
     @PostMapping("/push/public-notify")
     @Operation(summary = "오피셜 공지/알림 저장", description = "오피셜 공지/알림을 작성해 저장")
@@ -43,13 +43,13 @@ public class AdminFCMController {
     @Operation(summary = "공지 수정", description = "특정 공지 수정 후 저장")
     public ResponseEntity<ResponseNotificationDTO> modifyNotification(@PathVariable Long id,
                                                                       @RequestBody ModifyNotificationDTO dto){
-        return ResponseEntity.status(HttpStatus.OK).body(adminNotificationService.modify(id, dto));
+        return ResponseEntity.status(HttpStatus.OK).body(adminNotificationUseCase.modify(id, dto));
     }
 
     @DeleteMapping("/notification/delete/{id}")
     @Operation(summary = "공지 삭제", description = "특정 공지 삭제")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long id){
-        adminNotificationService.delete(id);
+        adminNotificationUseCase.delete(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

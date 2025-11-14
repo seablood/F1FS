@@ -3,7 +3,6 @@ package kr.co.F1FS.app.domain.follow.application.service;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowUserUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowUserJpaPort;
-import kr.co.F1FS.app.domain.follow.application.port.out.FollowUserPort;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowUserDTO;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
@@ -22,12 +21,12 @@ public class FollowUserService implements FollowUserUseCase {
     private final FollowMapper followMapper;
     private final FollowUserJpaPort followUserJpaPort;
     private final UserUseCase userUseCase;
-    private final FollowUserPort followUserPort;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     @Transactional
     public void toggle(User followerUser, String followeeNickname){
-        User followeeUser = followUserPort.findByNicknameNotDTO(followeeNickname);
+        User followeeUser = userUseCase.findByNicknameNotDTONotCache(followeeNickname);
         cacheEvictUtil.evictCachingUser(followerUser);
         cacheEvictUtil.evictCachingUser(followeeUser);
 
@@ -42,32 +41,38 @@ public class FollowUserService implements FollowUserUseCase {
         followUserJpaPort.save(followUser);
         userUseCase.increaseFollow(followerUser, followeeUser);
 
-        followUserPort.saveAndFlush(followerUser);
-        followUserPort.saveAndFlush(followeeUser);
+        userUseCase.saveAndFlush(followerUser);
+        userUseCase.saveAndFlush(followeeUser);
     }
 
+    @Override
     public List<ResponseFollowUserDTO> findFollowers(String nickname){
-        User user = followUserPort.findByNicknameNotDTO(nickname);
+        User user = userUseCase.findByNicknameNotDTO(nickname);
         return followUserJpaPort.findByFolloweeUser(user);
     }
 
+    @Override
     public List<ResponseFollowUserDTO> findFollowees(String nickname){
-        User user = followUserPort.findByNicknameNotDTO(nickname);
+        User user = userUseCase.findByNicknameNotDTO(nickname);
         return followUserJpaPort.findByFollowerUser(user);
     }
 
+    @Override
     public List<ResponseFollowUserDTO> findFollowersAuth(User user){
         return followUserJpaPort.findByFolloweeUser(user);
     }
 
+    @Override
     public List<ResponseFollowUserDTO> findFolloweesAuth(User user){
         return followUserJpaPort.findByFollowerUser(user);
     }
 
+    @Override
     public List<ResponseUserIdDTO> findFollowersNotDTO(User user){ // DTO 매핑 고려 대상 메서드
         return followUserJpaPort.findByFolloweeUserId(user);
     }
 
+    @Override
     public boolean isFollowed(User followerUser, User followeeUser){
         return followUserJpaPort.existsFollowUserByFollowerUserAndFolloweeUser(followerUser, followeeUser);
     }

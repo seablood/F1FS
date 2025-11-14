@@ -22,6 +22,9 @@ public interface DriverUseCase {
     ResponseDriverDTO findById(Long id);
     ResponseDriverDTO findByEngName(String engName);
     Driver findByIdNotDTO(Long id);
+    Driver findByIdNotDTONotCache(Long id);
+    Driver findByNameNotDTONotCache(String name);
+    Driver findByNumberNotDTONotCache(Integer number);
     void modify(Driver driver, ModifyDriverCommand command);
     void updateTeam(Driver driver, String constructorName, String constructorEngName);
     void updateRacingClass(Driver driver, RacingClass racingClass);

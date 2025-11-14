@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.domain.driver.application.service;
 
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorDriverUseCase;
 import kr.co.F1FS.app.domain.driver.application.mapper.DriverMapper;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverDebutRelationUseCase;
+import kr.co.F1FS.app.domain.driver.application.port.in.DriverRecordRelationUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
-import kr.co.F1FS.app.domain.driver.application.port.out.DriverConstructorPort;
 import kr.co.F1FS.app.domain.driver.application.port.out.DriverJpaPort;
-import kr.co.F1FS.app.domain.driver.application.port.out.DriverRecordPort;
-import kr.co.F1FS.app.domain.driver.application.port.out.DriverTeamPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverDebutRelation;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverRecordRelation;
@@ -13,6 +13,7 @@ import kr.co.F1FS.app.domain.driver.presentation.dto.CreateDriverDTO;
 import kr.co.F1FS.app.domain.driver.presentation.dto.ModifyDriverCommand;
 import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
+import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationDriverUseCase;
 import kr.co.F1FS.app.global.presentation.dto.driver.ResponseDriverDTO;
 import kr.co.F1FS.app.global.presentation.dto.driver.SimpleResponseDriverDTO;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
@@ -38,15 +39,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class DriverService implements DriverUseCase {
-    private final DriverConstructorPort driverConstructorPort;
-    private final DriverTeamPort driverTeamPort;
-    private final DriverRecordPort driverRecordPort;
+    private final ConstructorDriverUseCase constructorUseCase;
+    private final ConstructorDriverRelationDriverUseCase cdRelationUseCase;
     private final CurrentSeasonUseCase currentSeasonUseCase;
     private final SinceDebutUseCase sinceDebutUseCase;
     private final DriverMapper driverMapper;
     private final DriverJpaPort driverJpaPort;
-    private final DriverRecordRelationService recordRelationService;
-    private final DriverDebutRelationService debutRelationService;
+    private final DriverRecordRelationUseCase recordRelationUseCase;
+    private final DriverDebutRelationUseCase debutRelationUseCase;
     private final ValidationService validationService;
 
     @Override
@@ -55,18 +55,19 @@ public class DriverService implements DriverUseCase {
                        CreateSinceDebutDTO sinceDebutDTO){
         Driver driver = driverMapper.toDriver(driverDTO);
         validationService.checkValid(driver);
-        CurrentSeason currentSeason = driverRecordPort.toCurrentSeason(currentSeasonDTO);
-        SinceDebut sinceDebut = driverRecordPort.toSinceDebut(sinceDebutDTO);
+        CurrentSeason currentSeason = currentSeasonUseCase.toCurrentSeason(currentSeasonDTO);
+        SinceDebut sinceDebut = sinceDebutUseCase.toSinceDebut(sinceDebutDTO);
         if(!driver.getTeam().equals("FA")){
-            Constructor constructor = driverConstructorPort.findByName(driver.getTeam());
+            Constructor constructor = constructorUseCase.findByNameNotDTONotCache(driver.getTeam());
             driver.updateEngTeam(constructor.getEngName());
 
-            driverTeamPort.save(driverTeamPort.toConstructorDriverRelation(constructor, driver));
+            cdRelationUseCase.save(constructor, driver);
         }
-        recordRelationService.save(driver, currentSeason);
-        debutRelationService.save(driver, sinceDebut);
+        recordRelationUseCase.save(driver, currentSeason);
+        debutRelationUseCase.save(driver, sinceDebut);
 
-        driverRecordPort.save(currentSeason, sinceDebut);
+        currentSeasonUseCase.save(currentSeason);
+        sinceDebutUseCase.save(sinceDebut);
 
         return driverJpaPort.save(driver);
     }
@@ -115,6 +116,21 @@ public class DriverService implements DriverUseCase {
     }
 
     @Override
+    public Driver findByIdNotDTONotCache(Long id) {
+        return driverJpaPort.findById(id);
+    }
+
+    @Override
+    public Driver findByNameNotDTONotCache(String name) {
+        return driverJpaPort.findByName(name);
+    }
+
+    @Override
+    public Driver findByNumberNotDTONotCache(Integer number) {
+        return driverJpaPort.findByNumber(number);
+    }
+
+    @Override
     public void modify(Driver driver, ModifyDriverCommand command){
         driver.modify(command);
     }
@@ -133,8 +149,8 @@ public class DriverService implements DriverUseCase {
 
     @Override
     public void updateRecordForRace(Driver driver, int position, int points, boolean isFastestLap){
-        DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
-        DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
+        DriverRecordRelation recordRelation = recordRelationUseCase.getRecordByDriverAndRacingClass(driver);
+        DriverDebutRelation debutRelation = debutRelationUseCase.getSinceDebutByDriverAndRacingClass(driver);
 
         if(!recordRelation.isEntryClassSeason()) recordRelation.updateEntryClassSeason(true);
 
@@ -144,8 +160,8 @@ public class DriverService implements DriverUseCase {
 
     @Override
     public void updateRecordForQualifying(Driver driver, int position){
-        DriverRecordRelation recordRelation = recordRelationService.getRecordByDriverAndRacingClass(driver);
-        DriverDebutRelation debutRelation = debutRelationService.getSinceDebutByDriverAndRacingClass(driver);
+        DriverRecordRelation recordRelation = recordRelationUseCase.getRecordByDriverAndRacingClass(driver);
+        DriverDebutRelation debutRelation = debutRelationUseCase.getSinceDebutByDriverAndRacingClass(driver);
 
         if(!recordRelation.isEntryClassSeason()) recordRelation.updateEntryClassSeason(true);
 
@@ -166,8 +182,8 @@ public class DriverService implements DriverUseCase {
     @Override
     @Cacheable(value = "DriverCurrentSeason", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseCurrentSeasonDTO getCurrentSeason(Driver driver){
-        ResponseCurrentSeasonDTO currentSeasonDTO = driverRecordPort.toResponseCurrentSeasonDTO(
-                recordRelationService.getRecordByDriverAndRacingClass(driver).getCurrentSeason()
+        ResponseCurrentSeasonDTO currentSeasonDTO = currentSeasonUseCase.toResponseCurrentSeasonDTO(
+                recordRelationUseCase.getRecordByDriverAndRacingClass(driver).getCurrentSeason()
         );
 
         return currentSeasonDTO;
@@ -176,8 +192,8 @@ public class DriverService implements DriverUseCase {
     @Override
     @Cacheable(value = "DriverSinceDebut", key = "#driver.id", cacheManager = "redisLongCacheManager")
     public ResponseSinceDebutDTO getSinceDebut(Driver driver) {
-        ResponseSinceDebutDTO sinceDebutDTO = driverRecordPort.toResponseSinceDebutDTO(
-                debutRelationService.getSinceDebutByDriverAndRacingClass(driver).getSinceDebut()
+        ResponseSinceDebutDTO sinceDebutDTO = sinceDebutUseCase.toResponseSinceDebutDTO(
+                debutRelationUseCase.getSinceDebutByDriverAndRacingClass(driver).getSinceDebut()
         );
 
         return sinceDebutDTO;

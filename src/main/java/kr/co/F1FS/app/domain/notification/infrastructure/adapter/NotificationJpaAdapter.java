@@ -46,4 +46,9 @@ public class NotificationJpaAdapter implements NotificationJpaPort {
         return notificationRepository.findByRedisId(redisId)
                 .orElseThrow(() -> new NotificationException(NotificationExceptionType.NOTIFICATION_NOT_FOUND));
     }
+
+    @Override
+    public void delete(Notification notification) {
+        notificationRepository.delete(notification);
+    }
 }

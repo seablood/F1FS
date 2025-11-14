@@ -5,7 +5,6 @@ import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowDriverUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowDriverJpaPort;
-import kr.co.F1FS.app.domain.follow.application.port.out.FollowDriverPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowDriver;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -25,12 +24,12 @@ public class FollowDriverService implements FollowDriverUseCase {
     private final FollowDriverJpaPort followDriverJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
     private final DriverUseCase driverUseCase;
-    private final FollowDriverPort followDriverPort;
 
+    @Override
     @Transactional
     @CacheEvict(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
     public void toggle(User user, Long id){
-        Driver driver = followDriverPort.findByIdNotDTO(id);
+        Driver driver = driverUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingDriver(driver);
 
         if(isFollowed(user, driver)){
@@ -44,14 +43,16 @@ public class FollowDriverService implements FollowDriverUseCase {
         followDriverJpaPort.save(followDriver);
         driverUseCase.increaseFollower(driver);
 
-        followDriverPort.saveAndFlush(driver);
+        driverUseCase.saveAndFlush(driver);
     }
 
+    @Override
     @Cacheable(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
     public List<ResponseFollowDriverDTO> getFollowingDriver(User user){
         return followDriverJpaPort.findByFollowerUser(user);
     }
 
+    @Override
     public boolean isFollowed(User user, Driver driver){
         return followDriverJpaPort.existsFollowDriverByFollowerUserAndFolloweeDriver(user, driver);
     }

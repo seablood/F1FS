@@ -27,6 +27,7 @@ public class AdminAuthService implements AdminAuthUseCase {
     private final BCryptPasswordEncoder passwordEncoder;
     private final ValidationService validationService;
 
+    @Override
     @Transactional
     public ResponseUserDTO save(CreateAdminUserDTO dto){
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));

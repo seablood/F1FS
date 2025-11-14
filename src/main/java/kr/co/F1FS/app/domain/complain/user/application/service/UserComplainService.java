@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.complain.user.application.service;
 
 import jakarta.transaction.Transactional;
+import kr.co.F1FS.app.domain.admin.user.presentation.dto.AdminResponseUserComplainDTO;
 import kr.co.F1FS.app.domain.complain.user.application.mapper.UserComplainMapper;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.out.UserComplainJpaPort;
@@ -11,9 +12,12 @@ import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDT
 import kr.co.F1FS.app.global.application.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +42,31 @@ public class UserComplainService implements UserComplainUseCase {
         save(complain);
         sendMessage(complain);
         log.info("유저 신고 접수 완료 : {} -> {}", complain.getFromUser().getNickname(), complain.getToUser().getNickname());
+    }
+
+    @Override
+    public Page<AdminResponseUserComplainDTO> findAll(Pageable pageable) {
+        return userComplainJpaPort.findAll(pageable);
+    }
+
+    @Override
+    public Page<UserComplain> findAllByToUser(User toUser, Pageable pageable) {
+        return userComplainJpaPort.findAllByToUser(toUser, pageable);
+    }
+
+    @Override
+    public List<UserComplain> findAllByToUser(User toUser) {
+        return userComplainJpaPort.findAllByToUser(toUser);
+    }
+
+    @Override
+    public void delete(UserComplain userComplain) {
+        userComplainJpaPort.delete(userComplain);
+    }
+
+    @Override
+    public AdminResponseUserComplainDTO toAdminResponseUserComplainDTO(UserComplain userComplain) {
+        return complainMapper.toAdminResponseUserComplainDTO(userComplain);
     }
 
     public void sendMessage(UserComplain complain){

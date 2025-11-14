@@ -5,10 +5,11 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMLiveUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
-import kr.co.F1FS.app.global.util.NotificationType;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +22,10 @@ import java.util.List;
 @Slf4j
 public class FCMLiveService implements FCMLiveUseCase {
     private final NotificationMapper notificationMapper;
-    private final NotificationRedisService redisService;
-    private final NotificationService notificationService;
+    private final NotificationRedisUseCase redisUseCase;
+    private final NotificationUseCase notificationUseCase;
 
+    @Override
     public NotificationRedis sendPushForLiveInfo(FCMPushDTO dto){
         Notification notification = Notification.builder()
                 .setTitle(dto.getTitle())
@@ -39,8 +41,8 @@ public class FCMLiveService implements FCMLiveUseCase {
 
         try{
             String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
-            notificationService.saveNotification(redis, dto.getContent());
-            redisService.saveNotification(redis, "topic:"+dto.getTopic());
+            notificationUseCase.saveNotification(redis, dto.getContent());
+            redisUseCase.saveNotification(redis, "topic:"+dto.getTopic());
             log.info("토픽 푸시 알림 전송 성공 : {}", response);
         } catch (Exception e){
             log.error("토픽 푸시 알림 전송 실패");
@@ -49,6 +51,7 @@ public class FCMLiveService implements FCMLiveUseCase {
         return redis;
     }
 
+    @Override
     public void sendPushForAuthor(FCMPushDTO dto, FCMToken token, User user, Long contentId){
         NotificationRedis redis = notificationMapper.toNotificationRedis(dto, "personal");
 
@@ -67,16 +70,17 @@ public class FCMLiveService implements FCMLiveUseCase {
 
             try{
                 String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
-                redisService.saveNotificationForPersonal(redis, user);
+                redisUseCase.saveNotificationForPersonal(redis, user);
                 log.info("토픽 푸시 알림 전송 성공 : {}", response);
             } catch (Exception e){
                 log.error("토픽 푸시 알림 전송 실패");
             }
         }else {
-            redisService.saveNotificationForPersonal(redis, user);
+            redisUseCase.saveNotificationForPersonal(redis, user);
         }
     }
 
+    @Override
     public void sendPushForFollow(FCMPushDTO dto, List<FCMToken> tokens, Long contentId){
         Notification notification = Notification.builder()
                 .setTitle(dto.getTitle())
@@ -95,7 +99,7 @@ public class FCMLiveService implements FCMLiveUseCase {
 
             try{
                 String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
-                redisService.saveNotificationForPersonal(redis, token.getUserId());
+                redisUseCase.saveNotificationForPersonal(redis, token.getUserId());
                 log.info("토픽 푸시 알림 전송 성공 : {}", response);
             } catch (Exception e){
                 log.error("토픽 푸시 알림 전송 실패");

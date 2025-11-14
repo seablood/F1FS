@@ -24,6 +24,7 @@ public class NotificationRedisService implements NotificationRedisUseCase {
     private final NotificationMapper notificationMapper;
     private final RedisHandler redisHandler;
 
+    @Override
     public void saveNotification(NotificationRedis redis, String key){
         Set<Object> subscribeList = redisHandler.getSetOperations().members(key);
 
@@ -36,6 +37,7 @@ public class NotificationRedisService implements NotificationRedisUseCase {
         }
     }
 
+    @Override
     public void saveNotificationForPersonal(NotificationRedis redis, User user){
         if(redis.getTopic().equals("like")){
             NotificationRedis likeRedis = getNotificationList(user).stream()
@@ -56,6 +58,7 @@ public class NotificationRedisService implements NotificationRedisUseCase {
         redisHandler.getNotificationRedisListOperations().trim("notification:"+user.getId(), 0, 30);
     }
 
+    @Override
     public void saveNotificationForPersonal(NotificationRedis redis, Long userId){
         redisHandler.executeOperations(() -> redisHandler.getNotificationRedisListOperations()
                 .leftPush("notification:"+userId, redis));
@@ -63,20 +66,24 @@ public class NotificationRedisService implements NotificationRedisUseCase {
         redisHandler.getNotificationRedisListOperations().trim("notification:"+userId, 0, 30);
     }
 
+    @Override
     public void saveSubscribe(User user, String key){
         redisHandler.executeOperations(() -> redisHandler.getSetOperations().add(key, user.getId()));
     }
 
+    @Override
     public void saveUnsubscribe(User user, String key){
         redisHandler.executeOperations(() -> redisHandler.getSetOperations().remove(key, user.getId()));
     }
 
+    @Override
     public List<NotificationRedis> getNotificationList(User user){
         String key = "notification:"+user.getId();
 
         return redisHandler.getNotificationRedisListOperations().range(key, 0, -1);
     }
 
+    @Override
     public void readNotification(User user, Long id){
         String key = "notification:"+user.getId();
         List<NotificationRedis> list = getNotificationList(user);
@@ -91,6 +98,7 @@ public class NotificationRedisService implements NotificationRedisUseCase {
         redisHandler.getNotificationRedisListOperations().rightPushAll(key, list);
     }
 
+    @Override
     public void deleteNotification(User user, Long id){
         String key = "notification:"+user.getId();
         List<NotificationRedis> currentList = getNotificationList(user);
@@ -102,10 +110,12 @@ public class NotificationRedisService implements NotificationRedisUseCase {
         if (!updateList.isEmpty()) redisHandler.getNotificationRedisListOperations().rightPushAll(key, updateList);
     }
 
+    @Override
     public boolean isSubscribe(Long userId, String topic){
         return redisHandler.getSetOperations().isMember("topic:"+topic, userId);
     }
 
+    @Override
     public Page<ResponseNotificationRedisDTO> getNotificationRedisList(int page, int size, User user){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         List<NotificationRedis> list = getNotificationList(user);

@@ -1,9 +1,9 @@
 package kr.co.F1FS.app.global.util;
 
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowUserUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.FCMTokenUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.global.application.port.out.FCMUtilTokenPort;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FCMUtil {
     private final FollowUserUseCase followUserUseCase;
-    private final FCMUtilTokenPort tokenPort;
+    private final FCMTokenUseCase tokenUseCase;
 
     public FCMPushDTO sendPushForPost(User author, String title){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
@@ -59,7 +59,7 @@ public class FCMUtil {
     }
 
     public FCMToken getAuthorToken(User author){
-        return tokenPort.findByUserIdOrNull(author.getId());
+        return tokenUseCase.findByUserIdOrNull(author.getId());
     }
 
     public List<FCMToken> getFollowerToken(User author){
@@ -67,7 +67,7 @@ public class FCMUtil {
         List<FCMToken> tokens = new ArrayList<>();
 
         for (ResponseUserIdDTO followerId : followerList){
-            FCMToken notification = tokenPort.findByUserIdOrNull(followerId.getId());
+            FCMToken notification = tokenUseCase.findByUserIdOrNull(followerId.getId());
             if(notification != null) tokens.add(notification);
         }
 

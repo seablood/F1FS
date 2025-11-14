@@ -48,6 +48,7 @@ public class UserService implements UserUseCase {
         return userMapper.toUser(command);
     }
 
+    @Override
     @Cacheable(value = "UserDTO", key = "#nickname", cacheManager = "redisLongCacheManager")
     public ResponseUserDTO findByNickname(String nickname){
         User user = findByNicknameNotDTO(nickname);
@@ -64,6 +65,7 @@ public class UserService implements UserUseCase {
         return userJpaPort.findByRefreshToken(refreshToken);
     }
 
+    @Override
     @Cacheable(value = "User", key = "#nickname", cacheManager = "redisLongCacheManager")
     public User findByNicknameNotDTO(String nickname){
         return userJpaPort.findByNickname(nickname);
@@ -74,6 +76,7 @@ public class UserService implements UserUseCase {
         return userJpaPort.findByNickname(nickname);
     }
 
+    @Override
     public User findByUsernameNotDTO(String username){
         return userJpaPort.findByUsernameOrNull(username);
     }
@@ -88,6 +91,7 @@ public class UserService implements UserUseCase {
         return userJpaPort.findAllByLastLoginDateBeforeOrLastLoginDateIsNull(sixMonthAgo);
     }
 
+    @Override
     @Transactional
     public ResponseUserDTO modify(User user, ModifyNicknameDTO dto){
         cacheEvictUtil.evictCachingUser(user);
@@ -96,26 +100,31 @@ public class UserService implements UserUseCase {
         return userMapper.toResponseUserDTO(user);
     }
 
+    @Override
     public void updateLastLoginDate(User user) {
         user.updateLastLoginDate();
         userJpaPort.saveAndFlush(user);
     }
 
+    @Override
     public void updatePassword(User user, String password) {
         user.updatePassword(password);
         userJpaPort.saveAndFlush(user);
     }
 
+    @Override
     public void updateRefreshToken(User user, String refreshToken) {
         user.updateRefreshToken(refreshToken);
         userJpaPort.saveAndFlush(user);
     }
 
+    @Override
     public void updateRole(User user, Role newRole){
         user.updateRole(newRole);
         userJpaPort.saveAndFlush(user);
     }
 
+    @Override
     public void increaseFollow(User followerUser, User followeeUser) {
         followerUser.changeFollowingNum(1);
         followeeUser.changeFollowerNum(1);
@@ -124,6 +133,7 @@ public class UserService implements UserUseCase {
         userJpaPort.saveAndFlush(followeeUser);
     }
 
+    @Override
     public void decreaseFollow(User followerUser, User followeeUser) {
         followerUser.changeFollowingNum(-1);
         followeeUser.changeFollowerNum(-1);
@@ -147,6 +157,7 @@ public class UserService implements UserUseCase {
         userJpaPort.delete(user);
     }
 
+    @Override
     public void suspendUser(User user, Integer durationDays){
         user.updateSuspendUntil(durationDays);
         updateRole(user, Role.DISCIPLINE);

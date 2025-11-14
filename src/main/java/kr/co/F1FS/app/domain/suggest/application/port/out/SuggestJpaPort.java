@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 public interface SuggestJpaPort {
     Suggest save(Suggest suggest);
     Suggest saveAndFlush(Suggest suggest);
+    Page<Suggest> findAll(Pageable pageable);
     Suggest findById(Long id);
     Page<ResponseSuggestDTO> findAllByFromUser(User user, Pageable pageable);
-
     void delete(Suggest suggest);
 }

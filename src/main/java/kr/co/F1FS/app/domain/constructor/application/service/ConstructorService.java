@@ -1,6 +1,7 @@
 package kr.co.F1FS.app.domain.constructor.application.service;
 
 import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorMapper;
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
 import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
 import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorJpaPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
@@ -10,7 +11,7 @@ import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
-import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationUseCase;
+import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationConstructorUseCase;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.CreateConstructorDTO;
@@ -36,11 +37,12 @@ import java.util.List;
 public class ConstructorService implements ConstructorUseCase {
     private final CurrentSeasonUseCase currentSeasonUseCase;
     private final SinceDebutUseCase sinceDebutUseCase;
-    private final ConstructorDriverRelationUseCase relationUseCase;
+    private final ConstructorDriverRelationConstructorUseCase relationUseCase;
     private final ConstructorMapper constructorMapper;
-    private final ConstructorRecordRelationService recordRelationService;
+    private final ConstructorRecordRelationUseCase recordRelationUseCase;
     private final ConstructorJpaPort constructorJpaPort;
 
+    @Override
     @Transactional
     public Constructor save(CreateConstructorDTO constructorDTO, CreateCurrentSeasonDTO currentSeasonDTO,
                             CreateSinceDebutDTO sinceDebutDTO){
@@ -48,7 +50,7 @@ public class ConstructorService implements ConstructorUseCase {
         CurrentSeason currentSeason = currentSeasonUseCase.toCurrentSeason(currentSeasonDTO);
         SinceDebut sinceDebut = sinceDebutUseCase.toSinceDebut(sinceDebutDTO);
 
-        recordRelationService.save(constructor, currentSeason, sinceDebut);
+        recordRelationUseCase.save(constructor, currentSeason, sinceDebut);
 
         currentSeasonUseCase.save(currentSeason);
         sinceDebutUseCase.save(sinceDebut);
@@ -66,16 +68,18 @@ public class ConstructorService implements ConstructorUseCase {
         return constructorJpaPort.saveAndFlush(constructor);
     }
 
+    @Override
     public Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
         return constructorJpaPort.findAll(pageable);
     }
 
+    @Override
     @Cacheable(value = "ConstructorDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseConstructorDTO findById(Long id){
         Constructor constructor = constructorJpaPort.findById(id);
-        ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
+        ConstructorRecordRelation relation = recordRelationUseCase.findByConstructor(constructor);
         ResponseCurrentSeasonDTO currentSeasonDTO = currentSeasonUseCase.toResponseCurrentSeasonDTO(relation.getCurrentSeason());
         ResponseSinceDebutDTO sinceDebutDTO = sinceDebutUseCase.toResponseSinceDebutDTO(relation.getSinceDebut());
 
@@ -83,9 +87,20 @@ public class ConstructorService implements ConstructorUseCase {
                 sinceDebutDTO);
     }
 
+    @Override
     @Cacheable(value = "Constructor", key = "#id", cacheManager = "redisLongCacheManager")
     public Constructor findByIdNotDTO(Long id){
         return constructorJpaPort.findById(id);
+    }
+
+    @Override
+    public Constructor findByIdNotDTONotCache(Long id) {
+        return constructorJpaPort.findById(id);
+    }
+
+    @Override
+    public Constructor findByNameNotDTONotCache(String name) {
+        return constructorJpaPort.findByName(name);
     }
 
     @Override
@@ -95,36 +110,40 @@ public class ConstructorService implements ConstructorUseCase {
 
     @Override
     public void updateRecordForRace(Constructor constructor, int position, int points, boolean isFastestLap){
-        ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
+        ConstructorRecordRelation relation = recordRelationUseCase.findByConstructor(constructor);
 
         if(!relation.isEntryClassSeason()) relation.updateEntryClassSeason(true);
 
-        recordRelationService.updateRecordForRace(relation, position, points, isFastestLap);
+        recordRelationUseCase.updateRecordForRace(relation, position, points, isFastestLap);
     }
 
     @Override
     public void updateRecordForQualifying(Constructor constructor, int position){
-        ConstructorRecordRelation relation = recordRelationService.findByConstructor(constructor);
+        ConstructorRecordRelation relation = recordRelationUseCase.findByConstructor(constructor);
 
         if(!relation.isEntryClassSeason()) relation.updateEntryClassSeason(true);
 
-        recordRelationService.updateRecordForQualifying(relation, position);
+        recordRelationUseCase.updateRecordForQualifying(relation, position);
     }
 
+    @Override
     public void increaseFollower(Constructor constructor){
         constructor.increaseFollower();
     }
 
+    @Override
     public void decreaseFollower(Constructor constructor){
         constructor.decreaseFollower();
     }
 
+    @Override
     public List<String> getDrivers(Constructor constructor){
         return relationUseCase.findConstructorDriverRelationByConstructor(constructor).stream()
                 .map((relation) -> relation.getDriver().getName())
                 .toList();
     }
 
+    @Override
     public Pageable switchCondition(int page, int size, String condition){
         switch (condition){
             case "nameASC" :

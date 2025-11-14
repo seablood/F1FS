@@ -30,6 +30,11 @@ public class SuggestJpaAdapter implements SuggestJpaPort {
     }
 
     @Override
+    public Page<Suggest> findAll(Pageable pageable) {
+        return suggestRepository.findAll(pageable);
+    }
+
+    @Override
     public Suggest findById(Long id) {
         return suggestRepository.findById(id)
                 .orElseThrow(() -> new SuggestException(SuggestExceptionType.SUGGEST_NOT_FOUND));

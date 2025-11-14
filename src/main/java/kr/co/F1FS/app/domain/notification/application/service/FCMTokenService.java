@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.notification.application.service;
 import com.google.firebase.messaging.FirebaseMessaging;
 import kr.co.F1FS.app.domain.notification.application.mapper.FCMTokenMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMTokenUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.out.FCMTokenJpaPort;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 public class FCMTokenService implements FCMTokenUseCase {
     private final FCMTokenJpaPort fcmTokenJpaPort;
-    private final NotificationRedisService redisService;
+    private final NotificationRedisUseCase redisUseCase;
     private final FCMTokenMapper fcmTokenMapper;
 
     private static final String[] TOPIC_LIST = {"news", "post", "reply", "like", "note"};
@@ -29,7 +30,7 @@ public class FCMTokenService implements FCMTokenUseCase {
         FCMToken fcmToken = fcmTokenMapper.toFCMToken(user, token);
 
         for (String topic : TOPIC_LIST){
-            if(redisService.isSubscribe(user.getId(), topic)){
+            if(redisUseCase.isSubscribe(user.getId(), topic)){
                 try{
                     FirebaseMessaging.getInstance().subscribeToTopic(List.of(fcmToken.getToken()), topic);
                     log.info("토픽 구독 지정 성공 : {}", topic);
@@ -53,7 +54,7 @@ public class FCMTokenService implements FCMTokenUseCase {
         FCMToken fcmToken = fcmTokenJpaPort.findByUserId(user.getId());
 
         for (String topic : TOPIC_LIST){
-            if(redisService.isSubscribe(user.getId(), topic)){
+            if(redisUseCase.isSubscribe(user.getId(), topic)){
                 try {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(fcmToken.getToken()), topic);
                     log.info("토픽 구독 해제 성공 : {}", topic);

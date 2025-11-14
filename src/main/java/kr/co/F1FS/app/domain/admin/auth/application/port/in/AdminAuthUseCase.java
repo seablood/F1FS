@@ -5,6 +5,4 @@ import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 
 public interface AdminAuthUseCase {
     ResponseUserDTO save(CreateAdminUserDTO dto);
-    void deleteVerificationCode();
-    void markDormantAccounts();
 }

@@ -5,7 +5,6 @@ import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.in.FollowConstructorUseCase;
 import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorJpaPort;
-import kr.co.F1FS.app.domain.follow.application.port.out.FollowConstructorPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowConstructor;
 import kr.co.F1FS.app.domain.follow.presentation.dto.ResponseFollowConstructorDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -25,12 +24,12 @@ public class FollowConstructorService implements FollowConstructorUseCase {
     private final FollowConstructorJpaPort followConstructorJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
     private final ConstructorUseCase constructorUseCase;
-    private final FollowConstructorPort followConstructorPort;
 
+    @Override
     @Transactional
     @CacheEvict(value = "FollowingConstructor", key = "#user.id", cacheManager = "redisLongCacheManager")
     public void toggle(User user, Long id){
-        Constructor constructor = followConstructorPort.findByIdNotDTO(id);
+        Constructor constructor = constructorUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingConstructor(constructor);
 
         if(isFollowed(user, constructor)){
@@ -46,14 +45,16 @@ public class FollowConstructorService implements FollowConstructorUseCase {
         followConstructorJpaPort.save(followConstructor);
         constructorUseCase.increaseFollower(constructor);
 
-        followConstructorPort.saveAndFlush(constructor);
+        constructorUseCase.saveAndFlush(constructor);
     }
 
+    @Override
     @Cacheable(value = "FollowingConstructor", key = "#user.id", cacheManager = "redisLongCacheManager")
     public List<ResponseFollowConstructorDTO> getFollowingConstructor(User user){
         return followConstructorJpaPort.findByFollowerUser(user);
     }
 
+    @Override
     public boolean isFollowed(User user, Constructor constructor){
         return followConstructorJpaPort.existsFollowConstructorByFollowerUserAndFolloweeConstructor(
                 user, constructor);

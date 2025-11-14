@@ -18,6 +18,7 @@ public class TokenService implements TokenUseCase {
     private final UserUseCase userUseCase;
     private final JwtTokenService jwtTokenService;
 
+    @Override
     @Transactional
     public void createNewAccessToken(Long id, String refreshToken, HttpServletResponse response){
         if(!jwtTokenService.validateToken(refreshToken)){

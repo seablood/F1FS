@@ -40,4 +40,10 @@ public class ConstructorJpaAdapter implements ConstructorJpaPort {
         return constructorRepository.findById(id)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
     }
+
+    @Override
+    public Constructor findByName(String name) {
+        return constructorRepository.findByName(name)
+                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_NOT_FOUND));
+    }
 }

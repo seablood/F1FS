@@ -21,6 +21,7 @@ public class EmailService implements EmailUseCase {
     private final SpringTemplateEngine springTemplateEngine;
     private final EmailSendService emailSendService;
 
+    @Override
     public void sendAuthEmail(User user, String code, String option){
         try {
             switch (option){
@@ -42,6 +43,7 @@ public class EmailService implements EmailUseCase {
     }
 
     // 계정 생성 인증 메일
+    @Override
     public void sendCreateAccountEmail(User user, String code){
         EmailProperties.Template template = emailProperties.getTemplate(EmailType.CREATE_ACCOUNT);
 
@@ -54,6 +56,7 @@ public class EmailService implements EmailUseCase {
     }
 
     // 비밀번호 변경 인증 메일
+    @Override
     public void sendUpdatePasswordEmail(User user, String code){
         EmailProperties.Template template = emailProperties.getTemplate(EmailType.UPDATE_PASSWORD);
 
@@ -65,6 +68,7 @@ public class EmailService implements EmailUseCase {
         sendEmail(emailDTO, user);
     }
 
+    @Override
     public void sendActiveAccountEmail(User user, String code){
         EmailProperties.Template template = emailProperties.getTemplate(EmailType.ACTIVE_ACCOUNT);
 

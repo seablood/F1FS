@@ -1,10 +1,13 @@
 package kr.co.F1FS.app.domain.team.application.service;
 
+import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorUseCase;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverDebutRelationUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverRecordRelationUseCase;
 import kr.co.F1FS.app.domain.driver.application.port.in.DriverUseCase;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
+import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
+import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import kr.co.F1FS.app.domain.team.application.mapper.ConstructorDriverRelationMapper;
@@ -29,17 +32,18 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
     private final DriverUseCase driverUseCase;
     private final DriverRecordRelationUseCase driverRecordUseCase;
     private final DriverDebutRelationUseCase driverDebutUseCase;
-    private final CDRelationDriverDebutPort driverDebutPort;
-    private final CDRelationConstructorPort constructorPort;
-    private final CDRelationDriverPort driverPort;
+    private final DriverDebutRelationUseCase driverDebutRelationUseCase;
+    private final ConstructorUseCase constructorUseCase;
     private final CDRelationJpaPort cdRelationJpaPort;
-    private final CDRelationRecordPort recordPort;
+    private final CurrentSeasonUseCase currentSeasonUseCase;
+    private final SinceDebutUseCase sinceDebutUseCase;
     private final ConstructorDriverRelationMapper relationMapper;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     public ConstructorDriverRelation save(Constructor constructor, Driver driver){
         ConstructorDriverRelation relation = relationMapper.toConstructorDriverRelation(constructor, driver);
-        return relation;
+        return cdRelationJpaPort.save(relation);
     }
 
     @Override
@@ -47,10 +51,11 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
         return cdRelationJpaPort.findConstructorDriverRelationByConstructor(constructor);
     }
 
+    @Override
     @Transactional
     public void transfer(Integer number, String constructorName){
-        Driver driver = driverPort.findByNumber(number);
-        Constructor constructor = constructorPort.findByName(constructorName);
+        Driver driver = driverUseCase.findByNumberNotDTONotCache(number);
+        Constructor constructor = constructorUseCase.findByNameNotDTONotCache(constructorName);
         cacheEvictUtil.evictCachingDriver(driver);
         cacheEvictUtil.evictCachingConstructor(constructor);
 
@@ -77,11 +82,12 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
             driverUseCase.updateTeam(driver, constructor.getName(), constructor.getEngName());
             modifyRacingClass(driver, constructor.getRacingClass());
 
-            driverPort.saveAndFlush(driver);
+            driverUseCase.saveAndFlush(driver);
             cdRelationJpaPort.saveAndFlush(relation);
         }
     }
 
+    @Override
     @Transactional
     @Caching(evict = {
             @CacheEvict(value = "DriverDTO", key = "#driver.id", cacheManager = "redisLongCacheManager"),
@@ -93,24 +99,27 @@ public class ConstructorDriverRelationService implements ConstructorDriverRelati
     public void modifyRacingClass(Driver driver, RacingClass racingClass){
         driverUseCase.updateRacingClass(driver, racingClass);
 
-        if(!driverDebutPort.existsRelation(driver, racingClass)){
+        if(!driverDebutRelationUseCase.existsDriverDebutRelationByDriverSinceInfoAndRacingClass(driver, racingClass)){
             CurrentSeason currentSeason = new CurrentSeason();
             SinceDebut sinceDebut = new SinceDebut();
 
             driverRecordUseCase.save(driver, currentSeason);
             driverDebutUseCase.save(driver, sinceDebut);
-            recordPort.save(currentSeason, sinceDebut);
+            currentSeasonUseCase.save(currentSeason);
+            sinceDebutUseCase.save(sinceDebut);
         }
     }
 
+    @Override
     @Transactional
     public void delete(Long id, String option) {
-        Driver driver = driverPort.findById(id);
+        Driver driver = driverUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingDriver(driver);
 
         option(driver, option);
     }
 
+    @Override
     public void option(Driver driver, String option){
         ConstructorDriverRelation relation;
 

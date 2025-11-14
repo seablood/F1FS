@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.admin.driver.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.admin.driver.application.service.AdminDriverService;
+import kr.co.F1FS.app.domain.admin.driver.application.port.in.AdminDriverUseCase;
 import kr.co.F1FS.app.domain.admin.driver.presentation.dto.AdminResponseDriverDTO;
 import kr.co.F1FS.app.domain.admin.driver.presentation.dto.ModifyDriverDTO;
 import kr.co.F1FS.app.domain.team.application.port.in.ConstructorDriverRelationUseCase;
@@ -22,13 +22,13 @@ import java.util.List;
 @RequestMapping("/api/v1/admin/driver")
 @Tag(name = "드라이버 컨트롤러(관리자 권한)", description = "드라이버 관련 서비스(관리자 권한)")
 public class AdminDriverController {
-    private final AdminDriverService adminDriverService;
+    private final AdminDriverUseCase adminDriverUseCase;
     private final ConstructorDriverRelationUseCase relationUseCase;
 
     @PostMapping("/save")
     @Operation(summary = "드라이버 생성", description = "드라이버를 생성하고 컨스트럭터 소속을 저장한다.")
     public ResponseEntity<AdminResponseDriverDTO> save(@Valid @RequestBody CombinedDriverRequest request){
-        return ResponseEntity.status(HttpStatus.CREATED).body(adminDriverService.save(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminDriverUseCase.save(request));
     }
 
     @GetMapping("/find-all")
@@ -36,21 +36,21 @@ public class AdminDriverController {
     public ResponseEntity<List<SimpleResponseDriverDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
                                                                  @RequestParam(value = "condition", defaultValue = "nameASC") String condition){
-        Page<SimpleResponseDriverDTO> newPage = adminDriverService.findAll(page, size, condition);
+        Page<SimpleResponseDriverDTO> newPage = adminDriverUseCase.findAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
     @GetMapping("/find/{id}")
     @Operation(summary = "드라이버 상세 정보", description = "특정 ID 드라이버 상세 정보 반환")
     public ResponseEntity<AdminResponseDriverDTO> getDriverById(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(adminDriverService.getDriverById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(adminDriverUseCase.getDriverById(id));
     }
 
     @PutMapping("/modify/{id}")
     @Operation(summary = "드라이버 수정", description = "특정 드라이버 정보 수정")
     public ResponseEntity<AdminResponseDriverDTO> modify(@PathVariable Long id,
                                                          @Valid @RequestBody ModifyDriverDTO dto){
-        return ResponseEntity.status(HttpStatus.OK).body(adminDriverService.modify(id, dto));
+        return ResponseEntity.status(HttpStatus.OK).body(adminDriverUseCase.modify(id, dto));
     }
 
     @PutMapping("/modify/constructor/{number}/{constructorName}")

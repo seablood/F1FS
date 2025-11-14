@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.admin.auth.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.admin.auth.application.service.AdminAuthService;
+import kr.co.F1FS.app.domain.admin.auth.application.port.in.AdminAuthUseCase;
 import kr.co.F1FS.app.domain.admin.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/admin/auth")
 @Tag(name = "관리자 인증", description = "관리자 인증 관련 서비스")
 public class AdminAuthController {
-    private final AdminAuthService adminAuthService;
+    private final AdminAuthUseCase adminAuthUseCase;
 
     @PostMapping("/admin-save")
     @Operation(summary = "관리자 생성", description = "새로운 관리자 계정 생성")
     public ResponseEntity<ResponseUserDTO> save(@Valid @RequestBody CreateAdminUserDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(adminAuthService.save(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminAuthUseCase.save(dto));
     }
 }

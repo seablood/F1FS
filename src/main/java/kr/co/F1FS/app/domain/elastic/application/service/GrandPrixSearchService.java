@@ -64,6 +64,7 @@ public class GrandPrixSearchService implements GrandPrixSearchUseCase {
         return dtoList;
     }
 
+    @Override
     public Page<ResponseGrandPrixSearchDTO> searchGrandPrixWithPaging(int page, int size, String condition, String keyword){
         Pageable pageable = switchCondition(page, size, condition);
         NativeQuery query = setQuery(keyword);

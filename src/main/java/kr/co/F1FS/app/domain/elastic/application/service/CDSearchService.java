@@ -35,6 +35,7 @@ public class CDSearchService implements CDSearchUseCase {
     private final CDSearchRepoPort cdSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
+    @Override
     public ConstructorDocument save(Constructor constructor){
         ConstructorDocument constructorDocument = ConstructorDocument.builder()
                 .constructor(constructor).build();
@@ -47,6 +48,7 @@ public class CDSearchService implements CDSearchUseCase {
         return cdSearchRepoPort.save(document);
     }
 
+    @Override
     public DriverDocument save(Driver driver){
         DriverDocument driverDocument = DriverDocument.builder()
                 .driver(driver).build();
@@ -81,6 +83,7 @@ public class CDSearchService implements CDSearchUseCase {
         cdSearchRepoPort.save(document);
     }
 
+    @Override
     public List<CDSearchSuggestionDTO> suggestCD(String keyword){
         NativeQuery query = setQuery(keyword);
         query.setMaxResults(5);
@@ -91,6 +94,7 @@ public class CDSearchService implements CDSearchUseCase {
         return combine;
     }
 
+    @Override
     public Page<CDSearchSuggestionDTO> searchCDWithPaging(int page, int size, String condition, String keyword){
         Pageable pageable = switchCondition(page, size, condition);
         NativeQuery query = setQuery(keyword);

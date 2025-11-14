@@ -5,6 +5,9 @@ import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.FCMGroupUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.FCMTokenUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.NotificationUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
@@ -26,9 +29,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 public class FCMGroupService implements FCMGroupUseCase {
     private final NotificationMapper notificationMapper;
-    private final NotificationRedisService redisService;
-    private final NotificationService notificationService;
-    private final FCMTokenService fcmTokenService;
+    private final NotificationRedisUseCase redisUseCase;
+    private final NotificationUseCase notificationUseCase;
+    private final FCMTokenUseCase fcmTokenUseCase;
 
     private static final BlockingQueue<FCMPushDTO> QUEUE = new LinkedBlockingQueue<>();
     private static final int MAX = 5;
@@ -58,14 +61,15 @@ public class FCMGroupService implements FCMGroupUseCase {
         if(!list.isEmpty()){
             for (FCMPushDTO pushDTO : list){
                 NotificationRedis redis = sendPushToTopic(pushDTO);
-                notificationService.saveNotification(redis, pushDTO.getContent());
-                redisService.saveNotification(redis, "topic:"+redis.getTopic());
+                notificationUseCase.saveNotification(redis, pushDTO.getContent());
+                redisUseCase.saveNotification(redis, "topic:"+redis.getTopic());
             }
         }
 
         log.info("그룹 푸시 알림 전송 완료");
     }
 
+    @Override
     public NotificationRedis sendPushToTopic(FCMPushDTO dto){ // 토픽 구독자 전체에게 푸시 알림 발송
         Notification notification = Notification.builder()
                 .setTitle(dto.getTitle())
@@ -90,36 +94,38 @@ public class FCMGroupService implements FCMGroupUseCase {
         return redis;
     }
 
+    @Override
     public void subscribeToTopic(FCMTopicRequestDTO dto, User user){
         String key = TOPIC_PREFIX+dto.getTopic();
-        FCMToken token = fcmTokenService.findByUserIdOrNull(user.getId());
+        FCMToken token = fcmTokenUseCase.findByUserIdOrNull(user.getId());
 
         if(token != null){
             try{
                 FirebaseMessaging.getInstance().subscribeToTopic(List.of(token.getToken()), dto.getTopic());
-                redisService.saveSubscribe(user, key);
+                redisUseCase.saveSubscribe(user, key);
                 log.info("토픽 구독 지정 성공");
             } catch (Exception e){
                 log.error("토픽 구독 지정 실패");
             }
         }else {
-            redisService.saveSubscribe(user, key);
+            redisUseCase.saveSubscribe(user, key);
         }
     }
 
+    @Override
     public void unsubscribeFromTopic(FCMTopicRequestDTO dto, User user){
         String key = TOPIC_PREFIX+dto.getTopic();
-        FCMToken token = fcmTokenService.findByUserIdOrNull(user.getId());
+        FCMToken token = fcmTokenUseCase.findByUserIdOrNull(user.getId());
 
         if(token != null){
             try{
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(token.getToken()), dto.getTopic());
-                redisService.saveUnsubscribe(user, key);
+                redisUseCase.saveUnsubscribe(user, key);
             } catch (Exception e){
                 log.error("토픽 구독 해제 실패");
             }
         }else {
-            redisService.saveUnsubscribe(user, key);
+            redisUseCase.saveUnsubscribe(user, key);
         }
     }
 }

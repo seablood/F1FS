@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.chat.application.service;
 
 import kr.co.F1FS.app.domain.chat.application.mapper.ChatRoomMapper;
 import kr.co.F1FS.app.domain.chat.application.port.in.ChatRoomUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.in.ChatSubscribeUseCase;
 import kr.co.F1FS.app.domain.chat.application.port.out.ChatRoomJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
@@ -26,7 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ChatRoomService implements ChatRoomUseCase {
-    private final ChatSubscribeService chatSubscribeService;
+    private final ChatSubscribeUseCase chatSubscribeUseCase;
     private final ChatRoomSearchUseCase searchUseCase;
     private final ChatRoomJpaPort chatRoomJpaPort;
     private final ChatRoomMapper chatRoomMapper;
@@ -50,14 +51,14 @@ public class ChatRoomService implements ChatRoomUseCase {
     @Override
     public Page<ResponseChatRoomDTO> findSubscribeChatRoom(int page, int size, String condition, String username) {
         Pageable pageable = conditionSwitch(page, size, condition);
-        List<Long> roomIds = chatSubscribeService.findSubscribeChatRoom(username);
+        List<Long> roomIds = chatSubscribeUseCase.findSubscribeChatRoom(username);
 
         return chatRoomJpaPort.findByIdIn(roomIds, pageable);
     }
 
     @Override
     public boolean enterChatRoom(Long roomId, String username, LocalDateTime lastEnterTime) {
-        if(!chatSubscribeService.isSubscribe(roomId, username)){
+        if(!chatSubscribeUseCase.isSubscribe(roomId, username)){
             ChatRoom chatRoom = chatRoomJpaPort.findById(roomId);
             ChatRoomDocument document = searchUseCase.findById(roomId);
 
@@ -65,7 +66,7 @@ public class ChatRoomService implements ChatRoomUseCase {
             searchUseCase.increaseMemberCount(document);
             chatRoom.updateLastChatMessage(lastEnterTime);
 
-            chatSubscribeService.addSubscriber(roomId, username, lastEnterTime);
+            chatSubscribeUseCase.addSubscriber(roomId, username, lastEnterTime);
             chatRoomJpaPort.saveAndFlush(chatRoom);
             searchUseCase.save(document);
 
@@ -92,7 +93,7 @@ public class ChatRoomService implements ChatRoomUseCase {
         chatRoom.decreaseMember();
         chatRoom.updateLastChatMessage(sendTime);
 
-        chatSubscribeService.removeSubscriber(roomId, username);
+        chatSubscribeUseCase.removeSubscriber(roomId, username);
         chatRoomJpaPort.saveAndFlush(chatRoom);
         searchUseCase.save(document);
     }
@@ -122,7 +123,7 @@ public class ChatRoomService implements ChatRoomUseCase {
         if(!AuthorCertification.certification(username, chatRoom.getMasterUser())){
             throw new ChatRoomException(ChatRoomExceptionType.NOT_AUTHORITY_UPDATE_CHAT_ROOM);
         }
-        chatSubscribeService.deleteChatRoom(roomId);
+        chatSubscribeUseCase.deleteChatRoom(roomId);
 
         chatRoomJpaPort.delete(chatRoom);
         searchUseCase.delete(document);

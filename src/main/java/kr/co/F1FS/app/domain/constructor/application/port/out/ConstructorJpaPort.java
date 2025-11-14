@@ -10,4 +10,5 @@ public interface ConstructorJpaPort {
     Constructor saveAndFlush(Constructor constructor);
     Page<SimpleResponseConstructorDTO> findAll(Pageable pageable);
     Constructor findById(Long id);
+    Constructor findByName(String name);
 }

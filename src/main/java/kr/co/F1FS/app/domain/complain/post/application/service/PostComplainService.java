@@ -1,5 +1,6 @@
 package kr.co.F1FS.app.domain.complain.post.application.service;
 
+import kr.co.F1FS.app.domain.admin.post.presentation.dto.AdminResponsePostComplainDTO;
 import kr.co.F1FS.app.domain.complain.post.application.mapper.PostComplainMapper;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
@@ -11,6 +12,8 @@ import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,11 @@ public class PostComplainService implements PostComplainUseCase {
         save(complain);
         sendMessage(complain);
         log.info("게시글 신고 완료 : {}", post.getTitle());
+    }
+
+    @Override
+    public Page<AdminResponsePostComplainDTO> findAll(Pageable pageable) {
+        return postComplainJpaPort.findAll(pageable);
     }
 
     public void sendMessage(PostComplain complain){

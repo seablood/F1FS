@@ -42,7 +42,7 @@ public class CircuitService implements CircuitUseCase {
     }
 
     @Override
-    public Circuit findById(Long id) {
+    public Circuit findByIdNotDTONotCache(Long id) {
         return circuitJpaPort.findById(id);
     }
 

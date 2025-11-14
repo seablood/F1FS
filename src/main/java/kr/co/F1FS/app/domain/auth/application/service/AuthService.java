@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.domain.auth.application.mapper.AuthMapper;
 import kr.co.F1FS.app.domain.auth.application.port.in.AuthUseCase;
+import kr.co.F1FS.app.domain.auth.application.port.in.BlackListUseCase;
 import kr.co.F1FS.app.domain.auth.application.port.out.AuthJpaPort;
 import kr.co.F1FS.app.domain.auth.presentation.dto.AuthorizationUserDTO;
 import kr.co.F1FS.app.domain.email.application.port.in.EmailUseCase;
@@ -41,10 +42,11 @@ public class AuthService implements AuthUseCase {
     private final AuthJpaPort authJpaPort;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ValidationService validationService;
-    private final BlackListService blackListService;
+    private final BlackListUseCase blackListUseCase;
     private final JwtTokenService jwtTokenService;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO){
         userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
@@ -63,17 +65,20 @@ public class AuthService implements AuthUseCase {
         return authJpaPort.findAll();
     }
 
+    @Override
     public void sendEmail(User user, String option){
         VerificationCode code = createVerificationCode(user);
         emailUseCase.sendAuthEmail(user, code.getCode(), option);
     }
 
+    @Override
     public void sendEmail(AuthorizationUserDTO dto, String option){
         User user = userUseCase.findByEmailAndPassword(dto.getEmail(), dto.getPassword());
         VerificationCode code = createVerificationCode(user);
         emailUseCase.sendAuthEmail(user, code.getCode(), option);
     }
 
+    @Override
     public VerificationCode createVerificationCode(User user){
         String code = generateVerificationCode();
         VerificationCode verificationCode = VerificationCode.builder()
@@ -84,6 +89,7 @@ public class AuthService implements AuthUseCase {
         return authJpaPort.save(verificationCode);
     }
 
+    @Override
     public String generateVerificationCode(){
         String base56Character = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz";
         StringBuilder sb = new StringBuilder();
@@ -97,6 +103,7 @@ public class AuthService implements AuthUseCase {
         return sb.toString();
     }
 
+    @Override
     @Transactional
     public void verifyCode(String email, String code){
         VerificationCode verificationCode = authJpaPort.findVerificationCodeByEmailAndCode(email, code);
@@ -113,6 +120,7 @@ public class AuthService implements AuthUseCase {
         log.info("인증 완료 및 인증 코드 삭제 : {}", email);
     }
 
+    @Override
     @Transactional
     public void updatePassword(User user, ModifyPasswordDTO passwordDTO){
         cacheEvictUtil.evictCachingUser(user);
@@ -120,6 +128,7 @@ public class AuthService implements AuthUseCase {
         userUseCase.saveAndFlush(user);
     }
 
+    @Override
     @Transactional
     public void logout(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response,
                        User user) {
@@ -134,6 +143,7 @@ public class AuthService implements AuthUseCase {
         }
     }
 
+    @Override
     @Transactional
     public void secession(String accessToken, String refreshToken, HttpServletRequest request, HttpServletResponse response,
                           User user){
@@ -148,6 +158,7 @@ public class AuthService implements AuthUseCase {
         }
     }
 
+    @Override
     public void setBlackList(String token){
         Claims claims = jwtTokenService.getClaims(token);
 
@@ -156,7 +167,7 @@ public class AuthService implements AuthUseCase {
 
         // 만료 시간이 남아 있는 경우 블랙리스트 추가
         if (expirationMillis > 0) {
-            blackListService.addBlackList(token, expirationMillis);
+            blackListUseCase.addBlackList(token, expirationMillis);
         }
     }
 

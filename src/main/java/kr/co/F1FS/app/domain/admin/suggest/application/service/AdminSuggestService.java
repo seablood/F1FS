@@ -1,8 +1,6 @@
 package kr.co.F1FS.app.domain.admin.suggest.application.service;
 
 import kr.co.F1FS.app.domain.admin.suggest.application.port.in.AdminSuggestUseCase;
-import kr.co.F1FS.app.domain.admin.suggest.application.port.out.AdminSuggestPort;
-import kr.co.F1FS.app.domain.suggest.application.mapper.SuggestMapper;
 import kr.co.F1FS.app.domain.suggest.application.port.in.SuggestUseCase;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
@@ -20,25 +18,25 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class AdminSuggestService implements AdminSuggestUseCase {
-    private final AdminSuggestPort suggestPort;
     private final SuggestUseCase suggestUseCase;
-    private final SuggestMapper suggestMapper;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     public Page<ResponseSuggestDTO> findAll(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return suggestPort.findAll(pageable).map(suggest -> suggestMapper.toResponseSuggestDTO(suggest));
+        return suggestUseCase.findAll(pageable).map(suggest -> suggestUseCase.toResponseSuggestDTO(suggest));
     }
 
+    @Override
     @Transactional
     public void suggestConfirmedToggle(Long id){
-        Suggest suggest = suggestPort.findById(id);
+        Suggest suggest = suggestUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingSuggest(suggest);
 
         if(!suggest.isConfirmed()) suggestUseCase.updateConfirmed(suggest, true);
         else suggestUseCase.updateConfirmed(suggest, false);
 
-        suggestPort.saveAndFlush(suggest);
+        suggestUseCase.saveAndFlush(suggest);
     }
 }

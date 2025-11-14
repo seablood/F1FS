@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.chat.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.chat.application.service.ChatRoomService;
+import kr.co.F1FS.app.domain.chat.application.port.in.ChatRoomUseCase;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
 import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
@@ -21,12 +21,12 @@ import java.util.List;
 @RequestMapping("/api/v1/chat_room")
 @Tag(name = "채팅방(CharRoom) 시스템", description = "채팅방 관련 기능")
 public class ChatRoomController {
-    private final ChatRoomService chatRoomService;
+    private final ChatRoomUseCase chatRoomUseCase;
 
     @PostMapping("/save")
     @Operation(summary = "채팅방 생성", description = "채팅방 생성 및 저장")
     public ResponseEntity<Void> save(@RequestBody CreateChatRoomDTO dto, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        chatRoomService.save(dto, principalDetails.getUser().getUsername());
+        chatRoomUseCase.save(dto, principalDetails.getUser().getUsername());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -35,7 +35,7 @@ public class ChatRoomController {
     public ResponseEntity<List<ResponseChatRoomDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size,
                                                              @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<ResponseChatRoomDTO> newPage = chatRoomService.findAll(page, size, condition);
+        Page<ResponseChatRoomDTO> newPage = chatRoomUseCase.findAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
@@ -45,7 +45,7 @@ public class ChatRoomController {
                                                                            @RequestParam(value = "size", defaultValue = "10") int size,
                                                                            @RequestParam(value = "condition", defaultValue = "new") String condition,
                                                                            @AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<ResponseChatRoomDTO> newPage = chatRoomService.findSubscribeChatRoom(page, size, condition, principalDetails.getUsername());
+        Page<ResponseChatRoomDTO> newPage = chatRoomUseCase.findSubscribeChatRoom(page, size, condition, principalDetails.getUsername());
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
@@ -53,14 +53,14 @@ public class ChatRoomController {
     @Operation(summary = "채팅방 수정", description = "특정 채팅방 이름 및 정보 수정")
     public ResponseEntity<Void> modify(@PathVariable Long roomId, @RequestBody ModifyChatRoomDTO dto,
                                        @AuthenticationPrincipal PrincipalDetails principalDetails){
-        chatRoomService.modify(roomId, dto, principalDetails.getUsername());
+        chatRoomUseCase.modify(roomId, dto, principalDetails.getUsername());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/delete/{roomId}")
     @Operation(summary = "채팅방 삭제", description = "특정 채팅방 삭제")
     public ResponseEntity<Void> delete(@PathVariable Long roomId, @AuthenticationPrincipal PrincipalDetails principalDetails){
-        chatRoomService.delete(roomId, principalDetails.getUser().getUsername());
+        chatRoomUseCase.delete(roomId, principalDetails.getUser().getUsername());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

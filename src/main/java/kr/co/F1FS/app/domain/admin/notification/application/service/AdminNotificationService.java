@@ -1,8 +1,6 @@
 package kr.co.F1FS.app.domain.admin.notification.application.service;
 
 import kr.co.F1FS.app.domain.admin.notification.application.port.in.AdminNotificationUseCase;
-import kr.co.F1FS.app.domain.admin.notification.application.port.out.AdminNotificationPort;
-import kr.co.F1FS.app.domain.notification.application.mapper.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.NotificationUseCase;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
@@ -15,27 +13,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AdminNotificationService implements AdminNotificationUseCase {
-    private final AdminNotificationPort notificationPort;
     private final NotificationUseCase notificationUseCase;
-    private final NotificationMapper notificationMapper;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     @Transactional
     public ResponseNotificationDTO modify(Long id, ModifyNotificationDTO dto){
-        Notification notification = notificationPort.findById(id);
+        Notification notification = notificationUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingNotification(notification);
 
         notificationUseCase.modify(notification, dto);
-        notificationPort.saveAndFlush(notification);
+        notificationUseCase.saveAndFlush(notification);
 
-        return notificationMapper.toResponseNotificationDTO(notification);
+        return notificationUseCase.toResponseNotificationDTO(notification);
     }
 
+    @Override
     @Transactional
     public void delete(Long id){
-        Notification notification = notificationPort.findById(id);
+        Notification notification = notificationUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingNotification(notification);
 
-        notificationPort.delete(notification);
+        notificationUseCase.delete(notification);
     }
 }

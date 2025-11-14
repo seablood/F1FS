@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.grandprix.application.service;
 
-import kr.co.F1FS.app.domain.circuit.application.mapper.CircuitMapper;
+import kr.co.F1FS.app.domain.circuit.application.port.in.CircuitUseCase;
 import kr.co.F1FS.app.domain.circuit.domain.Circuit;
 import kr.co.F1FS.app.domain.grandprix.application.mapper.GrandPrixMapper;
 import kr.co.F1FS.app.domain.grandprix.application.port.in.GrandPrixUseCase;
-import kr.co.F1FS.app.domain.grandprix.application.port.out.GrandPrixCircuitPort;
 import kr.co.F1FS.app.domain.grandprix.application.port.out.GrandPrixJpaPort;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.CreateGrandPrixCommand;
@@ -24,9 +23,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrandPrixService implements GrandPrixUseCase {
     private final GrandPrixJpaPort grandPrixJpaPort;
-    private final GrandPrixCircuitPort circuitPort;
+    private final CircuitUseCase circuitUseCase;
     private final GrandPrixMapper grandPrixMapper;
-    private final CircuitMapper circuitMapper;
     private final ValidationService validationService;
     private final CacheEvictUtil cacheEvictUtil;
 
@@ -63,9 +61,9 @@ public class GrandPrixService implements GrandPrixUseCase {
     @Cacheable(value = "GrandPrixDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseGrandPrixDTO getGrandPrixById(Long id) {
         GrandPrix grandPrix = grandPrixJpaPort.findById(id);
-        Circuit circuit = circuitPort.getCircuitByIdNotDTO(grandPrix.getCircuitId());
+        Circuit circuit = circuitUseCase.findByIdNotDTONotCache(grandPrix.getCircuitId());
 
-        return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
+        return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitUseCase.toSimpleResponseCircuitDTO(circuit));
     }
 
     @Override

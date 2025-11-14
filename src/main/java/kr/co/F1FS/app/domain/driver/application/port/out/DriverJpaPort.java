@@ -10,5 +10,7 @@ public interface DriverJpaPort {
     Driver saveAndFlush(Driver driver);
     Page<SimpleResponseDriverDTO> findAll(Pageable pageable);
     Driver findById(Long id);
+    Driver findByName(String name);
     Driver findByEngName(String engName);
+    Driver findByNumber(Integer number);
 }

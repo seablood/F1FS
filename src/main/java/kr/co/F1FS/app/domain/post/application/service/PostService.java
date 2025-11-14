@@ -8,7 +8,6 @@ import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
 import kr.co.F1FS.app.domain.post.application.port.in.PostUseCase;
 import kr.co.F1FS.app.domain.post.application.port.out.PostJpaPort;
-import kr.co.F1FS.app.domain.post.application.port.out.PostSearchPort;
 import kr.co.F1FS.app.domain.post.presentation.dto.*;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
@@ -38,7 +37,6 @@ import java.util.List;
 @Slf4j
 public class PostService implements PostUseCase {
     private final PostJpaPort postJpaPort;
-    private final PostSearchPort searchPort;
     private final PostSearchUseCase searchUseCase;
     private final ValidationService validationService;
     private final FCMLiveUseCase fcmLiveUseCase;
@@ -47,12 +45,13 @@ public class PostService implements PostUseCase {
     private final CacheEvictUtil cacheEvictUtil;
     private final FCMUtil fcmUtil;
 
+    @Override
     @Transactional
     public ResponsePostDTO save(CreatePostDTO dto, User author){
         Post post = postMapper.toPost(dto, author);
         validationService.checkValid(post);
         postJpaPort.save(post);
-        searchPort.save(post);
+        searchUseCase.save(post);
 
         List<FCMToken> tokens = fcmUtil.getFollowerToken(author).stream()
                 .filter(token -> redisUseCase.isSubscribe(token.getUserId(), "post"))
@@ -66,19 +65,21 @@ public class PostService implements PostUseCase {
         return postMapper.toResponsePostDTO(postJpaPort.save(post));
     }
 
+    @Override
     public Page<ResponseSimplePostDTO> findAll(int page, int size, String condition){
         Pageable pageable = conditionSwitch(page, size, condition);
 
         return postJpaPort.findAll(pageable);
     }
 
-
+    @Override
     @Cacheable(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponsePostDTO findById(Long id){
         Post post = postJpaPort.findById(id);
         return postMapper.toResponsePostDTO(post);
     }
 
+    @Override
     @Cacheable(value = "PostNotDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public Post findByIdNotDTO(Long id){
         return postJpaPort.findById(id);
@@ -89,10 +90,16 @@ public class PostService implements PostUseCase {
         return postJpaPort.findById(id);
     }
 
+    @Override
+    public Page<Post> findAllByAuthor(User user, Pageable pageable) {
+        return postJpaPort.findAllByAuthor(user, pageable);
+    }
+
+    @Override
     @Transactional
     public ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user){
         Post post = postJpaPort.findById(id);
-        PostDocument document = searchPort.findById(id);
+        PostDocument document = searchUseCase.findById(id);
         cacheEvictUtil.evictCachingPost(post);
 
         if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
@@ -102,33 +109,47 @@ public class PostService implements PostUseCase {
         searchUseCase.modify(document, post);
 
         postJpaPort.saveAndFlush(post);
-        searchPort.save(document);
+        searchUseCase.save(document);
         return postMapper.toResponsePostDTO(post);
     }
 
+    @Override
     public void increaseLike(Post post){
         post.increaseLike();
         postJpaPort.saveAndFlush(post);
     }
 
+    @Override
     public void decreaseLike(Post post){
         post.decreaseLike();
         postJpaPort.saveAndFlush(post);
     }
 
+    @Override
     @Transactional
     public void delete(Long id, User user){
         Post post = postJpaPort.findById(id);
-        PostDocument document = searchPort.findById(id);
+        PostDocument document = searchUseCase.findById(id);
         cacheEvictUtil.evictCachingPost(post);
 
         if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
             throw new PostException(PostExceptionType.NOT_AUTHORITY_DELETE_POST);
         }
         postJpaPort.delete(post);
-        searchPort.delete(document);
+        searchUseCase.delete(document);
     }
 
+    @Override
+    public void delete(Post post) {
+        postJpaPort.delete(post);
+    }
+
+    @Override
+    public ResponseSimplePostDTO toResponseSimplePostDTO(Post post) {
+        return postMapper.toResponseSimplePostDTO(post);
+    }
+
+    @Override
     public Pageable conditionSwitch(int page, int size, String condition){
         switch (condition){
             case "new" :

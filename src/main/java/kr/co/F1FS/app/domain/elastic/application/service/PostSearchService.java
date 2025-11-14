@@ -29,6 +29,7 @@ public class PostSearchService implements PostSearchUseCase {
     private final PostSearchRepoPort postSearchRepoPort;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
+    @Override
     public void save(Post post){
         PostDocument postDocument = PostDocument.builder()
                 .post(post).build();
@@ -36,10 +37,12 @@ public class PostSearchService implements PostSearchUseCase {
         postSearchRepoPort.save(postDocument);
     }
 
+    @Override
     public void save(PostDocument postDocument){
         postSearchRepoPort.save(postDocument);
     }
 
+    @Override
     public PostDocument findById(Long id){
         return postSearchRepoPort.findById(id);
     }
@@ -55,11 +58,13 @@ public class PostSearchService implements PostSearchUseCase {
         postSearchRepoPort.delete(document);
     }
 
+    @Override
     public void increaseLikeNum(PostDocument postDocument){
         postDocument.increaseLikeNum();
         postSearchRepoPort.save(postDocument);
     }
 
+    @Override
     public void decreaseLikeNum(PostDocument postDocument){
         postDocument.decreaseLikeNum();
         postSearchRepoPort.save(postDocument);
@@ -141,6 +146,7 @@ public class PostSearchService implements PostSearchUseCase {
         return query;
     }
 
+    @Override
     public Page<ResponsePostDocumentDTO> getPostList(int page, int size, String condition, String option, String keyword){
         Pageable pageable = switchCondition(page, size, condition);
 

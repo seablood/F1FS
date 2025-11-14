@@ -30,23 +30,42 @@ public class SuggestService implements SuggestUseCase {
     private final SuggestJpaPort suggestJpaPort;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     @Transactional
     public ResponseSuggestDTO save(User user, CreateSuggestDTO dto){
         Suggest suggest = suggestJpaPort.save(suggestMapper.toSuggest(user, dto));
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
+    @Override
+    public Suggest saveAndFlush(Suggest suggest) {
+        return suggestJpaPort.saveAndFlush(suggest);
+    }
+
+    @Override
+    public Page<Suggest> findAll(Pageable pageable) {
+        return suggestJpaPort.findAll(pageable);
+    }
+
+    @Override
+    public Suggest findByIdNotDTONotCache(Long id) {
+        return suggestJpaPort.findById(id);
+    }
+
+    @Override
     @Cacheable(value = "SuggestDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSuggestDTO getSuggestById(Long id){
         Suggest suggest = suggestJpaPort.findById(id);
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
+    @Override
     public Page<ResponseSuggestDTO> getSuggestByUser(int page, int size, User user){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         return suggestJpaPort.findAllByFromUser(user, pageable);
     }
 
+    @Override
     public void updateConfirmed(Suggest suggest, boolean isConfirmed){
         cacheEvictUtil.evictCachingSuggest(suggest);
         suggest.updateConfirmed(isConfirmed);
@@ -54,6 +73,7 @@ public class SuggestService implements SuggestUseCase {
         suggestJpaPort.saveAndFlush(suggest);
     }
 
+    @Override
     @Transactional
     public ResponseSuggestDTO modify(Long id, ModifySuggestDTO dto, User user){
         Suggest suggest = suggestJpaPort.findById(id);
@@ -67,6 +87,7 @@ public class SuggestService implements SuggestUseCase {
         return suggestMapper.toResponseSuggestDTO(suggest);
     }
 
+    @Override
     @Transactional
     public void delete(Long id, User user){
         Suggest suggest = suggestJpaPort.findById(id);
@@ -76,5 +97,10 @@ public class SuggestService implements SuggestUseCase {
             throw new SuggestException(SuggestExceptionType.NOT_AUTHORITY_DELETE_SUGGEST);
         }
         suggestJpaPort.delete(suggest);
+    }
+
+    @Override
+    public ResponseSuggestDTO toResponseSuggestDTO(Suggest suggest) {
+        return suggestMapper.toResponseSuggestDTO(suggest);
     }
 }

@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.elastic.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.elastic.application.service.GrandPrixSearchService;
+import kr.co.F1FS.app.domain.elastic.application.port.in.GrandPrixSearchUseCase;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,12 +20,12 @@ import java.util.List;
 @RequestMapping("/api/v1/search-grand-prix")
 @Tag(name = "그랑프리 실시간 검색", description = "그랑프리를 실시간으로 검색")
 public class GrandPrixSearchController {
-    private final GrandPrixSearchService grandPrixSearchService;
+    private final GrandPrixSearchUseCase grandPrixSearchUseCase;
 
     @GetMapping("/live-search")
     @Operation(summary = "그랑프리 검색(실시간 추천)", description = "실시간 추천 검색")
     public ResponseEntity<List<ResponseGrandPrixSearchDTO>> liveSearch(@RequestParam(value = "search") String search){
-        return ResponseEntity.status(HttpStatus.OK).body(grandPrixSearchService.suggestGrandPrix(search));
+        return ResponseEntity.status(HttpStatus.OK).body(grandPrixSearchUseCase.suggestGrandPrix(search));
     }
 
     @GetMapping("/page-search")
@@ -34,7 +34,7 @@ public class GrandPrixSearchController {
                                                                        @RequestParam(value = "size", defaultValue = "10") int size,
                                                                        @RequestParam(value = "condition", defaultValue = "nameASC") String condition,
                                                                        @RequestParam(value = "search") String search){
-        Page<ResponseGrandPrixSearchDTO> newPage = grandPrixSearchService.searchGrandPrixWithPaging(page, size, condition, search);
+        Page<ResponseGrandPrixSearchDTO> newPage = grandPrixSearchUseCase.searchGrandPrixWithPaging(page, size, condition, search);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }

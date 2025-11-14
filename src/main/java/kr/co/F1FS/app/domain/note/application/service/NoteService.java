@@ -3,7 +3,6 @@ package kr.co.F1FS.app.domain.note.application.service;
 import kr.co.F1FS.app.domain.note.application.mapper.NoteMapper;
 import kr.co.F1FS.app.domain.note.application.port.in.NoteUseCase;
 import kr.co.F1FS.app.domain.note.application.port.out.NoteJpaPort;
-import kr.co.F1FS.app.domain.note.application.port.out.NoteUserPort;
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.note.presentation.dto.CreateNoteDTO;
 import kr.co.F1FS.app.domain.note.presentation.dto.ModifyNoteDTO;
@@ -11,6 +10,7 @@ import kr.co.F1FS.app.domain.notification.application.port.in.FCMLiveUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.NotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
+import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseNoteDTO;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseSimpleNoteDTO;
@@ -31,16 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NoteService implements NoteUseCase {
     private final NoteJpaPort noteJpaPort;
-    private final NoteUserPort userPort;
+    private final UserUseCase userUseCase;
     private final NotificationRedisUseCase redisUseCase;
     private final FCMLiveUseCase fcmLiveUseCase;
     private final NoteMapper noteMapper;
     private final CacheEvictUtil cacheEvictUtil;
     private final FCMUtil fcmUtil;
 
+    @Override
     @Transactional
     public ResponseNoteDTO save(CreateNoteDTO dto, User user, String nickname){
-        User toUser = userPort.findByNicknameNotDTO(nickname);
+        User toUser = userUseCase.findByNicknameNotDTONotCache(nickname);
         Note note = noteMapper.toNote(dto, toUser, user);
 
         noteJpaPort.save(note);
@@ -50,22 +51,26 @@ public class NoteService implements NoteUseCase {
         return noteMapper.toResponseNoteDTO(noteJpaPort.save(note));
     }
 
+    @Override
     public Page<ResponseSimpleNoteDTO> getNoteByToUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return noteJpaPort.findAllByToUser(user, pageable);
     }
 
+    @Override
     public Page<ResponseSimpleNoteDTO> getNoteByFromUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return noteJpaPort.findAllByFromUser(user, pageable);
     }
 
+    @Override
     public Note findByIdNotDTO(Long id){
         return noteJpaPort.findById(id);
     }
 
+    @Override
     @Cacheable(value = "NoteDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseNoteDTO findByIdDTO(Long id){
         Note note = findByIdNotDTO(id);
@@ -74,12 +79,14 @@ public class NoteService implements NoteUseCase {
         return noteMapper.toResponseNoteDTO(note);
     }
 
+    @Override
     @Transactional
     public void updateIsRead(Note note){
         if(!note.isRead()) note.updateIsRead();
         noteJpaPort.saveAndFlush(note);
     }
 
+    @Override
     @Transactional
     public ResponseNoteDTO modify(Long id, ModifyNoteDTO dto){
         Note note = findByIdNotDTO(id);
@@ -91,6 +98,7 @@ public class NoteService implements NoteUseCase {
         return noteMapper.toResponseNoteDTO(note);
     }
 
+    @Override
     @Transactional
     public void delete(Long id){
         Note note = findByIdNotDTO(id);

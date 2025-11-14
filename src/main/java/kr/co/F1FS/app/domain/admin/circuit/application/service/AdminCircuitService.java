@@ -29,7 +29,7 @@ public class AdminCircuitService implements AdminCircuitUseCase {
     @Override
     @Transactional
     public ResponseCircuitDTO modify(Long id, ModifyCircuitDTO dto) {
-        Circuit circuit = circuitUseCase.findById(id);
+        Circuit circuit = circuitUseCase.findByIdNotDTONotCache(id);
         circuit = circuitUseCase.modify(adminCircuitMapper.toModifyCircuitCommand(dto), circuit);
 
         return circuitUseCase.toResponseCircuitDTO(circuit);

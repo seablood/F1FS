@@ -2,8 +2,8 @@ package kr.co.F1FS.app.domain.post.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.F1FS.app.domain.post.application.port.in.PostLikeRelationUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
-import kr.co.F1FS.app.domain.post.application.service.PostLikeRelationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/post-like")
 @Tag(name = "게시글 좋아요 시스템", description = "게시글 좋아요 관련 기능")
 public class PostLikeController {
-    private final PostLikeRelationService relationService;
+    private final PostLikeRelationUseCase relationUseCase;
 
     @PostMapping("/toggle/{id}")
     @Operation(summary = "좋아요 토글 기능", description = "특정 게시글에 대한 좋아요 추가/삭제")
     public ResponseEntity<Void> toggle(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails details){
-        relationService.toggle(details.getUser(), id);
+        relationUseCase.toggle(details.getUser(), id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

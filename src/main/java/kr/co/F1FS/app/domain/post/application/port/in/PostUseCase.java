@@ -15,7 +15,12 @@ public interface PostUseCase {
     ResponsePostDTO findById(Long id);
     Post findByIdNotDTO(Long id);
     Post findByIdNotDTONotCache(Long id);
+    Page<Post> findAllByAuthor(User user, Pageable pageable);
     ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user);
+    void increaseLike(Post post);
+    void decreaseLike(Post post);
     void delete(Long id, User user);
+    void delete(Post post);
+    ResponseSimplePostDTO toResponseSimplePostDTO(Post post);
     Pageable conditionSwitch(int page, int size, String condition);
 }

@@ -11,4 +11,5 @@ public interface NotificationJpaPort {
     Page<SimpleResponseNotificationDTO> findAll(Pageable pageable);
     Notification findById(Long id);
     Notification findByRedisId(Long redisId);
+    void delete(Notification notification);
 }

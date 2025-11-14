@@ -20,6 +20,7 @@ public class NotificationService implements NotificationUseCase {
     private final NotificationMapper notificationMapper;
     private final NotificationJpaPort notificationJpaPort;
 
+    @Override
     @Transactional
     public void saveNotification(NotificationRedis redis, String content){
         Notification notification = notificationMapper.toNotification(redis, content);
@@ -27,24 +28,48 @@ public class NotificationService implements NotificationUseCase {
         notificationJpaPort.save(notification);
     }
 
+    @Override
+    public Notification saveAndFlush(Notification notification) {
+        return notificationJpaPort.saveAndFlush(notification);
+    }
+
+    @Override
+    public Notification findByIdNotDTONotCache(Long id) {
+        return notificationJpaPort.findById(id);
+    }
+
+    @Override
     @Cacheable(value = "NotificationDTOByRedisId", key = "#redisId", cacheManager = "redisLongCacheManager")
     public ResponseNotificationDTO getNotificationByRedisId(Long redisId){
         Notification notification = notificationJpaPort.findByRedisId(redisId);
         return notificationMapper.toResponseNotificationDTO(notification);
     }
 
+    @Override
     public ResponseNotificationDTO getNotificationById(Long id){
         Notification notification = notificationJpaPort.findById(id);
         return notificationMapper.toResponseNotificationDTO(notification);
     }
 
+    @Override
     public Page<SimpleResponseNotificationDTO> getNotificationList(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         return notificationJpaPort.findAll(pageable);
     }
 
+    @Override
     public void modify(Notification notification, ModifyNotificationDTO dto){
         notification.modify(dto);
+    }
+
+    @Override
+    public void delete(Notification notification) {
+        notificationJpaPort.delete(notification);
+    }
+
+    @Override
+    public ResponseNotificationDTO toResponseNotificationDTO(Notification notification) {
+        return notificationMapper.toResponseNotificationDTO(notification);
     }
 }

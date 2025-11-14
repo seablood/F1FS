@@ -40,8 +40,20 @@ public class DriverJpaAdapter implements DriverJpaPort {
     }
 
     @Override
+    public Driver findByName(String name) {
+        return driverRepository.findByName(name)
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
+    }
+
+    @Override
     public Driver findByEngName(String engName) {
         return driverRepository.findByEngName(engName)
+                .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
+    }
+
+    @Override
+    public Driver findByNumber(Integer number) {
+        return driverRepository.findByNumber(number)
                 .orElseThrow(() -> new DriverException(DriverExceptionType.DRIVER_NOT_FOUND));
     }
 }

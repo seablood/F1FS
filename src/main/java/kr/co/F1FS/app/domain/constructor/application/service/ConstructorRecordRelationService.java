@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.constructor.application.service;
 
 import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorRecordRelationMapper;
 import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
+import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorRecordRelationJpaPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.ResponseConstructorStandingDTO;
@@ -9,10 +10,7 @@ import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
-import kr.co.F1FS.app.domain.constructor.infrastructure.repository.ConstructorRecordRelationRepository;
 import kr.co.F1FS.app.global.util.RacingClass;
-import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
-import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,14 +23,14 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
     private final CurrentSeasonUseCase currentSeasonUseCase;
     private final SinceDebutUseCase sinceDebutUseCase;
     private final ConstructorRecordRelationMapper relationMapper;
-    private final ConstructorRecordRelationRepository relationRepository;
+    private final ConstructorRecordRelationJpaPort relationJpaPort;
 
     @Override
     public void save(Constructor constructor, CurrentSeason currentSeason, SinceDebut sinceDebut){
         ConstructorRecordRelation relation = relationMapper.toConstructorRecordRelation(constructor, currentSeason,
                 sinceDebut);
 
-        relationRepository.save(relation);
+        relationJpaPort.save(relation);
     }
 
     @Override
@@ -40,7 +38,7 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
     public List<ResponseConstructorStandingDTO> getConstructorStandingList(String racingClassCode){
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
         List<ConstructorRecordRelation> relationList =
-                relationRepository.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(racingClass, true);
+                relationJpaPort.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(racingClass, true);
 
         return relationList.stream()
                 .map(relation -> relationMapper.toResponseConstructorStandingDTO(relation))
@@ -50,8 +48,7 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
 
     @Override
     public ConstructorRecordRelation findByConstructor(Constructor constructor){
-        return relationRepository.findByConstructorInfo(constructor)
-                .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_RECORD_ERROR));
+        return relationJpaPort.findByConstructorInfo(constructor);
     }
 
     @Override
@@ -69,7 +66,7 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
     @Override
     public void updateChampionshipRank(String racingClassCode){
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
-        List<ConstructorRecordRelation> relationList = relationRepository.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(
+        List<ConstructorRecordRelation> relationList = relationJpaPort.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(
                 racingClass, true
                 ).stream().sorted((o1, o2) -> Integer.compare(o2.getCurrentSeason().getChampionshipPoint(), o1.getCurrentSeason().getChampionshipPoint()))
                 .toList();

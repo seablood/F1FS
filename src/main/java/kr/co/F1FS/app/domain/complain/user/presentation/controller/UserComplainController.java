@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.complain.user.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.complain.user.application.service.UserComplainService;
+import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user-complain")
 public class UserComplainController {
-    private final UserComplainService userComplainService;
+    private final UserComplainUseCase userComplainUseCase;
 
     @PostMapping("/save")
     @Operation(summary = "유저 신고", description = "특정 유저를 신고")
     public ResponseEntity<Void> userComplain(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                              @Valid @RequestBody CreateUserComplainDTO dto){
-        userComplainService.userComplain(principalDetails.getUser(), dto);
+        userComplainUseCase.userComplain(principalDetails.getUser(), dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

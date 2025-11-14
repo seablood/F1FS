@@ -32,7 +32,7 @@ public class AdminGrandPrixService implements AdminGrandPrixUseCase {
     @Transactional
     public ResponseGrandPrixDTO save(CreateGrandPrixDTO dto) {
         GrandPrix grandPrix = grandPrixUseCase.createGrandPrix(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
-        Circuit circuit = circuitUseCase.findById(grandPrix.getCircuitId());
+        Circuit circuit = circuitUseCase.findByIdNotDTONotCache(grandPrix.getCircuitId());
         sessionUseCase.save(grandPrix);
         grandPrix = grandPrixUseCase.save(grandPrix);
         searchUseCase.save(grandPrix);
@@ -54,7 +54,7 @@ public class AdminGrandPrixService implements AdminGrandPrixUseCase {
     @Transactional
     public ResponseGrandPrixDTO modify(ModifyGrandPrixDTO dto, Long id) {
         GrandPrix grandPrix = grandPrixUseCase.findByIdNotDTONotCache(id);
-        Circuit circuit = circuitUseCase.findById(grandPrix.getCircuitId());
+        Circuit circuit = circuitUseCase.findByIdNotDTONotCache(grandPrix.getCircuitId());
         GrandPrixDocument document = searchUseCase.findById(id);
 
         grandPrix = grandPrixUseCase.modify(adminGrandPrixMapper.toModifyGrandPrixCommand(dto), grandPrix);

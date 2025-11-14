@@ -6,7 +6,7 @@ import kr.co.F1FS.app.domain.session.application.mapper.SessionMapper;
 import kr.co.F1FS.app.domain.session.application.port.in.SessionUseCase;
 import kr.co.F1FS.app.domain.session.application.port.out.SessionJpaPort;
 import kr.co.F1FS.app.domain.session.domain.Session;
-import kr.co.F1FS.app.domain.sessionresult.application.port.in.SessionResultUseCase;
+import kr.co.F1FS.app.domain.sessionresult.application.port.in.SessionResultSessionUseCase;
 import kr.co.F1FS.app.global.presentation.dto.session.ResponseSessionDTO;
 import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import kr.co.F1FS.app.global.util.SessionType;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SessionService implements SessionUseCase {
     private final GrandPrixUseCase grandPrixUseCase;
-    private final SessionResultUseCase sessionResultUseCase;
+    private final SessionResultSessionUseCase sessionResultUseCase;
     private final SessionJpaPort sessionJpaPort;
     private final SessionMapper sessionMapper;
 
@@ -42,6 +42,11 @@ public class SessionService implements SessionUseCase {
         List<ResponseSessionResultDTO> resultList = sessionResultUseCase.getSessionResultBySession(session);
 
         return sessionMapper.toResponseSessionDTO(session, resultList);
+    }
+
+    @Override
+    public Session findByIdNotDTONotCache(Long id) {
+        return sessionJpaPort.findById(id);
     }
 
     public void isSession(SessionType sessionType, GrandPrix grandPrix){

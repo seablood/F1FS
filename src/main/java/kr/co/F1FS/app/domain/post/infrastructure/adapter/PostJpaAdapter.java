@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
 import kr.co.F1FS.app.domain.post.application.port.out.PostJpaPort;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.post.infrastructure.repository.PostRepository;
+import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
@@ -31,6 +32,11 @@ public class PostJpaAdapter implements PostJpaPort {
     @Override
     public Page<ResponseSimplePostDTO> findAll(Pageable pageable) {
         return postRepository.findAll(pageable).map(post -> postMapper.toResponseSimplePostDTO(post));
+    }
+
+    @Override
+    public Page<Post> findAllByAuthor(User user, Pageable pageable) {
+        return postRepository.findAllByAuthor(user, pageable);
     }
 
     @Override

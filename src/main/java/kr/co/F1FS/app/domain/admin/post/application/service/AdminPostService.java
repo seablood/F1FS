@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.admin.post.application.service;
 
 import kr.co.F1FS.app.domain.admin.post.application.port.in.AdminPostUseCase;
-import kr.co.F1FS.app.domain.admin.post.application.port.out.AdminPostPort;
 import kr.co.F1FS.app.domain.admin.post.presentation.dto.AdminResponsePostComplainDTO;
-import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
-import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
+import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
+import kr.co.F1FS.app.domain.post.application.port.in.PostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
@@ -24,34 +23,37 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AdminPostService implements AdminPostUseCase {
     private final UserUseCase userUseCase;
-    private final PostComplainJpaPort complainJpaPort;
-    private final AdminPostPort postPort;
-    private final PostMapper postMapper;
+    private final PostComplainUseCase complainUseCase;
+    private final PostUseCase postUseCase;
     private final CacheEvictUtil cacheEvictUtil;
 
+    @Override
     public Page<ResponseSimplePostDTO> getPostByUser(int page, int size, String condition, String nickname){
         Pageable pageable = switchCondition(page, size, condition);
         User user = userUseCase.findByNicknameNotDTO(nickname);
-        Page<Post> postPage = postPort.findAllByAuthor(user, pageable);
+        Page<Post> postPage = postUseCase.findAllByAuthor(user, pageable);
 
-        return postPage.map(post -> postMapper.toResponseSimplePostDTO(post));
+        return postPage.map(post -> postUseCase.toResponseSimplePostDTO(post));
     }
 
+    @Override
     public Page<AdminResponsePostComplainDTO> getAllComplain(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
-        return complainJpaPort.findAll(pageable);
+        return complainUseCase.findAll(pageable);
     }
 
+    @Override
     @Transactional
     public void delete(Long id){
-        Post post = postPort.findByIdNotDTO(id);
+        Post post = postUseCase.findByIdNotDTONotCache(id);
         cacheEvictUtil.evictCachingPost(post);
 
-        postPort.delete(post);
+        postUseCase.delete(post);
         log.info("관리자 권한 -> 게시글 삭제 : {}", post.getTitle());
     }
 
+    @Override
     public Pageable switchCondition(int page, int size, String condition){
         return switch (condition){
             case "older" ->

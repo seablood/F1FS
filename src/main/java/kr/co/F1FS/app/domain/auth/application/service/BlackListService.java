@@ -13,11 +13,13 @@ public class BlackListService implements BlackListUseCase {
     private final RedisHandler redisHandler;
     private static final String BLACKLIST_PREFIX = "blacklist:";
 
+    @Override
     public void addBlackList(String token, long expirationMillis){ // 블랙리스트 추가
         redisHandler.executeOperations(() -> redisHandler.getValueOperations().
                 set(BLACKLIST_PREFIX + token, "invalid", Duration.ofMillis(expirationMillis)));
     }
 
+    @Override
     public boolean isBlacklisted(String token) { // 블랙리스트 포함 여부
         return Boolean.TRUE.equals(redisHandler.getRedisTemplate().hasKey(BLACKLIST_PREFIX+token));
     }
