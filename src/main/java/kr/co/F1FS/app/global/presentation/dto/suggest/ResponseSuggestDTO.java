@@ -20,11 +20,4 @@ public class ResponseSuggestDTO {
     private String content;
     private String createdAt;
     private boolean isConfirmed;
-
-    public static ResponseSuggestDTO toDto(Suggest suggest){
-        LocalDateTime suggestTime = TimeUtil.convertToKoreanTime(suggest.getCreatedAt());
-
-        return new ResponseSuggestDTO(suggest.getId(), suggest.getFromUser().getNickname(), suggest.getTitle(),
-                suggest.getContent(), TimeUtil.formatPostTime(suggestTime), suggest.isConfirmed());
-    }
 }

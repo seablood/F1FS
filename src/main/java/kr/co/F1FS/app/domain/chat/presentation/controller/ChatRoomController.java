@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.chat.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.chat.application.port.in.ChatRoomUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.in.chatRoom.ChatRoomUseCase;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
 import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;

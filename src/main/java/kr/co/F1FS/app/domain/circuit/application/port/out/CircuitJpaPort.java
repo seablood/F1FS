@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 public interface CircuitJpaPort {
     Circuit save(Circuit circuit);
     Circuit saveAndFlush(Circuit circuit);
-    Page<SimpleResponseCircuitDTO> findAll(Pageable pageable);
+    Page<Circuit> findAll(Pageable pageable);
     Circuit findById(Long id);
 }

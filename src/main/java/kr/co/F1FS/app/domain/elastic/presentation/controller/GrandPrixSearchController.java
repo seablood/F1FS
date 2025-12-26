@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.elastic.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.elastic.application.port.in.GrandPrixSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.grandPrix.GrandPrixSearchUseCase;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

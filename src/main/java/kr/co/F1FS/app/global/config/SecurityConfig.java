@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
+import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.global.config.admin.filter.AdminJsonUsernamePasswordAuthenticationFilter;
 import kr.co.F1FS.app.global.config.admin.handler.AdminLoginFailureHandler;
 import kr.co.F1FS.app.global.config.admin.handler.AdminLoginSuccessHandler;
@@ -15,7 +17,6 @@ import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2FailureHandler;
 import kr.co.F1FS.app.global.config.oauth2.handler.OAuth2SuccessHandler;
 import kr.co.F1FS.app.global.config.oauth2.service.CustomOAuth2UserService;
 import kr.co.F1FS.app.global.config.oauth2.util.OAuth2CookieRepository;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +43,8 @@ public class SecurityConfig {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final PrincipalDetailsService principalDetailsService;
     private final JwtTokenService jwtTokenService;
-    private final UserRepository userRepository;
+    private final QueryUserUseCase queryUserUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
     private final ObjectMapper objectMapper;
     private final CustomAuthenticationProvider customAuthenticationProvider;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -135,7 +137,7 @@ public class SecurityConfig {
 
     @Bean
     public LoginSuccessHandler loginSuccessHandler(){
-        return new LoginSuccessHandler(jwtTokenService, userRepository, redisHandler);
+        return new LoginSuccessHandler(jwtTokenService, updateUserUseCase, queryUserUseCase, redisHandler);
     }
 
     @Bean
@@ -145,7 +147,7 @@ public class SecurityConfig {
 
     @Bean
     public AdminLoginSuccessHandler adminLoginSuccessHandler(){
-        return new AdminLoginSuccessHandler(jwtTokenService, userRepository, redisHandler);
+        return new AdminLoginSuccessHandler(jwtTokenService, updateUserUseCase, queryUserUseCase, redisHandler);
     }
 
     @Bean
@@ -175,6 +177,6 @@ public class SecurityConfig {
 
     @Bean
     public TokenFilter tokenFilter(){
-        return new TokenFilter(jwtTokenService, userRepository, principalDetailsService);
+        return new TokenFilter(jwtTokenService, queryUserUseCase, principalDetailsService);
     }
 }

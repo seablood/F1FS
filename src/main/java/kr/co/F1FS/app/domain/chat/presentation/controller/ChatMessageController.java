@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.chat.presentation.controller;
 
-import kr.co.F1FS.app.domain.chat.application.port.in.ChatMessageUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.in.chatMessage.ChatMessageUseCase;
 import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatMessageDTO;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatMessageDTO;
 import lombok.RequiredArgsConstructor;

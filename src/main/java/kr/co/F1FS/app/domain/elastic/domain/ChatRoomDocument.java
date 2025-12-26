@@ -2,6 +2,7 @@ package kr.co.F1FS.app.domain.elastic.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
+import kr.co.F1FS.app.global.util.TimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,5 +50,6 @@ public class ChatRoomDocument {
         this.name = chatRoom.getName();
         this.description = chatRoom.getDescription();
         this.memberCount = chatRoom.getMemberCount();
+        this.createTime = chatRoom.getCreateTime();
     }
 }

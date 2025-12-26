@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ChatMessageJpaPort {
     void save(ChatMessage chatMessage);
-    List<ResponseChatMessageDTO> findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(Long roomId, LocalDateTime lastEnterTime);
+    List<ChatMessage> findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(Long roomId, LocalDateTime lastEnterTime);
 }

@@ -1,14 +1,14 @@
 package kr.co.F1FS.app.global.config.oauth2.service;
 
+import kr.co.F1FS.app.domain.user.application.port.in.CreateUserUseCase;
+import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.oauth2.provider.FacebookUserInfo;
 import kr.co.F1FS.app.global.config.oauth2.provider.GoogleUserInfo;
 import kr.co.F1FS.app.global.config.oauth2.provider.NaverUserInfo;
 import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
-import kr.co.F1FS.app.global.util.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -21,7 +21,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
-    private final UserRepository userRepository;
+    private final CreateUserUseCase createUserUseCase;
+    private final QueryUserUseCase queryUserUseCase;
     private final RedisHandler redisHandler;
 
     @Override
@@ -42,19 +43,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userInfo = new NaverUserInfo((Map<String, Object>) oAuth2User.getAttributes().get("response"));
         }
 
-        User user = userRepository.findByProviderAndProviderId(userInfo.getProvider(), userInfo.getProviderId())
-                .orElse(null);
+        User user = queryUserUseCase.findByProviderAndProviderIdOrNull(userInfo.getProvider(), userInfo.getProviderId());
 
         if(user == null){
-            user = User.builder()
-                    .username(userInfo.getProvider()+userInfo.getProviderId())
-                    .nickname(userInfo.getProvider()+userInfo.getProviderId())
-                    .email(userInfo.getEmail())
-                    .provider(userInfo.getProvider())
-                    .providerId(userInfo.getProviderId())
-                    .build();
-            user.updateRole(Role.USER);
-            userRepository.saveAndFlush(user);
+            user = createUserUseCase.createEntity(userInfo);
         }
 
         return new PrincipalDetails(user, oAuth2User.getAttributes(), redisHandler);

@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.domain.constructor.domain;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.domain.constructor.presentation.dto.ModifyConstructorCommand;
+import kr.co.F1FS.app.domain.constructor.presentation.dto.constructor.ModifyConstructorCommand;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 

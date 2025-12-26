@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
+import kr.co.F1FS.app.domain.user.presentation.dto.ModifyDescriptionDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.domain.user.presentation.dto.ModifyNicknameDTO;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
@@ -38,8 +39,15 @@ public class UserController {
 
     @PutMapping("/modify-nickname")
     @Operation(summary = "유저 닉네임 변경", description = "로그인한 유저의 닉네임 변경")
-    public ResponseEntity<ResponseUserDTO> modify(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<ResponseUserDTO> modifyNickname(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                   @Valid @RequestBody ModifyNicknameDTO dto){
-        return ResponseEntity.status(HttpStatus.OK).body(userUseCase.modify(principalDetails.getUser(), dto));
+        return ResponseEntity.status(HttpStatus.OK).body(userUseCase.modifyNickname(principalDetails.getUser(), dto));
+    }
+
+    @PutMapping("/modify-description")
+    @Operation(summary = "유저 소개 변경", description = "로그인한 유저의 소개 변경")
+    public ResponseEntity<ResponseUserDTO> modifyDescription(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                          @Valid @RequestBody ModifyDescriptionDTO dto){
+        return ResponseEntity.status(HttpStatus.OK).body(userUseCase.modifyDescription(principalDetails.getUser(), dto));
     }
 }

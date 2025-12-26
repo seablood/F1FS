@@ -23,10 +23,7 @@ public class ChatMessageJpaAdapter implements ChatMessageJpaPort {
     }
 
     @Override
-    public List<ResponseChatMessageDTO> findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(Long roomId, LocalDateTime lastEnterTime) {
-        return chatMessageRepository.findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(roomId, lastEnterTime)
-                .stream()
-                .map(chatMessage -> chatMessageMapper.toResponseChatMessageDTO(chatMessage))
-                .toList();
+    public List<ChatMessage> findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(Long roomId, LocalDateTime lastEnterTime) {
+        return chatMessageRepository.findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(roomId, lastEnterTime);
     }
 }

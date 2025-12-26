@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.notification.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import kr.co.F1FS.app.domain.admin.notification.presentation.dto.ModifyNotificationDTO;
+import kr.co.F1FS.app.domain.notification.presentation.dto.admin.ModifyNotificationDTO;
 import lombok.*;
 
 import java.sql.Timestamp;

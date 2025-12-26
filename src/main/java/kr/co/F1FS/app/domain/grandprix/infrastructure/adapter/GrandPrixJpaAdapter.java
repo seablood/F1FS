@@ -29,10 +29,8 @@ public class GrandPrixJpaAdapter implements GrandPrixJpaPort {
     }
 
     @Override
-    public List<SimpleResponseGrandPrixDTO> findGrandPrixesBySeason(Integer season) {
-        return grandPrixRepository.findGrandPrixesBySeason(season).stream()
-                .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix))
-                .toList();
+    public List<GrandPrix> findGrandPrixesBySeason(Integer season) {
+        return grandPrixRepository.findGrandPrixesBySeason(season);
     }
 
     @Override

@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.auth.application.port.in.AuthUseCase;
+import kr.co.F1FS.app.domain.auth.application.port.in.auth.AuthUseCase;
+import kr.co.F1FS.app.domain.auth.application.port.in.verification.VerifyAndDeleteVerificationUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.domain.auth.presentation.dto.CreateUserDTO;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final JwtTokenService jwtTokenService;
     private final AuthUseCase authUseCase;
+    private final VerifyAndDeleteVerificationUseCase verifyAndDeleteVerificationUseCase;
 
     @PostMapping("/user-save")
     @Operation(summary = "회원가입(자체 계정)", description = "자체 로그인 계정 생성")
@@ -38,7 +40,7 @@ public class AuthController {
     @Operation(summary = "인증 코드 검사", description = "인증 코드 유효성을 검사")
     public ResponseEntity<Void> verifyCode(@RequestParam(value = "email") String email,
                                            @RequestParam(value = "code") String code){
-        authUseCase.verifyCode(email, code);
+        verifyAndDeleteVerificationUseCase.verifyCode(email, code);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

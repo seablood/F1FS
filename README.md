@@ -33,10 +33,10 @@ app/
 │   │   ├── port/
 │   │   │   ├── in/ (UseCase)
 │   │   │   └── out/ (Port)
-│   │   └── service/ (도메인 서비스)
+│   │   └── service/ (도메인 서비스 구현체)
 │   ├── domain/ (도메인 엔터티)
 │   ├── infrastructure/
-│   │   ├── adapter/ (어댑터 구현체)
+│   │   ├── adapter/ (JpaPort 구현체)
 │   │   └── repository/ (레포지토리)
 │   └── presentation/
 │   │   ├── controller/ (컨트롤러)
@@ -49,7 +49,7 @@ app/
     │   └── service/
     ├── config/ (각종 서버 환경 설정)
     ├── presentation/
-    │   └── dto/
+    │   └── dto/ (공용 DTO)
     └── util/ (각종 유틸 클래스)
 ```
 

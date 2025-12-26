@@ -1,8 +1,9 @@
 package kr.co.F1FS.app.domain.user.application.mapper;
 
-import kr.co.F1FS.app.domain.admin.auth.presentation.dto.CreateAdminUserDTO;
+import kr.co.F1FS.app.domain.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
+import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ public class UserMapper {
                 .password(command.getPassword())
                 .email(command.getEmail())
                 .nickname(command.getNickname())
+                .description("자신을 소개해주세요!")
                 .build();
     }
 
@@ -23,6 +25,16 @@ public class UserMapper {
                 .password(dto.getPassword())
                 .nickname(dto.getNickname())
                 .email(dto.getEmail())
+                .build();
+    }
+
+    public User toUser(OAuth2UserInfo userInfo){
+        return User.builder()
+                .username(userInfo.getProvider()+userInfo.getProviderId())
+                .nickname(userInfo.getProvider()+userInfo.getProviderId())
+                .email(userInfo.getEmail())
+                .provider(userInfo.getProvider())
+                .providerId(userInfo.getProviderId())
                 .build();
     }
 

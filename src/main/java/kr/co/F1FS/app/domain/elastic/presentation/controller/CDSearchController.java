@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.elastic.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.elastic.application.port.in.CDSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.cdSearch.CDSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

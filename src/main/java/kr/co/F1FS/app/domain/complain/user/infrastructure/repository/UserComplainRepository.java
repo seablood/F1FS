@@ -13,5 +13,6 @@ import java.util.List;
 public interface UserComplainRepository extends JpaRepository<UserComplain, Long> {
     Page<UserComplain> findAll(Pageable pageable);
     Page<UserComplain> findAllByToUser(User user, Pageable pageable);
+    Page<UserComplain> findAllByFromUser(User user, Pageable pageable);
     List<UserComplain> findAllByToUser(User user);
 }

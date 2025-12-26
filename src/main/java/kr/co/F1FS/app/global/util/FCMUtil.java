@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.global.util;
 
-import kr.co.F1FS.app.domain.follow.application.port.in.FollowUserUseCase;
-import kr.co.F1FS.app.domain.notification.application.port.in.FCMTokenUseCase;
+import kr.co.F1FS.app.domain.follow.application.port.in.user.QueryFollowUserUseCase;
+import kr.co.F1FS.app.domain.notification.application.port.in.fcmToken.QueryFCMTokenUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserIdDTO;
-import kr.co.F1FS.app.domain.notification.presentation.dto.FCMPushDTO;
+import kr.co.F1FS.app.global.presentation.dto.notification.FCMPushDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,8 +15,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FCMUtil {
-    private final FollowUserUseCase followUserUseCase;
-    private final FCMTokenUseCase tokenUseCase;
+    private final QueryFollowUserUseCase queryFollowUserUseCase;
+    private final QueryFCMTokenUseCase queryFCMTokenUseCase;
 
     public FCMPushDTO sendPushForPost(User author, String title){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
@@ -59,15 +59,15 @@ public class FCMUtil {
     }
 
     public FCMToken getAuthorToken(User author){
-        return tokenUseCase.findByUserIdOrNull(author.getId());
+        return queryFCMTokenUseCase.findByUserIdOrNull(author.getId());
     }
 
     public List<FCMToken> getFollowerToken(User author){
-        List<ResponseUserIdDTO> followerList = followUserUseCase.findFollowersNotDTO(author);
+        List<ResponseUserIdDTO> followerList = queryFollowUserUseCase.findByFolloweeUserIdForDTO(author);
         List<FCMToken> tokens = new ArrayList<>();
 
         for (ResponseUserIdDTO followerId : followerList){
-            FCMToken notification = tokenUseCase.findByUserIdOrNull(followerId.getId());
+            FCMToken notification = queryFCMTokenUseCase.findByUserIdOrNull(followerId.getId());
             if(notification != null) tokens.add(notification);
         }
 

@@ -8,12 +8,9 @@ import kr.co.F1FS.app.global.presentation.dto.circuit.SimpleResponseCircuitDTO;
 import org.springframework.data.domain.Page;
 
 public interface CircuitUseCase {
-    Circuit createCircuit(CreateCircuitCommand command);
     Page<SimpleResponseCircuitDTO> findAll(int page, int size);
     Circuit findByIdNotDTONotCache(Long id);
     ResponseCircuitDTO getCircuitById(Long id);
     SimpleResponseCircuitDTO getSimpleCircuitById(Long id);
-    Circuit modify(ModifyCircuitCommand command, Circuit circuit);
-    ResponseCircuitDTO toResponseCircuitDTO(Circuit circuit);
     SimpleResponseCircuitDTO toSimpleResponseCircuitDTO(Circuit circuit);
 }

@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.elastic.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.F1FS.app.domain.elastic.application.port.in.PostSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.post.PostSearchUseCase;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

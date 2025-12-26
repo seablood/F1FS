@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.domain.auth.application.port.in.BlackListUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.auth.application.service.BlackListService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

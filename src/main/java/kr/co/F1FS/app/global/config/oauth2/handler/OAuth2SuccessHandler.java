@@ -2,11 +2,12 @@ package kr.co.F1FS.app.global.config.oauth2.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
+import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.global.config.oauth2.util.OAuth2CookieRepository;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +27,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private static final Duration REFRESH_DURATION = Duration.ofDays(7);
 
     private final JwtTokenService jwtTokenService;
-    private final UserRepository userRepository;
+    private final UpdateUserUseCase updateUserUseCase;
+    private final QueryUserUseCase queryUserUseCase;
     private final OAuth2CookieRepository cookieRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        User user = userRepository.findByUsername(getUsername(authentication))
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+        User user = queryUserUseCase.findByUsername(getUsername(authentication));
         String accessToken = jwtTokenService.createToken(user, ACCESS_DURATION);
         String refreshToken = jwtTokenService.createToken(user, REFRESH_DURATION);
 
@@ -47,9 +48,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     }
 
     public void saveRefreshToken(User user, String refreshToken){
-        user.updateRefreshToken(refreshToken);
-        user.updateLastLoginDate();
-        userRepository.saveAndFlush(user);
+        updateUserUseCase.updateRefreshToken(user, refreshToken);
+        updateUserUseCase.updateLastLoginDate(user);
     }
 
     public void addRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response, String refreshToken){

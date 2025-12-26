@@ -8,6 +8,6 @@ import java.util.List;
 public interface GrandPrixJpaPort {
     GrandPrix save(GrandPrix grandPrix);
     GrandPrix saveAndFlush(GrandPrix grandPrix);
-    List<SimpleResponseGrandPrixDTO> findGrandPrixesBySeason(Integer season);
+    List<GrandPrix> findGrandPrixesBySeason(Integer season);
     GrandPrix findById(Long id);
 }

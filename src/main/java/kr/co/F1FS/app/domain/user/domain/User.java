@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -36,6 +35,8 @@ public class User {
     private Role role = Role.TEMPORARY;
     @Column(length = 400)
     private String refreshToken;
+    @Column(length = 500)
+    private String description;
     @CreationTimestamp
     private Timestamp createDate;
     @Column
@@ -77,6 +78,10 @@ public class User {
         this.nickname = nickname;
     }
 
+    public void updateDescription(String description){
+        this.description = description;
+    }
+
     public void changeFollowerNum(int i){
         this.followerNum +=i;
     }
@@ -90,13 +95,15 @@ public class User {
     }
 
     @Builder
-    public User(String username, String password, String nickname, String email, String providerId, String provider){
+    public User(String username, String password, String nickname, String email, String providerId, String provider,
+                String description){
         this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.email = email;
         this.providerId = providerId;
         this.provider = provider;
+        this.description = description;
         this.followerNum = 0;
         this.followingNum = 0;
         this.suspendNum = 0;

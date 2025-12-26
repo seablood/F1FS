@@ -1,13 +1,15 @@
 package kr.co.F1FS.app.global.config.login.provider;
 
 import jakarta.transaction.Transactional;
-import kr.co.F1FS.app.domain.suspend.application.port.in.SuspensionLogUseCase;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
+import kr.co.F1FS.app.domain.suspend.application.mapper.SuspensionLogMapper;
+import kr.co.F1FS.app.domain.suspend.application.port.in.DeleteSuspensionLogUseCase;
+import kr.co.F1FS.app.domain.suspend.application.port.in.QuerySuspensionLogUseCase;
+import kr.co.F1FS.app.domain.suspend.domain.SuspensionLog;
+import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.global.util.exception.authentication.*;
-import kr.co.F1FS.app.global.presentation.dto.suspend.ResponseSuspensionLogDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,10 +21,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class CustomAuthenticationProvider implements AuthenticationProvider {
-    private final UserRepository userRepository;
+    private final DeleteSuspensionLogUseCase deleteSuspensionLogUseCase;
+    private final QuerySuspensionLogUseCase querySuspensionLogUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
     private final BCryptPasswordEncoder passwordEncoder;
     private final PrincipalDetailsService detailsService;
-    private final SuspensionLogUseCase suspensionLogUseCase;
+    private final SuspensionLogMapper suspensionLogMapper;
 
 
     @Override
@@ -46,19 +50,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         }
 
         if(!principalDetails.isAccountNonLocked()){
-            throw new AccountLockedException("로그인 시도 횟 초과로 계정이 잠겨 있습니다. 5분 후 다시 시도해주세요.");
+            throw new AccountLockedException("로그인 시도 횟수 초과로 계정이 잠겨 있습니다. 5분 후 다시 시도해주세요.");
         }
 
         if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
-            ResponseSuspensionLogDTO dto = suspensionLogUseCase.getSuspensionLog(principalDetails.getUser());
+            SuspensionLog log = querySuspensionLogUseCase.findBySuspendUser(principalDetails.getUser());
 
             if(principalDetails.getUser().isSuspendUntil()) {
-                throw new AccountSuspendException("이용이 정지된 계정입니다.", dto);
+                throw new AccountSuspendException("이용이 정지된 계정입니다.", suspensionLogMapper.toResponseSuspensionLogDTO(log));
             }
             else {
-                principalDetails.getUser().updateRole(Role.USER);
-                suspensionLogUseCase.deleteSuspensionLog(principalDetails.getUser());
-                userRepository.saveAndFlush(principalDetails.getUser());
+                updateUserUseCase.updateRole(principalDetails.getUser(), Role.USER);
+                deleteSuspensionLogUseCase.delete(log);
             }
         }
 

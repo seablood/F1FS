@@ -10,9 +10,9 @@ import java.util.List;
 public interface ChatRoomJpaPort {
     void save(ChatRoom chatRoom);
     void saveAndFlush(ChatRoom chatRoom);
-    Page<ResponseChatRoomDTO> findAll(Pageable pageable);
+    Page<ChatRoom> findAll(Pageable pageable);
     ChatRoom findById(Long roomId);
-    Page<ResponseChatRoomDTO> findByIdIn(List<Long> roomIds, Pageable pageable);
+    Page<ChatRoom> findByIdIn(List<Long> roomIds, Pageable pageable);
     void delete(ChatRoom chatRoom);
 
 }

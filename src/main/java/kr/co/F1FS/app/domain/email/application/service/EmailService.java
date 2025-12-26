@@ -6,6 +6,7 @@ import kr.co.F1FS.app.global.config.email.EmailProperties;
 import kr.co.F1FS.app.global.config.email.EmailType;
 import kr.co.F1FS.app.domain.email.presentation.dto.EmailDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import kr.co.F1FS.app.global.util.exception.email.EmailException;
 import kr.co.F1FS.app.global.util.exception.email.EmailExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,6 @@ public class EmailService implements EmailUseCase {
     public void sendAuthEmail(User user, String code, String option){
         try {
             switch (option){
-                case "create_account" :
-                    sendCreateAccountEmail(user, code);
-                    break;
                 case "update_password" :
                     sendUpdatePasswordEmail(user, code);
                     break;
@@ -44,15 +42,15 @@ public class EmailService implements EmailUseCase {
 
     // 계정 생성 인증 메일
     @Override
-    public void sendCreateAccountEmail(User user, String code){
+    public void sendCreateAccountEmail(ResponseUserDTO dto, String code){
         EmailProperties.Template template = emailProperties.getTemplate(EmailType.CREATE_ACCOUNT);
 
         String subject = template.getSubject();
         String content = template.getContent().replace("{{code}}", code);
 
-        EmailDTO emailDTO = emailMapper.toEmailDTO(user, subject, content, "create_account");
+        EmailDTO emailDTO = emailMapper.toEmailDTO(dto, subject, content);
 
-        sendEmail(emailDTO, user);
+        sendEmail(emailDTO, dto);
     }
 
     // 비밀번호 변경 인증 메일
@@ -83,6 +81,15 @@ public class EmailService implements EmailUseCase {
     public void sendEmail(EmailDTO emailDTO, User user){
         try{
             String emailContext = getContext(emailDTO, user.getNickname());
+            emailSendService.addEmail(emailDTO.getTo(), emailDTO.getSubject(), emailContext, emailDTO.getEmailType());
+        } catch (Exception e){
+            throw new EmailException(EmailExceptionType.SEND_EMAIL_ERROR);
+        }
+    }
+
+    public void sendEmail(EmailDTO emailDTO, ResponseUserDTO dto){
+        try{
+            String emailContext = getContext(emailDTO, dto.getNickname());
             emailSendService.addEmail(emailDTO.getTo(), emailDTO.getSubject(), emailContext, emailDTO.getEmailType());
         } catch (Exception e){
             throw new EmailException(EmailExceptionType.SEND_EMAIL_ERROR);

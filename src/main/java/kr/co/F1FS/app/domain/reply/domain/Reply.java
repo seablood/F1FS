@@ -21,36 +21,39 @@ public class Reply {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @ManyToOne
     @JoinColumn(name = "post_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
-
     @ManyToOne
     @JoinColumn(name = "suggest_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Suggest suggest;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
-
     @Lob
     @Column(nullable = false)
     private String content;
-
     @CreationTimestamp
     @Column(name = "create_time")
     private Timestamp createdAt;
-
     @UpdateTimestamp
     @Column(name = "update_time")
     private Timestamp updatedAt;
+    private int likeNum;
 
     public void modify(String content){
         this.content = content;
+    }
+
+    public void increaseLikeNum(){
+        this.likeNum++;
+    }
+
+    public void decreaseLikeNum(){
+        this.likeNum--;
     }
 
     @Builder
@@ -59,5 +62,6 @@ public class Reply {
         this.post = post;
         this.suggest = suggest;
         this.user = user;
+        this.likeNum = 0;
     }
 }

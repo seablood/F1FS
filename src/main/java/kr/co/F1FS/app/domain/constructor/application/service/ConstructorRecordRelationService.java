@@ -1,13 +1,13 @@
 package kr.co.F1FS.app.domain.constructor.application.service;
 
-import kr.co.F1FS.app.domain.constructor.application.mapper.ConstructorRecordRelationMapper;
-import kr.co.F1FS.app.domain.constructor.application.port.in.ConstructorRecordRelationUseCase;
-import kr.co.F1FS.app.domain.constructor.application.port.out.ConstructorRecordRelationJpaPort;
+import kr.co.F1FS.app.domain.constructor.application.mapper.record.ConstructorRecordRelationMapper;
+import kr.co.F1FS.app.domain.constructor.application.port.in.record.ConstructorRecordRelationUseCase;
+import kr.co.F1FS.app.domain.constructor.application.port.out.record.ConstructorRecordRelationJpaPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.ResponseConstructorStandingDTO;
-import kr.co.F1FS.app.domain.record.application.port.in.CurrentSeasonUseCase;
-import kr.co.F1FS.app.domain.record.application.port.in.SinceDebutUseCase;
+import kr.co.F1FS.app.domain.record.application.port.in.sinceDebut.UpdateSinceDebutUseCase;
+import kr.co.F1FS.app.domain.record.application.port.in.currentSeason.UpdateCurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import kr.co.F1FS.app.global.util.RacingClass;
@@ -20,8 +20,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ConstructorRecordRelationService implements ConstructorRecordRelationUseCase {
-    private final CurrentSeasonUseCase currentSeasonUseCase;
-    private final SinceDebutUseCase sinceDebutUseCase;
+    private final UpdateCurrentSeasonUseCase updateCurrentSeasonUseCase;
+    private final UpdateSinceDebutUseCase updateSinceDebutUseCase;
     private final ConstructorRecordRelationMapper relationMapper;
     private final ConstructorRecordRelationJpaPort relationJpaPort;
 
@@ -53,14 +53,14 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
 
     @Override
     public void updateRecordForRace(ConstructorRecordRelation relation, int position, int points, boolean isFastestLap){
-        currentSeasonUseCase.updateCurrentSeasonForRace(relation.getCurrentSeason(), position, points, isFastestLap);
-        sinceDebutUseCase.updateSinceDebutForRace(relation.getSinceDebut(), position, isFastestLap);
+        updateCurrentSeasonUseCase.updateCurrentSeasonForRace(relation.getCurrentSeason(), position, points, isFastestLap);
+        updateSinceDebutUseCase.updateSinceDebutForRace(relation.getSinceDebut(), position, isFastestLap);
     }
 
     @Override
     public void updateRecordForQualifying(ConstructorRecordRelation relation, int position){
-        currentSeasonUseCase.updateCurrentSeasonForQualifying(relation.getCurrentSeason(), position);
-        sinceDebutUseCase.updateSinceDebutForQualifying(relation.getSinceDebut(), position);
+        updateCurrentSeasonUseCase.updateCurrentSeasonForQualifying(relation.getCurrentSeason(), position);
+        updateSinceDebutUseCase.updateSinceDebutForQualifying(relation.getSinceDebut(), position);
     }
 
     @Override
@@ -74,8 +74,7 @@ public class ConstructorRecordRelationService implements ConstructorRecordRelati
         int rank = 1;
         for (ConstructorRecordRelation relation : relationList){
             CurrentSeason record = relation.getCurrentSeason();
-            currentSeasonUseCase.updateChampionshipRank(record, rank++);
-            currentSeasonUseCase.saveAndFlush(record);
+            updateCurrentSeasonUseCase.updateChampionshipRank(record, rank++);
         }
     }
 }

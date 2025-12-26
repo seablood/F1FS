@@ -9,8 +9,8 @@ import org.springframework.data.domain.Pageable;
 public interface NoteJpaPort {
     Note save(Note note);
     Note saveAndFlush(Note note);
-    Page<ResponseSimpleNoteDTO> findAllByToUser(User user, Pageable pageable);
-    Page<ResponseSimpleNoteDTO> findAllByFromUser(User user, Pageable pageable);
+    Page<Note> findAllByToUser(User user, Pageable pageable);
+    Page<Note> findAllByFromUser(User user, Pageable pageable);
     Note findById(Long id);
     void delete(Note note);
 }

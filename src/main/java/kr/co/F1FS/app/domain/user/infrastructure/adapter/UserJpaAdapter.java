@@ -34,6 +34,23 @@ public class UserJpaAdapter implements UserJpaPort {
     }
 
     @Override
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+    }
+
+    @Override
+    public Optional<User> findByUsernameForOptional(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
     public User findByNickname(String nickname) {
         return userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
@@ -60,6 +77,12 @@ public class UserJpaAdapter implements UserJpaPort {
     public User findByEmailAndPassword(String email, String password) {
         return userRepository.findByEmailAndPassword(email, password)
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+    }
+
+    @Override
+    public User findByProviderAndProviderIdOrNull(String provider, String ProviderId) {
+        return userRepository.findByProviderAndProviderId(provider, ProviderId)
+                .orElse(null);
     }
 
     @Override

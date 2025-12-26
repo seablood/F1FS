@@ -31,8 +31,8 @@ public class ChatRoomJpaAdapter implements ChatRoomJpaPort {
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findAll(Pageable pageable) {
-        return chatRoomRepository.findAll(pageable).map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
+    public Page<ChatRoom> findAll(Pageable pageable) {
+        return chatRoomRepository.findAll(pageable);
     }
 
     @Override
@@ -42,9 +42,8 @@ public class ChatRoomJpaAdapter implements ChatRoomJpaPort {
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findByIdIn(List<Long> roomIds, Pageable pageable) {
-        return chatRoomRepository.findByIdIn(roomIds, pageable)
-                .map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
+    public Page<ChatRoom> findByIdIn(List<Long> roomIds, Pageable pageable) {
+        return chatRoomRepository.findByIdIn(roomIds, pageable);
     }
 
     @Override

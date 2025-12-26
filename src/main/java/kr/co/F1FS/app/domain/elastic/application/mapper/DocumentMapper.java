@@ -1,7 +1,11 @@
 package kr.co.F1FS.app.domain.elastic.application.mapper;
 
+import kr.co.F1FS.app.domain.constructor.domain.Constructor;
+import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.elastic.domain.*;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
+import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
@@ -10,6 +14,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class DocumentMapper {
+    public ConstructorDocument toConstructorDocument(Constructor constructor){
+        return ConstructorDocument.builder().constructor(constructor).build();
+    }
+
+    public DriverDocument toDriverDocument(Driver driver){
+        return DriverDocument.builder().driver(driver).build();
+    }
+
+    public GrandPrixDocument toGrandPrixDocument(GrandPrix grandPrix){
+        return GrandPrixDocument.builder().grandPrix(grandPrix).build();
+    }
+
+    public PostDocument toPostDocument(Post post){
+        return PostDocument.builder().post(post).build();
+    }
+
     public CDSearchSuggestionDTO toCDSearchSuggestionDTO(DriverDocument driverDocument){
         return CDSearchSuggestionDTO.builder()
                 .id(driverDocument.getId())

@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.email.presentation.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import kr.co.F1FS.app.domain.auth.application.port.in.AuthUseCase;
+import kr.co.F1FS.app.domain.auth.application.port.in.auth.AuthUseCase;
 import kr.co.F1FS.app.domain.auth.presentation.dto.AuthorizationUserDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;

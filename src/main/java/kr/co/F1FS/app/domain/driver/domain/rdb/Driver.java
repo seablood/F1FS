@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.driver.domain.rdb;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
-import kr.co.F1FS.app.domain.driver.presentation.dto.ModifyDriverCommand;
+import kr.co.F1FS.app.domain.driver.presentation.dto.driver.ModifyDriverCommand;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
 

@@ -2,17 +2,17 @@ package kr.co.F1FS.app.global.config.login.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
+import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.CookieUtil;
-import kr.co.F1FS.app.global.util.exception.user.UserException;
-import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -25,13 +25,14 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private static final Duration REFRESH_DURATION = Duration.ofDays(7);
 
     private final JwtTokenService jwtTokenService;
-    private final UserRepository userRepository;
+    private final UpdateUserUseCase updateUserUseCase;
+    private final QueryUserUseCase queryUserUseCase;
     private final RedisHandler redisHandler;
 
     @Override
+    @Transactional
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        User user = userRepository.findByUsername(getUsername(authentication))
-                .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+        User user = queryUserUseCase.findByUsername(getUsername(authentication));
         String accessToken = jwtTokenService.createToken(user, ACCESS_DURATION);
         String refreshToken = jwtTokenService.createToken(user, REFRESH_DURATION);
 
@@ -49,9 +50,8 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     }
 
     public void saveRefreshToken(User user, String refreshToken){
-        user.updateRefreshToken(refreshToken);
-        user.updateLastLoginDate();
-        userRepository.saveAndFlush(user);
+        updateUserUseCase.updateLastLoginDate(user);
+        updateUserUseCase.updateRefreshToken(user, refreshToken);
     }
 
     public void addRefreshTokenCookie(HttpServletRequest request, HttpServletResponse response, String refreshToken){

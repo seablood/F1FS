@@ -2,8 +2,8 @@ package kr.co.F1FS.app.domain.record.application.mapper;
 
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
-import kr.co.F1FS.app.domain.record.presentation.dto.CreateCurrentSeasonDTO;
-import kr.co.F1FS.app.domain.record.presentation.dto.CreateSinceDebutDTO;
+import kr.co.F1FS.app.domain.record.presentation.dto.currentSeason.CreateCurrentSeasonDTO;
+import kr.co.F1FS.app.domain.record.presentation.dto.sinceDebut.CreateSinceDebutDTO;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseCurrentSeasonDTO;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseSinceDebutDTO;
 import org.springframework.stereotype.Component;

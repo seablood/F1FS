@@ -4,10 +4,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetailsService;
 import kr.co.F1FS.app.global.config.jwt.service.JwtTokenService;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.domain.user.infrastructure.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +23,7 @@ import java.io.IOException;
 public class TokenFilter extends OncePerRequestFilter {
     private final JwtTokenService jwtTokenService;
 
-    private final UserRepository userRepository;
+    private final QueryUserUseCase queryUserUseCase;
 
     private final PrincipalDetailsService detailsService;
 
@@ -48,7 +48,7 @@ public class TokenFilter extends OncePerRequestFilter {
         jwtTokenService.resolveAccessToken(request)
                 .filter(jwtTokenService::validateToken)
                 .ifPresent(accessToken -> jwtTokenService.getUsername(accessToken)
-                        .ifPresent(username -> userRepository.findByUsername(username)
+                        .ifPresent(username -> queryUserUseCase.findByUsernameForOptional(username)
                                 .ifPresent(this::saveAuthentication)));
 
         filterChain.doFilter(request, response);
