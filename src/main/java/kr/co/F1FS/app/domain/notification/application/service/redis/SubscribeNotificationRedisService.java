@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.notification.presentation.dto.fcm.FCMTopicRequestDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class SubscribeNotificationRedisService implements SubscribeNotificationR
     public void saveSubscribe(FCMTopicRequestDTO dto, User user, String key, FCMToken token) {
         if(token != null){
             try{
-                FirebaseMessaging.getInstance().subscribeToTopic(List.of(token.getToken()), dto.getTopic());
+                FirebaseMessaging.getInstance().subscribeToTopic(List.of(token.getToken()), dto.getTopic().toString());
                 redisHandler.executeOperations(() -> redisHandler.getSetOperations().add(key, user.getId()));
                 log.info("토픽 구독 지정 성공");
             } catch (Exception e){
@@ -37,7 +38,7 @@ public class SubscribeNotificationRedisService implements SubscribeNotificationR
     public void saveUnsubscribe(FCMTopicRequestDTO dto, User user, String key, FCMToken token) {
         if(token != null){
             try{
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(token.getToken()), dto.getTopic());
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(token.getToken()), dto.getTopic().toString());
                 redisHandler.executeOperations(() -> redisHandler.getSetOperations().remove(key, user.getId()));
             } catch (Exception e){
                 log.error("토픽 구독 해제 실패");
@@ -48,7 +49,7 @@ public class SubscribeNotificationRedisService implements SubscribeNotificationR
     }
 
     @Override
-    public boolean isSubscribe(Long userId, String topic) {
-        return redisHandler.getSetOperations().isMember("topic:"+topic, userId);
+    public boolean isSubscribe(Long userId, Topic topic) {
+        return redisHandler.getSetOperations().isMember("topic:"+topic.toString(), userId);
     }
 }

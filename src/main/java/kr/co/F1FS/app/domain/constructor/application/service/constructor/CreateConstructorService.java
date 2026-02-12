@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.constructor.application.port.in.constructor.CreateC
 import kr.co.F1FS.app.domain.constructor.application.port.out.constructor.ConstructorJpaPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.constructor.CreateConstructorDTO;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.currentSeason.CreateCurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.sinceDebut.CreateSinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
@@ -22,6 +23,7 @@ public class CreateConstructorService implements CreateConstructorUseCase {
     private final CreateCurrentSeasonUseCase createCurrentSeasonUseCase;
     private final CreateSinceDebutUseCase createSinceDebutUseCase;
     private final CreateConstructorRecordRelationUseCase createConstructorRecordRelationUseCase;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
 
     @Override
     public Constructor save(CreateConstructorDTO constructorDTO, CreateCurrentSeasonDTO currentSeasonDTO, CreateSinceDebutDTO sinceDebutDTO) {
@@ -30,7 +32,13 @@ public class CreateConstructorService implements CreateConstructorUseCase {
         SinceDebut sinceDebut = createSinceDebutUseCase.save(sinceDebutDTO);
 
         createConstructorRecordRelationUseCase.save(constructor, currentSeason, sinceDebut);
+        saveSuggestKeyword(constructor);
 
         return constructor;
+    }
+
+    public void saveSuggestKeyword(Constructor constructor){
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(constructor.getName());
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(constructor.getEngName());
     }
 }

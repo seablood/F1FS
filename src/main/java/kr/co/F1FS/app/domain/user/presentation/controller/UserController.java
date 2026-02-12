@@ -33,8 +33,8 @@ public class UserController {
 
     @GetMapping("/user-info")
     @Operation(summary = "유저 정보", description = "특정 유저의 정보를 반환")
-    public ResponseEntity<ResponseUserDTO> getUserInfo(@RequestParam(value = "nickname") String nickname){
-        return ResponseEntity.status(HttpStatus.OK).body(userUseCase.findByNickname(nickname));
+    public ResponseEntity<ResponseUserDTO> getUserByNickname(@RequestParam(value = "nickname") String nickname){
+        return ResponseEntity.status(HttpStatus.OK).body(userUseCase.getUserByNickname(nickname));
     }
 
     @PutMapping("/modify-nickname")

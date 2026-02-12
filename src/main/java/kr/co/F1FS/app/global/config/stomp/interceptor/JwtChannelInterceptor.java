@@ -5,6 +5,7 @@ import kr.co.F1FS.app.global.util.exception.chat.StompException;
 import kr.co.F1FS.app.global.util.exception.chat.StompExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -21,8 +22,9 @@ import java.util.Collections;
 public class JwtChannelInterceptor implements ChannelInterceptor {
     private final JwtTokenService jwtTokenService;
 
+    @NotNull
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel){
+    public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if(StompCommand.CONNECT.equals(accessor.getCommand())){

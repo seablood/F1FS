@@ -10,5 +10,6 @@ public interface QueryNotificationUseCase {
     Notification findById(Long id);
     ResponseNotificationDTO findByIdForDTO(Long id);
     ResponseNotificationDTO findByRedisIdForDTO(Long redisId);
-    Page<SimpleResponseNotificationDTO> findAll(Pageable pageable);
+    Page<SimpleResponseNotificationDTO> findAllForDTO(Pageable pageable);
+    Page<SimpleResponseNotificationDTO> findAllByAuthorForSimpleDTO(String author, Pageable pageable);
 }

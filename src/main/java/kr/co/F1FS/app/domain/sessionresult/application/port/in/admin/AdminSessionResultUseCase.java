@@ -5,5 +5,5 @@ import kr.co.F1FS.app.domain.sessionresult.presentation.dto.admin.CreateSessionR
 import java.util.List;
 
 public interface AdminSessionResultUseCase {
-    void saveSessionResult(List<CreateSessionResultDTO> dtoList, Long id, String racingClassCode);
+    void save(List<CreateSessionResultDTO> dtoList, Long id, String racingClassCode);
 }

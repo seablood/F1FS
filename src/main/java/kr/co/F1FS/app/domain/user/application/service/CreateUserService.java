@@ -1,10 +1,10 @@
 package kr.co.F1FS.app.domain.user.application.service;
 
-import kr.co.F1FS.app.domain.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.CreateUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.out.UserJpaPort;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.presentation.dto.CreateAdminUserCommand;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
 import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
@@ -40,8 +40,8 @@ public class CreateUserService implements CreateUserUseCase {
     }
 
     @Override
-    public ResponseUserDTO createAdminUser(CreateAdminUserDTO dto) {
-        User user = userDomainService.createEntity(dto);
+    public ResponseUserDTO createAdminUser(CreateAdminUserCommand command) {
+        User user = userDomainService.createEntity(command);
         validationService.checkValid(user);
         userDomainService.updateLastLoginDate(user);
         userDomainService.updateRole(user, Role.ADMIN);

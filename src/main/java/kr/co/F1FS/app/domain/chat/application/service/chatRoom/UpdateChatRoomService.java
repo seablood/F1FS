@@ -1,9 +1,9 @@
 package kr.co.F1FS.app.domain.chat.application.service.chatRoom;
 
 import kr.co.F1FS.app.domain.chat.application.port.in.chatRoom.UpdateChatRoomUseCase;
-import kr.co.F1FS.app.domain.chat.application.port.out.ChatRoomJpaPort;
+import kr.co.F1FS.app.domain.chat.application.port.out.chatRoom.ChatRoomJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
-import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.ModifyChatRoomDTO;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

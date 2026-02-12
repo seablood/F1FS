@@ -10,6 +10,5 @@ import java.util.List;
 
 public interface FindNotificationRedisUseCase {
     List<NotificationRedis> getNotificationList(User user);
-    void readNotification(User user, Long id);
     Page<ResponseNotificationRedisDTO> getNotificationRedisList(Pageable pageable, User user);
 }

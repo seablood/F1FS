@@ -6,7 +6,8 @@ import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
-import kr.co.F1FS.app.global.presentation.dto.complain.ResponseUserComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -25,19 +26,19 @@ public class UserComplainController {
 
     @PostMapping("/save")
     @Operation(summary = "유저 신고", description = "특정 유저를 신고")
-    public ResponseEntity<Void> userComplain(@AuthenticationPrincipal PrincipalDetails principalDetails,
+    public ResponseEntity<Void> save(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                              @Valid @RequestBody CreateUserComplainDTO dto){
-        userComplainUseCase.userComplain(principalDetails.getUser(), dto);
+        userComplainUseCase.save(principalDetails.getUser(), dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @GetMapping("/find-list")
     @Operation(summary = "신고 목록", description = "유저 신고 목록 반환")
-    public ResponseEntity<List<ResponseUserComplainDTO>> getUserComplainList(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                                             @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                             @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                             @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<ResponseUserComplainDTO> newPage = userComplainUseCase.getUserComplainListByFromUser(
+    public ResponseEntity<List<SimpleResponseUserComplainDTO>> getUserComplainListByFromUser(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                                             @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                             @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                             @RequestParam(value = "condition", defaultValue = "new") String condition){
+        Page<SimpleResponseUserComplainDTO> newPage = userComplainUseCase.getUserComplainListByFromUser(
                 page, size, condition, principalDetails.getUser()
         );
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
@@ -45,8 +46,8 @@ public class UserComplainController {
 
     @GetMapping("/find/{id}")
     @Operation(summary = "유저 신고 내용", description = "유저 신고 세부 내용 보기")
-    public ResponseEntity<ResponseUserComplainDTO> getUserComplain(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(userComplainUseCase.getUserComplain(id));
+    public ResponseEntity<ResponseUserComplainDTO> getUserComplainById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(userComplainUseCase.getUserComplainById(id));
     }
 
     @DeleteMapping("/delete/{id}")

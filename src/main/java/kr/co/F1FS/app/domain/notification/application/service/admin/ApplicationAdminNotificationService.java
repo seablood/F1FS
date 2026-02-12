@@ -8,9 +8,15 @@ import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMGroupUseCa
 import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCase;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
 import kr.co.F1FS.app.domain.notification.presentation.dto.admin.ModifyNotificationDTO;
+import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.notification.FCMPushDTO;
 import kr.co.F1FS.app.global.presentation.dto.notification.ResponseNotificationDTO;
+import kr.co.F1FS.app.global.presentation.dto.notification.SimpleResponseNotificationDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,13 +30,27 @@ public class ApplicationAdminNotificationService implements AdminNotificationUse
     private final FCMLiveUseCase fcmLiveUseCase;
 
     @Override
-    public void addPushDTO(FCMPushDTO pushDTO) {
+    public void addPushDTO(FCMPushDTO pushDTO, User adminUser) {
+        pushDTO.setAuthor(adminUser.getNickname());
         fcmGroupUseCase.addPushDTO(pushDTO);
     }
 
     @Override
-    public void sendPushForLiveInfo(FCMPushDTO pushDTO) {
+    public void sendPushForLiveInfo(FCMPushDTO pushDTO, User adminUser) {
+        pushDTO.setAuthor(adminUser.getNickname());
         fcmLiveUseCase.sendPushForLiveInfo(pushDTO);
+    }
+
+    @Override
+    public Page<SimpleResponseNotificationDTO> getNotificationListByAuthor(int page, int size, String condition, User adminUser) {
+        Pageable pageable = switchCondition(page, size, condition);
+
+        return queryNotificationUseCase.findAllByAuthorForSimpleDTO(adminUser.getNickname(), pageable);
+    }
+
+    @Override
+    public ResponseNotificationDTO getNotificationById(Long id) {
+        return queryNotificationUseCase.findByIdForDTO(id);
     }
 
     @Override
@@ -47,5 +67,14 @@ public class ApplicationAdminNotificationService implements AdminNotificationUse
         Notification notification = queryNotificationUseCase.findById(id);
 
         deleteNotificationUseCase.delete(notification);
+    }
+
+    public Pageable switchCondition(int page, int size, String condition){
+        return switch (condition){
+            case "older" ->
+                    PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
+            default ->
+                    PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        };
     }
 }

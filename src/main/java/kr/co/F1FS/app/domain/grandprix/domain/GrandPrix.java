@@ -24,7 +24,9 @@ public class GrandPrix {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String engName;
     @Column(name = "first_session_time")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
@@ -43,7 +45,9 @@ public class GrandPrix {
     private String description;
     @Positive(message = "정확한 ID를 입력하세요.")
     private Long circuitId;
+    @Column(nullable = false)
     private Integer season;
+    @Column(nullable = false)
     private Integer round;
     private String firstPracticeTime;
     private String secondPracticeTime;

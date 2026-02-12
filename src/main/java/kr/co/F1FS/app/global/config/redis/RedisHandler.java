@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.global.config.redis;
 
+import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +20,27 @@ public class RedisHandler {
     private final RedisTemplate<String, NotificationRedis> notificationRedisTemplate;
     @Qualifier("redisObjectTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
+    @Qualifier("stringListRedisTemplate")
+    private final RedisTemplate<String, String> stringListRedisTemplate;
+    @Qualifier("grandPrixSuggestListRedisTemplate")
+    private final RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> grandPrixSuggestListRedisTemplate;
+    @Qualifier("cdSuggestListRedisTemplate")
+    private final RedisTemplate<String, CDSearchSuggestionDTO>  cdSuggestListRedisTemplate;
 
     public RedisTemplate<String, NotificationRedis> getNotificationRedisTemplate() {
         return notificationRedisTemplate;
+    }
+
+    public RedisTemplate<String, String> getStringListRedisTemplate(){
+        return stringListRedisTemplate;
+    }
+
+    public RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> getGrandPrixSuggestListRedisTemplate(){
+        return grandPrixSuggestListRedisTemplate;
+    }
+
+    public RedisTemplate<String, CDSearchSuggestionDTO> getCdSuggestListRedisTemplate(){
+        return cdSuggestListRedisTemplate;
     }
 
     public RedisTemplate<String, Object> getRedisTemplate(){

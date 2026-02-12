@@ -38,4 +38,9 @@ public class GrandPrixJpaAdapter implements GrandPrixJpaPort {
         return grandPrixRepository.findById(id)
                 .orElseThrow(() -> new GrandPrixException(GrandPrixExceptionType.GRAND_PRIX_NOT_FOUND));
     }
+
+    @Override
+    public boolean existsGrandPrixByNameAndEngName(String name, String engName) {
+        return grandPrixRepository.existsGrandPrixByNameAndEngName(name, engName);
+    }
 }

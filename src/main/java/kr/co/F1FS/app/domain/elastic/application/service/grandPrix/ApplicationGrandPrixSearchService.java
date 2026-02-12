@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.elastic.application.port.out.GrandPrixSearchRepoPor
 import kr.co.F1FS.app.domain.elastic.domain.GrandPrixDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.GrandPrixSearchRepository;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixExceptionType;
 import lombok.RequiredArgsConstructor;

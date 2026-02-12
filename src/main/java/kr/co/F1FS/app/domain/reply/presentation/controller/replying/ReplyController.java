@@ -33,8 +33,8 @@ public class ReplyController {
 
     @GetMapping("/find/{postId}")
     @Operation(summary = "댓글 불러오기", description = "특정 게시글의 모든 댓글 리스트로 반환")
-    public ResponseEntity<List<ResponseReplyDTO>> findByPostId(@PathVariable Long postId){
-        return ResponseEntity.status(HttpStatus.OK).body(replyUseCase.findByPost(postId));
+    public ResponseEntity<List<ResponseReplyDTO>> getReplyListByPost(@PathVariable Long postId){
+        return ResponseEntity.status(HttpStatus.OK).body(replyUseCase.getReplyListByPost(postId));
     }
 
     @PutMapping("/modify/{id}")

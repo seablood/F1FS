@@ -42,12 +42,12 @@ public class ApplicationReplyService implements ReplyUseCase {
 
     @Override
     @Cacheable(value = "PostReplyList", key = "#id", cacheManager = "redisLongCacheManager")
-    public List<ResponseReplyDTO> findByPost(Long id){
+    public List<ResponseReplyDTO> getReplyListByPost(Long id){
         Post post = queryPostUseCase.findById(id);
         List<Reply> replies = queryReplyUseCase.findAllByPost(post);
-        Map<Long, List<ResponseReplyCommentDTO>> commentMap = queryReplyCommentUseCase.findByReply(replies);
+        Map<Long, List<ResponseReplyCommentDTO>> commentMap = queryReplyCommentUseCase.findByReplyForDTO(replies);
 
-        return queryReplyUseCase.findReplyList(post, replies, commentMap);
+        return queryReplyUseCase.findReplyListForDTO(post, replies, commentMap);
     }
 
     @Override

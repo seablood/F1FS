@@ -1,7 +1,9 @@
 package kr.co.F1FS.app.global.util;
 
 import kr.co.F1FS.app.domain.circuit.domain.Circuit;
+import kr.co.F1FS.app.domain.complain.note.domain.NoteComplain;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
+import kr.co.F1FS.app.domain.complain.reply.domain.ReplyComplain;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
@@ -57,9 +59,6 @@ public class CacheEvictUtil {
     )
     public void evictCachingNotification(Notification notification){}
 
-    @Caching(evict = @CacheEvict(value = "SuspensionLogDTO", key = "#user.id", cacheManager = "redisLongCacheManager"))
-    public void evictCachingSuspensionLog(User user){}
-
     @Caching(evict = @CacheEvict(value = "NoteDTO", key = "#note.id", cacheManager = "redisLongCacheManager"))
     public void evictCachingNote(Note note){}
 
@@ -87,12 +86,25 @@ public class CacheEvictUtil {
     public void evictCachingStandingList(String racingClassCode){}
 
     @Caching(evict = {
-            @CacheEvict(value = "UserComplainDTO", key = "#userComplain.id", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "UserComplainDTO", key = "#userComplain.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "UserComplainDTOForAdmin", key = "#userComplain.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingUserComplain(UserComplain userComplain){}
 
     @Caching(evict = {
-            @CacheEvict(value = "PostComplainDTO", key = "#postComplain.id", cacheManager = "redisLongCacheManager")
+            @CacheEvict(value = "PostComplainDTO", key = "#postComplain.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "PostComplainDTOForAdmin", key = "#postComplain.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingPostComplain(PostComplain postComplain){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "ReplyComplainDTO", key = "#replyComplain.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "ReplyComplainDTOForAdmin", key = "#replyComplain.id", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingReplyComplain(ReplyComplain replyComplain){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "NoteComplainDTO", key = "#noteComplain.id", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingNoteComplain(NoteComplain noteComplain){}
 }

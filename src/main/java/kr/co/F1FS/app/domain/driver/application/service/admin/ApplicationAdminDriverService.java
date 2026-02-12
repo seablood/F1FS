@@ -45,7 +45,7 @@ public class ApplicationAdminDriverService implements AdminDriverUseCase {
     }
 
     @Override
-    public Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition){
+    public Page<SimpleResponseDriverDTO> getDriverAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
        return queryDriverUseCase.findAllForSimpleDTO(pageable);

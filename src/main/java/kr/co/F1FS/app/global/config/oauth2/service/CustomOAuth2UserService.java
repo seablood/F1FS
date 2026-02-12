@@ -2,6 +2,7 @@ package kr.co.F1FS.app.global.config.oauth2.service;
 
 import kr.co.F1FS.app.domain.user.application.port.in.CreateUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
+import kr.co.F1FS.app.global.application.port.in.CheckAccountStatusUseCase;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.config.oauth2.provider.FacebookUserInfo;
 import kr.co.F1FS.app.global.config.oauth2.provider.GoogleUserInfo;
@@ -23,6 +24,7 @@ import java.util.Map;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private final CreateUserUseCase createUserUseCase;
     private final QueryUserUseCase queryUserUseCase;
+    private final CheckAccountStatusUseCase checkAccountStatusUseCase;
     private final RedisHandler redisHandler;
 
     @Override
@@ -47,8 +49,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         if(user == null){
             user = createUserUseCase.createEntity(userInfo);
-        }
+            return new PrincipalDetails(user, oAuth2User.getAttributes(), redisHandler);
+        }else {
+            PrincipalDetails principalDetails = new PrincipalDetails(user, oAuth2User.getAttributes(), redisHandler);
 
-        return new PrincipalDetails(user, oAuth2User.getAttributes(), redisHandler);
+            checkAccountStatusUseCase.checkAccount(principalDetails);
+            return principalDetails;
+        }
     }
 }

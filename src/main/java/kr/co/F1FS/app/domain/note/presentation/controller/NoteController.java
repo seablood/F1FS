@@ -34,28 +34,28 @@ public class NoteController {
 
     @GetMapping("/find-all/receive")
     @Operation(summary = "모든 받은 쪽지 보기", description = "로그인한 유저가 받은 모든 쪽지 페이징으로 반환")
-    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteByToUser(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteListByToUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                        @RequestParam(value = "size", defaultValue = "10") int size,
                                                                        @AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteByToUser(principalDetails.getUser(), page, size);
+        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteListByToUser(principalDetails.getUser(), page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
     @GetMapping("/find-all/send")
     @Operation(summary = "모든 보낸 쪽지 보기", description = "로그인한 유저가 보낸 모든 쪽지 페이징으로 반환")
-    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteByFromUser(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteListByFromUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                        @RequestParam(value = "size", defaultValue = "10") int size,
                                                                        @AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteByFromUser(principalDetails.getUser(), page, size);
+        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteListByFromUser(principalDetails.getUser(), page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
     @GetMapping("/find/{id}")
     @Operation(summary = "쪽지 상세 페이지", description = "특정 ID의 쪽를 반환")
-    public ResponseEntity<ResponseNoteDTO> findById(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(noteUseCase.findByIdDTO(id));
+    public ResponseEntity<ResponseNoteDTO> getNoteById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(noteUseCase.getNoteById(id));
     }
 
     @PutMapping("/modify/{id}")

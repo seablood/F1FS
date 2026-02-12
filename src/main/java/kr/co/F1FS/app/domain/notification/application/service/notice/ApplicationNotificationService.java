@@ -29,6 +29,6 @@ public class ApplicationNotificationService implements NotificationUseCase {
     public Page<SimpleResponseNotificationDTO> getNotificationList(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return queryNotificationUseCase.findAll(pageable);
+        return queryNotificationUseCase.findAllForDTO(pageable);
     }
 }

@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.domain.user.application.port.out;
 
 import kr.co.F1FS.app.domain.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,8 +11,8 @@ import java.util.Optional;
 public interface UserJpaPort {
     User save(User user);
     User saveAndFlush(User user);
-    void saveAllAndFlush(List<User> list);
     User findById(Long id);
+    Page<User> findAll(Pageable pageable);
     User findByUsername(String username);
     Optional<User> findByUsernameForOptional(String username);
     User findByNickname(String nickname);

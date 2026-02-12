@@ -10,6 +10,7 @@ import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class PostMapper {
@@ -28,12 +29,13 @@ public class PostMapper {
                 .build();
     }
 
-    public ResponsePostDTO toResponsePostDTO(Post post){
+    public ResponsePostDTO toResponsePostDTO(Post post, List<String> tags){
         return ResponsePostDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .author(post.getAuthor().getNickname())
+                .tags(tags)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .likeNum(post.getLikeNum())

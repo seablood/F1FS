@@ -1,8 +1,8 @@
 package kr.co.F1FS.app.domain.chat.application.service.chatRoom;
 
-import kr.co.F1FS.app.domain.chat.application.mapper.ChatRoomMapper;
+import kr.co.F1FS.app.domain.chat.application.mapper.chatRoom.ChatRoomMapper;
 import kr.co.F1FS.app.domain.chat.application.port.in.chatRoom.QueryChatRoomUseCase;
-import kr.co.F1FS.app.domain.chat.application.port.out.ChatRoomJpaPort;
+import kr.co.F1FS.app.domain.chat.application.port.out.chatRoom.ChatRoomJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDTO;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +24,12 @@ public class QueryChatRoomService implements QueryChatRoomUseCase {
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findAll(Pageable pageable) {
+    public Page<ResponseChatRoomDTO> findAllForDTO(Pageable pageable) {
         return chatRoomJpaPort.findAll(pageable).map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findByIdIn(List<Long> roomIds, Pageable pageable) {
+    public Page<ResponseChatRoomDTO> findByIdInForDTO(List<Long> roomIds, Pageable pageable) {
         return chatRoomJpaPort.findByIdIn(roomIds, pageable)
                 .map(chatRoom -> chatRoomMapper.toResponseChatRoomDTO(chatRoom));
     }

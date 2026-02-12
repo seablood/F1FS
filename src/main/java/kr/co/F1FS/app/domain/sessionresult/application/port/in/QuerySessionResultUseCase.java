@@ -6,5 +6,5 @@ import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResul
 import java.util.List;
 
 public interface QuerySessionResultUseCase {
-    List<ResponseSessionResultDTO> getSessionResultBySession(Session session);
+    List<ResponseSessionResultDTO> findSessionResultBySessionForDTO(Session session);
 }

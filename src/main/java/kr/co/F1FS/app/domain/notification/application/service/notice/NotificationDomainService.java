@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 public class NotificationDomainService {
     private final NotificationMapper notificationMapper;
 
-    public Notification createEntity(NotificationRedis redis, String content){
-        return notificationMapper.toNotification(redis, content);
+    public Notification createEntity(NotificationRedis redis, String content, String author){
+        return notificationMapper.toNotification(redis, content, author);
     }
 
     public void modify(Notification notification, ModifyNotificationDTO dto){

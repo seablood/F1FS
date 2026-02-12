@@ -6,7 +6,7 @@ import kr.co.F1FS.app.domain.user.presentation.dto.ModifyNicknameDTO;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 
 public interface UserUseCase {
-    ResponseUserDTO findByNickname(String nickname);
+    ResponseUserDTO getUserByNickname(String nickname);
     ResponseUserDTO modifyNickname(User user, ModifyNicknameDTO dto);
     ResponseUserDTO modifyDescription(User user, ModifyDescriptionDTO dto);
 }

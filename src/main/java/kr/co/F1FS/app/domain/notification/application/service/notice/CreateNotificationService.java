@@ -14,8 +14,8 @@ public class CreateNotificationService implements CreateNotificationUseCase {
     private final NotificationDomainService notificationDomainService;
 
     @Override
-    public void save(NotificationRedis redis, String content) {
-        Notification notification = notificationDomainService.createEntity(redis, content);
+    public void save(NotificationRedis redis, String content, String author) {
+        Notification notification = notificationDomainService.createEntity(redis, content, author);
 
         notificationJpaPort.save(notification);
     }

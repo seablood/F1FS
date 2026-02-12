@@ -14,6 +14,7 @@ import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseNoteDTO;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseSimpleNoteDTO;
 import kr.co.F1FS.app.global.util.FCMUtil;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -48,28 +49,23 @@ public class ApplicationNoteService implements NoteUseCase {
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> getNoteByToUser(User user, int page, int size){
+    public Page<ResponseSimpleNoteDTO> getNoteListByToUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return queryNoteUseCase.findAllByToUser(user, pageable);
+        return queryNoteUseCase.findAllByToUserForDTO(user, pageable);
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> getNoteByFromUser(User user, int page, int size){
+    public Page<ResponseSimpleNoteDTO> getNoteListByFromUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return queryNoteUseCase.findAllByFromUser(user, pageable);
-    }
-
-    @Override
-    public Note findByIdNotDTO(Long id){
-        return queryNoteUseCase.findById(id);
+        return queryNoteUseCase.findAllByFromUserForDTO(user, pageable);
     }
 
     @Override
     @Cacheable(value = "NoteDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponseNoteDTO findByIdDTO(Long id){
-        Note note = findByIdNotDTO(id);
+    public ResponseNoteDTO getNoteById(Long id){
+        Note note = queryNoteUseCase.findById(id);
         updateIsRead(note);
 
         return noteMapper.toResponseNoteDTO(note);
@@ -84,22 +80,21 @@ public class ApplicationNoteService implements NoteUseCase {
     @Override
     @Transactional
     public ResponseNoteDTO modify(Long id, ModifyNoteDTO dto){
-        Note note = findByIdNotDTO(id);
-        updateNoteUseCase.modify(note, dto);
+        Note note = queryNoteUseCase.findById(id);
 
-        return noteMapper.toResponseNoteDTO(note);
+        return updateNoteUseCase.modify(note, dto);
     }
 
     @Override
     @Transactional
     public void delete(Long id){
-        Note note = findByIdNotDTO(id);
+        Note note = queryNoteUseCase.findById(id);
 
         deleteNoteUseCase.delete(note);
     }
 
     public void sendNotification(User toUser, User fromUser, Note note){
-        if(subscribeNotificationRedisUseCase.isSubscribe(toUser.getId(), "note")){
+        if(subscribeNotificationRedisUseCase.isSubscribe(toUser.getId(), Topic.NOTE)){
             FCMPushDTO pushDTO = fcmUtil.sendPushForNote(fromUser);
             FCMToken token = fcmUtil.getAuthorToken(toUser);
             fcmLiveUseCase.sendPushForAuthor(pushDTO, token, toUser, note.getId());

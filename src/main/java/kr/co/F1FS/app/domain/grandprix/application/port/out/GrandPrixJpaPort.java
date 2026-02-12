@@ -10,4 +10,5 @@ public interface GrandPrixJpaPort {
     GrandPrix saveAndFlush(GrandPrix grandPrix);
     List<GrandPrix> findGrandPrixesBySeason(Integer season);
     GrandPrix findById(Long id);
+    boolean existsGrandPrixByNameAndEngName(String name, String engName);
 }

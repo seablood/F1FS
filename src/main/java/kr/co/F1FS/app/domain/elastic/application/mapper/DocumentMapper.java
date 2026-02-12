@@ -6,11 +6,16 @@ import kr.co.F1FS.app.domain.elastic.domain.*;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.post.domain.Post;
+import kr.co.F1FS.app.domain.tag.domain.Tag;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class DocumentMapper {
@@ -26,8 +31,24 @@ public class DocumentMapper {
         return GrandPrixDocument.builder().grandPrix(grandPrix).build();
     }
 
-    public PostDocument toPostDocument(Post post){
-        return PostDocument.builder().post(post).build();
+    public GrandPrixSuggestDocument toGrandPrixSuggestDocument(GrandPrix grandPrix){
+        return GrandPrixSuggestDocument.builder().grandPrix(grandPrix).build();
+    }
+
+    public PostDocument toPostDocument(Post post, List<String> tags){
+        return PostDocument.builder().post(post).tags(tags).build();
+    }
+
+    public TagDocument toTagDocument(Tag tag){
+        return TagDocument.builder().tag(tag).build();
+    }
+
+    public SuggestKeywordDocument toSuggestKeywordDocument(String suggest, Long searchCount, LocalDateTime lastSearchedAt){
+        return SuggestKeywordDocument.builder()
+                .suggest(suggest)
+                .searchCount(searchCount)
+                .lastSearchedAt(lastSearchedAt)
+                .build();
     }
 
     public CDSearchSuggestionDTO toCDSearchSuggestionDTO(DriverDocument driverDocument){
@@ -55,6 +76,7 @@ public class DocumentMapper {
                 .id(postDocument.getId())
                 .title(postDocument.getTitle())
                 .author(postDocument.getAuthor())
+                .tags(postDocument.getTags())
                 .createdAt(TimeUtil.formatPostTime(postDocument.getCreatedAt()))
                 .likeNum(postDocument.getLikeNum())
                 .build();
@@ -66,6 +88,13 @@ public class DocumentMapper {
                 .korName(grandPrixDocument.getKorName())
                 .engName(grandPrixDocument.getEngName())
                 .season(grandPrixDocument.getSeason())
+                .build();
+    }
+
+    public ResponseSuggestGrandPrixSearchDTO toResponseSuggestGrandPrixSearchDTO(GrandPrixSuggestDocument suggestDocument){
+        return ResponseSuggestGrandPrixSearchDTO.builder()
+                .korName(suggestDocument.getKorName())
+                .engName(suggestDocument.getEngName())
                 .build();
     }
 

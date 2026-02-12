@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import kr.co.F1FS.app.global.util.NotificationType;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class NotificationRedis {
     private Long id;
     private String title;
     private String content;
-    private String topic;
+    private Topic topic;
     private Long contentId;
     private NotificationType type;
     private boolean isRead;
@@ -33,7 +34,7 @@ public class NotificationRedis {
     }
 
     @Builder
-    public NotificationRedis(Long id, String title, String content, String topic, NotificationType type){
+    public NotificationRedis(Long id, String title, String content, Topic topic, NotificationType type){
         this.id = id;
         this.title = title;
         this.content = content;

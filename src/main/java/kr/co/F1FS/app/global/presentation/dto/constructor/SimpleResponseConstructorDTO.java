@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.global.presentation.dto.constructor;
 
-import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -22,9 +22,9 @@ public class CircuitController {
 
     @GetMapping("/find-all")
     @Operation(summary = "서킷 리스트", description = "모든 서킷 리스트 반환")
-    public ResponseEntity<List<SimpleResponseCircuitDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<SimpleResponseCircuitDTO>> getCircuitAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                   @RequestParam(value = "size", defaultValue = "10") int size){
-        Page<SimpleResponseCircuitDTO> newPage = circuitUseCase.findAll(page, size);
+        Page<SimpleResponseCircuitDTO> newPage = circuitUseCase.getCircuitAll(page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }

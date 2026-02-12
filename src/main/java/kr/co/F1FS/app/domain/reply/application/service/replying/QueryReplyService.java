@@ -34,7 +34,7 @@ public class QueryReplyService implements QueryReplyUseCase {
     }
 
     @Override
-    public List<ResponseReplyDTO> findReplyList(Post post, List<Reply> replies, Map<Long, List<ResponseReplyCommentDTO>> commentMap) {
+    public List<ResponseReplyDTO> findReplyListForDTO(Post post, List<Reply> replies, Map<Long, List<ResponseReplyCommentDTO>> commentMap) {
         return replies.stream().map(reply -> {
             ResponseReplyDTO dto = replyMapper.toResponseReplyDTO(reply);
             dto.setComments(commentMap.getOrDefault(commentMap.get(reply.getId()), List.of()));
@@ -43,7 +43,7 @@ public class QueryReplyService implements QueryReplyUseCase {
     }
 
     @Override
-    public Page<ResponseReplyByUserDTO> findAllByUser(User user, Pageable pageable) {
+    public Page<ResponseReplyByUserDTO> findAllByUserForDTO(User user, Pageable pageable) {
         Page<Reply> replies = replyJpaPort.findAllByUser(user, pageable);
 
         return replies.map(reply -> replyMapper.toResponseReplyByUserDTO(reply));

@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.domain.chat.domain;
 
 import jakarta.persistence.*;
-import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.ModifyChatRoomDTO;
 import lombok.*;
 
 import java.time.LocalDateTime;

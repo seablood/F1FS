@@ -1,7 +1,10 @@
 package kr.co.F1FS.app.domain.elastic.application.service.chatRoom;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.chatRoom.ChatRoomSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.ChatRoomSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.ChatRoomDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.ChatRoomSearchRepository;
@@ -26,6 +29,7 @@ public class ApplicationChatRoomSearchService implements ChatRoomSearchUseCase {
     private final DocumentMapper documentMapper;
     private final ChatRoomSearchRepository chatRoomSearchRepository;
     private final ChatRoomSearchRepoPort chatRoomSearchRepoPort;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     @Override
@@ -33,29 +37,20 @@ public class ApplicationChatRoomSearchService implements ChatRoomSearchUseCase {
         Pageable pageable = switchCondition(page, size, condition);
         NativeQuery query = setQueryNameOrDescription(keyword);
 
-        return getPageImpl(query, pageable);
+        return getPageImpl(query, pageable, keyword);
     }
 
     public NativeQuery setQueryNameOrDescription(String keyword){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
-                                .should(s -> s.match(m -> m
-                                        .field("name.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("name.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("description.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("description.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                                .must(m -> m.multiMatch(mm -> {
+                                    mm.query(keyword)
+                                            .fields("name.kor^2", "name.eng^2", "description.kor", "description.eng")
+                                            .operator(Operator.Or);
+                                    return mm;
+                                }))))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
                 .build();
 
         return query;
@@ -72,7 +67,7 @@ public class ApplicationChatRoomSearchService implements ChatRoomSearchUseCase {
         }
     }
 
-    public PageImpl getPageImpl(NativeQuery query, Pageable pageable){
+    public PageImpl getPageImpl(NativeQuery query, Pageable pageable, String keyword){
         SearchHits<ChatRoomDocument> hits = elasticsearchTemplate.search(query, ChatRoomDocument.class);
         List<ChatRoomDocument> list = hits.stream()
                 .map(hit -> hit.getContent())
@@ -83,6 +78,8 @@ public class ApplicationChatRoomSearchService implements ChatRoomSearchUseCase {
                 .sorted(comparator)
                 .map(chatRoomDocument -> documentMapper.toResponseChatRoomDocumentDTO(chatRoomDocument))
                 .toList();
+
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), sorted.size());

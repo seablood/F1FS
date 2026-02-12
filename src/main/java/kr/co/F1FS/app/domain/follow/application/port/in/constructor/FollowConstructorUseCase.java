@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface FollowConstructorUseCase {
     void toggle(User user, Long id);
-    List<ResponseFollowConstructorDTO> getFollowingConstructor(User user);
+    List<ResponseFollowConstructorDTO> getFollowingConstructorByUser(User user);
     List<ResponseFollowConstructorDTO> getFollowingConstructorByNickname(String nickname);
 }

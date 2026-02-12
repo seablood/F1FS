@@ -11,5 +11,6 @@ public interface NotificationJpaPort {
     Page<Notification> findAll(Pageable pageable);
     Notification findById(Long id);
     Notification findByRedisId(Long redisId);
+    Page<Notification> findAllByAuthor(String author, Pageable pageable);
     void delete(Notification notification);
 }

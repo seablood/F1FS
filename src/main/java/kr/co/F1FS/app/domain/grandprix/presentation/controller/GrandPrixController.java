@@ -21,8 +21,8 @@ public class GrandPrixController {
 
     @GetMapping("/find-all")
     @Operation(summary = "모든 그랑프리 리스트", description = "모든 그랑프리 리스트를 반환")
-    public ResponseEntity<List<SimpleResponseGrandPrixDTO>> findAll(@RequestParam(value = "season", defaultValue = "2025") int season){
-        return ResponseEntity.status(HttpStatus.OK).body(grandPrixUseCase.findAll(season));
+    public ResponseEntity<List<SimpleResponseGrandPrixDTO>> getGrandPrixAll(@RequestParam(value = "season", defaultValue = "2025") int season){
+        return ResponseEntity.status(HttpStatus.OK).body(grandPrixUseCase.getGrandPrixAll(season));
     }
 
     @GetMapping("/find/{id}")

@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.notification.application.port.in.redis.SaveNotifica
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.config.redis.RedisHandler;
+import kr.co.F1FS.app.global.util.Topic;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,9 @@ public class SaveNotificationRedisService implements SaveNotificationRedisUseCas
 
     @Override
     public void saveNotificationForPersonal(NotificationRedis redis, User user) {
-        if(redis.getTopic().equals("like")){
+        if(redis.getTopic().equals(Topic.LIKE)){
             NotificationRedis likeRedis = findNotificationRedisUseCase.getNotificationList(user).stream()
-                    .filter(redis1 -> redis1.getTopic().equals("like") && redis1.getContentId().equals(redis.getContentId()))
+                    .filter(redis1 -> redis1.getTopic().equals(Topic.LIKE) && redis1.getContentId().equals(redis.getContentId()))
                     .findFirst()
                     .orElseThrow(() -> new RedisException(RedisExceptionType.REDIS_TEMPLATE_ERROR));
 

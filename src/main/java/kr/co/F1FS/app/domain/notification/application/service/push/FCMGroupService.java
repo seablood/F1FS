@@ -9,6 +9,7 @@ import kr.co.F1FS.app.domain.notification.application.port.in.notice.CreateNotif
 import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMGroupUseCase;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.notification.FCMPushDTO;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -33,6 +34,7 @@ public class FCMGroupService implements FCMGroupUseCase {
 
     @Async
     public void addPushDTO(FCMPushDTO pushDTO){
+        pushDTO.setTopics(Topic.OFFICIAL);
         QUEUE.add(pushDTO);
     }
 
@@ -55,8 +57,8 @@ public class FCMGroupService implements FCMGroupUseCase {
         if(!list.isEmpty()){
             for (FCMPushDTO pushDTO : list){
                 NotificationRedis redis = sendPushToTopic(pushDTO);
-                createNotificationUseCase.save(redis, pushDTO.getContent());
-                saveNotificationRedisUseCase.saveNotification(redis, "topic:"+redis.getTopic());
+                createNotificationUseCase.save(redis, pushDTO.getContent(), pushDTO.getAuthor());
+                saveNotificationRedisUseCase.saveNotification(redis, "topic:"+redis.getTopic().toString());
             }
         }
 
@@ -71,7 +73,7 @@ public class FCMGroupService implements FCMGroupUseCase {
                 .build();
 
         Message message = Message.builder()
-                .setTopic(dto.getTopic())
+                .setTopic(dto.getTopics().toString())
                 .setNotification(notification)
                 .build();
 

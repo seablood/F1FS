@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ReplyUseCase {
     Reply save(CreateReplyDTO dto, User user, Long id);
-    List<ResponseReplyDTO> findByPost(Long id);
+    List<ResponseReplyDTO> getReplyListByPost(Long id);
     ResponseReplyDTO modify(Long replyId, ModifyReplyDTO dto, User user);
     void delete(Long replyId, User user);
 }

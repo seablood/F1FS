@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.notification.application.port.in.fcmToken.DeleteFCM
 import kr.co.F1FS.app.domain.notification.application.port.out.fcmToken.FCMTokenJpaPort;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,14 @@ public class DeleteFCMTokenService implements DeleteFCMTokenUseCase {
     private final FCMTokenJpaPort fcmTokenJpaPort;
     private final SubscribeNotificationRedisUseCase subscribeNotificationRedisUseCase;
 
-    private static final String[] TOPIC_LIST = {"news", "post", "reply", "like", "note"};
+    private static final Topic[] TOPIC_LIST = {Topic.NEWS, Topic.POST, Topic.REPLY, Topic.LIKE, Topic.NOTE};
 
     @Override
     public void delete(FCMToken fcmToken, User user) {
-        for (String topic : TOPIC_LIST){
+        for (Topic topic : TOPIC_LIST){
             if(subscribeNotificationRedisUseCase.isSubscribe(user.getId(), topic)){
                 try {
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(fcmToken.getToken()), topic);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(List.of(fcmToken.getToken()), topic.toString());
                     log.info("토픽 구독 해제 성공 : {}", topic);
                 } catch (Exception e){
                     log.error("토픽 구독 해제 실패 : {}", topic);

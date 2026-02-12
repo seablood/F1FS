@@ -47,7 +47,7 @@ public class ApplicationFollowDriverService implements FollowDriverUseCase {
     }
 
     @Override
-    public List<ResponseFollowDriverDTO> getFollowingDriver(User user){
+    public List<ResponseFollowDriverDTO> getFollowingDriverByUser(User user){
         return queryFollowDriverUseCase.findByFollowerUserForDTO(user);
     }
 

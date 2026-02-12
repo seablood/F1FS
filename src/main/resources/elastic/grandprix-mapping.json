@@ -13,13 +13,21 @@
         "ngram_search": {
           "type": "text",
           "analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
         }
       }
     },
     "engName": {
       "type": "text",
       "analyzer": "autocomplete_standard",
-      "search_analyzer": "standard"
+      "search_analyzer": "standard",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
     },
     "season": {
       "type": "integer",

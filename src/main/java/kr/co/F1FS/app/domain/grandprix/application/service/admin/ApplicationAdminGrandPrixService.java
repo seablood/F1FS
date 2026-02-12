@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.domain.grandprix.application.service.admin;
 
+import kr.co.F1FS.app.domain.elastic.application.port.in.grandPrix.CreateGrandPrixSuggestSearchUseCase;
 import kr.co.F1FS.app.domain.grandprix.application.mapper.admin.AdminGrandPrixMapper;
+import kr.co.F1FS.app.domain.grandprix.application.port.in.CheckGrandPrixUseCase;
 import kr.co.F1FS.app.domain.grandprix.application.port.in.admin.AdminGrandPrixUseCase;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.admin.CreateGrandPrixDTO;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.admin.ModifyGrandPrixDTO;
@@ -32,9 +34,11 @@ public class ApplicationAdminGrandPrixService implements AdminGrandPrixUseCase {
     private final CreateGrandPrixUseCase createGrandPrixUseCase;
     private final UpdateGrandPrixUseCase updateGrandPrixUseCase;
     private final QueryGrandPrixUseCase queryGrandPrixUseCase;
+    private final CheckGrandPrixUseCase checkGrandPrixUseCase;
     private final CreateGrandPrixSearchUseCase createGrandPrixSearchUseCase;
     private final UpdateGrandPrixSearchUseCase updateGrandPrixSearchUseCase;
     private final QueryGrandPrixSearchUseCase queryGrandPrixSearchUseCase;
+    private final CreateGrandPrixSuggestSearchUseCase createGrandPrixSuggestSearchUseCase;
     private final CreateSessionUseCase createSessionUseCase;
     private final QueryCircuitUseCase queryCircuitUseCase;
     private final AdminGrandPrixMapper adminGrandPrixMapper;
@@ -44,18 +48,28 @@ public class ApplicationAdminGrandPrixService implements AdminGrandPrixUseCase {
     @Override
     @Transactional
     public ResponseGrandPrixDTO save(CreateGrandPrixDTO dto) {
-        GrandPrix grandPrix = createGrandPrixUseCase.save(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
-        Circuit circuit = queryCircuitUseCase.findById(grandPrix.getCircuitId());
-        createSessionUseCase.save(grandPrix);
-        createGrandPrixSearchUseCase.save(grandPrix);
+        if(!checkGrandPrixUseCase.existsGrandPrixByNameAndEngName(dto.getName(), dto.getEngName())){
+            GrandPrix grandPrix = createGrandPrixUseCase.save(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
+            Circuit circuit = queryCircuitUseCase.findById(grandPrix.getCircuitId());
+            createSessionUseCase.save(grandPrix);
+            createGrandPrixSuggestSearchUseCase.save(grandPrix);
+            createGrandPrixSearchUseCase.save(grandPrix);
 
-        return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
+            return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
+        }else {
+            GrandPrix grandPrix = createGrandPrixUseCase.save(adminGrandPrixMapper.toCreateGrandPrixCommand(dto));
+            Circuit circuit = queryCircuitUseCase.findById(grandPrix.getCircuitId());
+            createSessionUseCase.save(grandPrix);
+            createGrandPrixSearchUseCase.save(grandPrix);
+
+            return grandPrixMapper.toResponseGrandPrixDTO(grandPrix, circuitMapper.toSimpleResponseCircuitDTO(circuit));
+        }
     }
 
     @Override
     @Cacheable(value = "GrandPrixListForAdmin", key = "#season", cacheManager = "redisLongCacheManager")
-    public List<SimpleResponseGrandPrixDTO> findAll(Integer season){
-        return queryGrandPrixUseCase.findAll(season);
+    public List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season){
+        return queryGrandPrixUseCase.findAllForDTO(season);
     }
 
     @Override

@@ -22,7 +22,7 @@ public class QueryGrandPrixService implements QueryGrandPrixUseCase {
     }
 
     @Override
-    public List<SimpleResponseGrandPrixDTO> findAll(Integer season) {
+    public List<SimpleResponseGrandPrixDTO> findAllForDTO(Integer season) {
         return grandPrixJpaPort.findGrandPrixesBySeason(season).stream()
                 .map(grandPrix -> grandPrixMapper.toSimpleResponseGrandPrixDTO(grandPrix))
                 .toList();

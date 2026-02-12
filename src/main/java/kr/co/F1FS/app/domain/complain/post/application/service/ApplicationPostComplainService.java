@@ -4,14 +4,14 @@ import kr.co.F1FS.app.domain.complain.post.application.port.in.CreatePostComplai
 import kr.co.F1FS.app.domain.complain.post.application.port.in.DeletePostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.QueryPostComplainUseCase;
-import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.QueryPostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.complain.post.presentation.dto.CreatePostComplainDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
-import kr.co.F1FS.app.global.presentation.dto.complain.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.SimpleResponsePostComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -32,12 +32,11 @@ public class ApplicationPostComplainService implements PostComplainUseCase {
     private final DeletePostComplainUseCase deletePostComplainUseCase;
     private final QueryPostComplainUseCase queryPostComplainUseCase;
     private final QueryPostUseCase queryPostUseCase;
-    public final PostComplainJpaPort postComplainJpaPort;
     private final SlackService slackService;
 
     @Override
     @Transactional
-    public void postComplain(Long id, User user, CreatePostComplainDTO dto){
+    public void save(Long id, User user, CreatePostComplainDTO dto){
         Post post = queryPostUseCase.findById(id);
         PostComplain complain = createPostComplainUseCase.save(post, user, dto);
 
@@ -46,7 +45,7 @@ public class ApplicationPostComplainService implements PostComplainUseCase {
     }
 
     @Override
-    public Page<ResponsePostComplainDTO> findAllByUser(int page, int size, String condition, User user) {
+    public Page<SimpleResponsePostComplainDTO> getPostComplainListByUser(int page, int size, String condition, User user) {
         Pageable pageable = switchCondition(page, size, condition);
 
         return queryPostComplainUseCase.findAllByUserForDTO(user, pageable);
@@ -54,7 +53,7 @@ public class ApplicationPostComplainService implements PostComplainUseCase {
 
     @Override
     @Cacheable(value = "PostComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponsePostComplainDTO getPostComplain(Long id) {
+    public ResponsePostComplainDTO getPostComplainById(Long id) {
         return queryPostComplainUseCase.findByIdForDTO(id);
     }
 

@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface FollowDriverUseCase {
     void toggle(User user, Long id);
-    List<ResponseFollowDriverDTO> getFollowingDriver(User user);
+    List<ResponseFollowDriverDTO> getFollowingDriverByUser(User user);
     List<ResponseFollowDriverDTO> getFollowingDriverByNickname(String nickname);
 }

@@ -9,5 +9,5 @@ import java.util.Map;
 
 public interface QueryReplyCommentUseCase {
     ReplyComment findById(Long id);
-    Map<Long, List<ResponseReplyCommentDTO>> findByReply(List<Reply> replies);
+    Map<Long, List<ResponseReplyCommentDTO>> findByReplyForDTO(List<Reply> replies);
 }

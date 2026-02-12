@@ -29,15 +29,15 @@ public class FollowConstructorController {
 
     @GetMapping("/following/not-auth/{nickname}")
     @Operation(summary = "팔로잉 확인 기능", description = "특정 유저의 컨스트럭터 팔로잉 확인")
-    public ResponseEntity<List<ResponseFollowConstructorDTO>> getFollowing(@PathVariable String nickname){
+    public ResponseEntity<List<ResponseFollowConstructorDTO>> getFollowingConstructorByNickname(@PathVariable String nickname){
         return ResponseEntity.status(HttpStatus.OK).body(followConstructorUseCase.getFollowingConstructorByNickname(nickname));
     }
 
     @GetMapping("/following")
     @Operation(summary = "팔로잉 확인 기능", description = "로그인 유저의 컨스트럭터 팔로잉 확인")
-    public ResponseEntity<List<ResponseFollowConstructorDTO>> getFollowingConstructorAuth(
+    public ResponseEntity<List<ResponseFollowConstructorDTO>> getFollowingConstructorByUser(
                                         @AuthenticationPrincipal PrincipalDetails details){
         return ResponseEntity.status(HttpStatus.OK).body(
-                followConstructorUseCase.getFollowingConstructor(details.getUser()));
+                followConstructorUseCase.getFollowingConstructorByUser(details.getUser()));
     }
 }

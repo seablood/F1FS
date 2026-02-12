@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.complain.post.application.service.admin;
 
-import kr.co.F1FS.app.domain.complain.post.presentation.dto.admin.AdminResponsePostComplainDTO;
-import kr.co.F1FS.app.domain.complain.post.application.mapper.admin.AdminPostComplainMapper;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.admin.AdminPostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.QueryPostComplainUseCase;
-import kr.co.F1FS.app.global.presentation.dto.complain.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.SimpleResponsePostComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -17,19 +16,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ApplicationAdminPostComplainService implements AdminPostComplainUseCase {
     private final QueryPostComplainUseCase queryPostComplainUseCase;
-    private final AdminPostComplainMapper adminPostComplainMapper;
 
     @Override
-    public Page<AdminResponsePostComplainDTO> getAllComplain(int page, int size, String condition) {
+    public Page<SimpleResponsePostComplainDTO> getPostComplainAll(int page, int size, String condition) {
         Pageable pageable = switchCondition(page, size, condition);
 
-        return queryPostComplainUseCase.findAll(pageable)
-                .map(postComplain -> adminPostComplainMapper.toAdminResponsePostComplainDTO(postComplain));
+        return queryPostComplainUseCase.findAllForDTO(pageable);
     }
 
     @Override
     @Cacheable(value = "PostComplainDTOForAdmin", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponsePostComplainDTO getComplainById(Long id) {
+    public ResponsePostComplainDTO getPostComplainById(Long id) {
         return queryPostComplainUseCase.findByIdForDTO(id);
     }
 

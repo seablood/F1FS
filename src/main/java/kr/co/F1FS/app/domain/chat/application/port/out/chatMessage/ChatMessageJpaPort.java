@@ -1,0 +1,12 @@
+package kr.co.F1FS.app.domain.chat.application.port.out.chatMessage;
+
+import kr.co.F1FS.app.domain.chat.domain.ChatMessage;
+import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatMessageDTO;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface ChatMessageJpaPort {
+    ChatMessage save(ChatMessage chatMessage);
+    List<ChatMessage> findByRoomIdAndSendTimeGreaterThanEqualOrderBySendTimeAsc(Long roomId, LocalDateTime lastEnterTime);
+}

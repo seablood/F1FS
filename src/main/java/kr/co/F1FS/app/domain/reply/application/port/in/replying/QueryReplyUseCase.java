@@ -15,6 +15,6 @@ import java.util.Map;
 public interface QueryReplyUseCase {
     Reply findById(Long id);
     List<Reply> findAllByPost(Post post);
-    List<ResponseReplyDTO> findReplyList(Post post, List<Reply> replies, Map<Long, List<ResponseReplyCommentDTO>> commentMap);
-    Page<ResponseReplyByUserDTO> findAllByUser(User user, Pageable pageable);
+    List<ResponseReplyDTO> findReplyListForDTO(Post post, List<Reply> replies, Map<Long, List<ResponseReplyCommentDTO>> commentMap);
+    Page<ResponseReplyByUserDTO> findAllByUserForDTO(User user, Pageable pageable);
 }

@@ -8,6 +8,7 @@ import kr.co.F1FS.app.domain.driver.application.port.in.driver.CreateDriverUseCa
 import kr.co.F1FS.app.domain.driver.application.port.out.driver.DriverJpaPort;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.presentation.dto.driver.CreateDriverDTO;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.currentSeason.CreateCurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.sinceDebut.CreateSinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
@@ -30,6 +31,7 @@ public class CreateDriverService implements CreateDriverUseCase {
     private final CreateConstructorDriverRelationUseCase createCDRelationUseCase;
     private final CreateDriverRecordRelationUseCase createDriverRecordRelationUseCase;
     private final CreateDriverDebutRelationUseCase createDriverDebutRelationUseCase;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ValidationService validationService;
 
     @Override
@@ -48,7 +50,13 @@ public class CreateDriverService implements CreateDriverUseCase {
 
         createDriverRecordRelationUseCase.save(driver, currentSeason);
         createDriverDebutRelationUseCase.save(driver, sinceDebut);
+        saveSuggestKeyword(driver);
 
         return driverJpaPort.save(driver);
+    }
+
+    public void saveSuggestKeyword(Driver driver){
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(driver.getName());
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(driver.getEngName());
     }
 }

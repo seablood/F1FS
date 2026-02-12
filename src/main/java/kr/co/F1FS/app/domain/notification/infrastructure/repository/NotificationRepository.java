@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
     Optional<Notification> findByRedisId(Long redisId);
     Page<Notification> findAll(Pageable pageable);
+    Page<Notification> findAllByAuthor(String author, Pageable pageable);
 }

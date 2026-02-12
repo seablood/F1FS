@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.constructor.application.mapper.record;
 
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
-import kr.co.F1FS.app.domain.constructor.presentation.dto.ResponseConstructorStandingDTO;
+import kr.co.F1FS.app.domain.constructor.presentation.dto.record.ResponseConstructorStandingDTO;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import org.springframework.stereotype.Component;

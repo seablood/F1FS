@@ -30,21 +30,6 @@ public class FindNotificationRedisService implements FindNotificationRedisUseCas
     }
 
     @Override
-    public void readNotification(User user, Long id) {
-        String key = "notification:"+user.getId();
-        List<NotificationRedis> list = getNotificationList(user);
-        for (NotificationRedis redis : list){
-            if(Objects.equals(redis.getId(), id)){
-                redis.updateIsRead(true);
-                break;
-            }
-        }
-
-        redisHandler.getNotificationRedisTemplate().delete(key);
-        redisHandler.getNotificationRedisListOperations().rightPushAll(key, list);
-    }
-
-    @Override
     public Page<ResponseNotificationRedisDTO> getNotificationRedisList(Pageable pageable, User user) {
         List<NotificationRedis> list = getNotificationList(user);
 

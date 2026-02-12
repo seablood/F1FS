@@ -30,8 +30,8 @@ public class AdminGrandPrixController {
 
     @GetMapping("/find-all")
     @Operation(summary = "그랑프리 전체 리스트", description = "특정 시즌의 그랑프리 전체 리스트 반환")
-    public ResponseEntity<List<SimpleResponseGrandPrixDTO>> findAll(@RequestParam(value = "season", defaultValue = "2025") Integer season){
-        return ResponseEntity.status(HttpStatus.OK).body(adminGrandPrixUseCase.findAll(season));
+    public ResponseEntity<List<SimpleResponseGrandPrixDTO>> getGrandPrixAll(@RequestParam(value = "season", defaultValue = "2025") Integer season){
+        return ResponseEntity.status(HttpStatus.OK).body(adminGrandPrixUseCase.getGrandPrixAll(season));
     }
 
     @GetMapping("/find/{id}")

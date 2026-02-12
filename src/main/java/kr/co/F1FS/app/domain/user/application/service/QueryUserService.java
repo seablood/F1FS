@@ -5,7 +5,10 @@ import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.out.UserJpaPort;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.SimpleResponseUserDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +24,11 @@ public class QueryUserService implements QueryUserUseCase {
     @Override
     public User findById(Long id) {
         return userJpaPort.findById(id);
+    }
+
+    @Override
+    public Page<SimpleResponseUserDTO> findAllForSimpleDTO(Pageable pageable) {
+        return userJpaPort.findAll(pageable).map(user -> userMapper.toSimpleResponseUserDTO(user));
     }
 
     @Override

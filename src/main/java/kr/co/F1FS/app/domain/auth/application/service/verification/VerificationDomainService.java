@@ -2,8 +2,6 @@ package kr.co.F1FS.app.domain.auth.application.service.verification;
 
 import kr.co.F1FS.app.domain.auth.application.mapper.AuthMapper;
 import kr.co.F1FS.app.domain.auth.domain.VerificationCode;
-import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +12,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class VerificationDomainService {
     private final AuthMapper authMapper;
 
-    public VerificationCode createEntity(User user, String code){
-        VerificationCode verificationCode = authMapper.toVerificationCode(user, code);
-
-        return verificationCode;
-    }
-
-    public VerificationCode createEntity(ResponseUserDTO dto, String code){
-        VerificationCode verificationCode = authMapper.toVerificationCode(dto, code);
-
-        return verificationCode;
+    public VerificationCode createEntity(String email, String code){
+        return authMapper.toVerificationCode(email, code);
     }
 
     public boolean isExpired(VerificationCode code){

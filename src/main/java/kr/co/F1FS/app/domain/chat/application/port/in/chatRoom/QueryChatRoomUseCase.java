@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface QueryChatRoomUseCase {
     ChatRoom findById(Long roomId);
-    Page<ResponseChatRoomDTO> findAll(Pageable pageable);
-    Page<ResponseChatRoomDTO> findByIdIn(List<Long> roomIds, Pageable pageable);
+    Page<ResponseChatRoomDTO> findAllForDTO(Pageable pageable);
+    Page<ResponseChatRoomDTO> findByIdInForDTO(List<Long> roomIds, Pageable pageable);
 }

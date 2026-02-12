@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DriverUseCase {
-    Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition);
-    ResponseDriverDTO findById(Long id);
+    Page<SimpleResponseDriverDTO> getDriverAll(int page, int size, String condition);
+    ResponseDriverDTO getDriverById(Long id);
     Pageable switchCondition(int page, int size, String condition);
 }

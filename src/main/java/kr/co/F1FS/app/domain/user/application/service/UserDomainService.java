@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.user.application.service;
 import kr.co.F1FS.app.domain.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.presentation.dto.CreateAdminUserCommand;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
 import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
@@ -19,8 +20,8 @@ public class UserDomainService {
         return userMapper.toUser(command);
     }
 
-    public User createEntity(CreateAdminUserDTO dto){
-        return userMapper.toUser(dto);
+    public User createEntity(CreateAdminUserCommand command){
+        return userMapper.toUser(command);
     }
 
     public User createEntity(OAuth2UserInfo userInfo){

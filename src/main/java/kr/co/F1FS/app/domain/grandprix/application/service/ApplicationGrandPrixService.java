@@ -25,8 +25,8 @@ public class ApplicationGrandPrixService implements GrandPrixUseCase {
 
     @Override
     @Cacheable(value = "GrandPrixList", key = "#season", cacheManager = "redisLongCacheManager")
-    public List<SimpleResponseGrandPrixDTO> findAll(Integer season){
-        return queryGrandPrixUseCase.findAll(season);
+    public List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season){
+        return queryGrandPrixUseCase.findAllForDTO(season);
     }
 
     @Override

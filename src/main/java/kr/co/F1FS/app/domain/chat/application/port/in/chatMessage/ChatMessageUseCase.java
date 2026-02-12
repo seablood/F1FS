@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.chat.application.port.in.chatMessage;
 
-import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatMessageDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatMessage.CreateChatMessageDTO;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatMessageDTO;
 
 import java.util.List;

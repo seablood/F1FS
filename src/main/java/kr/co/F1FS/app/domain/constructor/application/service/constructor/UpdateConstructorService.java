@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.constructor.application.port.in.constructor.UpdateC
 import kr.co.F1FS.app.domain.constructor.application.port.out.constructor.ConstructorJpaPort;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.constructor.ModifyConstructorCommand;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +13,14 @@ import org.springframework.stereotype.Service;
 public class UpdateConstructorService implements UpdateConstructorUseCase {
     private final ConstructorJpaPort constructorJpaPort;
     private final ConstructorDomainService constructorDomainService;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
 
     @Override
     public void modify(Constructor constructor, ModifyConstructorCommand command) {
         constructorDomainService.modify(constructor, command);
 
         constructorJpaPort.save(constructor);
+        saveSuggestKeyword(constructor);
     }
 
     @Override
@@ -32,5 +35,10 @@ public class UpdateConstructorService implements UpdateConstructorUseCase {
         constructorDomainService.decreaseFollower(constructor);
 
         constructorJpaPort.saveAndFlush(constructor);
+    }
+
+    public void saveSuggestKeyword(Constructor constructor){
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(constructor.getName());
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(constructor.getEngName());
     }
 }

@@ -1,12 +1,16 @@
 package kr.co.F1FS.app.domain.elastic.application.service.cdSearch;
 
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.cdSearch.CDSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.CDSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
 import kr.co.F1FS.app.domain.elastic.domain.DriverDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.ConstructorSearchRepository;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.DriverSearchRepository;
+import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
@@ -18,10 +22,8 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.Duration;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,15 +33,21 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
     private final ConstructorSearchRepository constructorSearchRepository;
     private final DriverSearchRepository driverSearchRepository;
     private final CDSearchRepoPort cdSearchRepoPort;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
+    private final RedisHandler redisHandler;
 
     @Override
     public List<CDSearchSuggestionDTO> suggestCD(String keyword){
-        NativeQuery query = setQuery(keyword);
+        if (redisHandler.getCdSuggestListRedisTemplate().hasKey("cd-suggest:"+keyword)){
+            return redisHandler.getCdSuggestListRedisTemplate().opsForList().range("cd-suggest:"+keyword, 0, -1);
+        }
+        NativeQuery query = setSuggestQuery(keyword);
         query.setMaxResults(5);
 
         List<CDSearchSuggestionDTO> combine = getCombineList(query);
-        Collections.shuffle(combine);
+        redisHandler.getCdSuggestListRedisTemplate().opsForList().rightPushAll("cd-suggest:"+keyword, combine);
+        redisHandler.getCdSuggestListRedisTemplate().expire("cd-suggest:"+keyword, Duration.ofMinutes(5));
 
         return combine;
     }
@@ -56,6 +64,8 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
                 .sorted(comparator)
                 .toList();
 
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
+
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), sorted.size());
         List<CDSearchSuggestionDTO> paged = sorted.subList(start, end);
@@ -67,27 +77,71 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
-                                .should(s -> s.matchPhrasePrefix(mp -> mp
-                                        .field("korName")
-                                        .query(keyword)))
-                                .should(s -> s.match(m -> m
-                                        .field("korName.ngram_search")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.matchPhrasePrefix(mp -> mp
-                                        .field("engName")
-                                        .query(keyword)))
-                                .should(s -> s.match(m -> m
-                                        .field("engName")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.matchPhrasePrefix(mp -> mp
-                                        .field("racingClass")
-                                        .query(keyword)))
-                                .should(s -> s.match(m -> m
-                                        .field("racingClass")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                                .must(m -> m.multiMatch(mm -> {
+                                    mm.query(keyword)
+                                            .fields("korName^3", "engName^3", "racingClass")
+                                            .operator(Operator.Or);
+                                    return mm;
+                                }))))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .build();
+
+        return query;
+    }
+
+    public NativeQuery setSuggestQuery(String keyword){
+        String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
+        String trimmed = keyword.trim();
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> {
+                            b.must(m -> m.bool(bb -> {
+                                bb.should(s -> s.prefix(p -> {
+                                    p.field("korName.normalized")
+                                            .value(normalized)
+                                            .boost(5.0f);
+                                    return p;
+                                }));
+                                bb.should(s -> s.prefix(p -> {
+                                    p.field("engName.normalized")
+                                            .value(normalized)
+                                            .boost(5.0f);
+                                    return p;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("korName.kor_autocomplete")
+                                            .query(trimmed)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("engName.eng_autocomplete")
+                                            .query(normalized)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.minimumShouldMatch("1");
+
+                                return bb;
+                            }));
+                            b.should(s -> s.match(m -> {
+                                m.field("korName.ngram")
+                                        .query(normalized)
+                                        .boost(1.5f);
+                                return m;
+                            }));
+                            b.should(s -> s.match(m -> {
+                                m.field("engName.ngram")
+                                        .query(normalized)
+                                        .boost(1.5f);
+                                return m;
+                            }));
+
+                            return b;
+                        }))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .withMaxResults(7)
                 .build();
 
         return query;

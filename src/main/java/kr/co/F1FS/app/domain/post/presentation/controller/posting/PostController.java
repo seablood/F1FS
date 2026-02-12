@@ -33,17 +33,17 @@ public class PostController {
 
     @GetMapping("/find-all")
     @Operation(summary = "모든 게시글 검색(정렬 포함)", description = "존재하는 모든 게시글을 반환")
-    public ResponseEntity<List<ResponseSimplePostDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<ResponseSimplePostDTO>> getPostAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                @RequestParam(value = "size", defaultValue = "10") int size,
                                                                @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<ResponseSimplePostDTO> newPage = postUseCase.findAll(page, size, condition);
+        Page<ResponseSimplePostDTO> newPage = postUseCase.getPostAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
     @GetMapping("/find/{id}")
     @Operation(summary = "게시글 상세 페이지(ID)", description = "특정 ID의 게시글을 반환")
-    public ResponseEntity<ResponsePostDTO> findById(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(postUseCase.findById(id));
+    public ResponseEntity<ResponsePostDTO> getPostById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(postUseCase.getPostById(id));
     }
 
     @PutMapping("/modify/{id}")

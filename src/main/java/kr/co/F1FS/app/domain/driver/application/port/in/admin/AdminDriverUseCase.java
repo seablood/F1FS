@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminDriverUseCase {
     AdminResponseDriverDTO save(CombinedDriverRequest request);
-    Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition);
+    Page<SimpleResponseDriverDTO> getDriverAll(int page, int size, String condition);
     AdminResponseDriverDTO getDriverById(Long id);
     AdminResponseDriverDTO modify(Long id, ModifyDriverDTO dto);
     Pageable switchCondition(int page, int size, String condition);

@@ -22,9 +22,9 @@ public class ApplicationSessionService implements SessionUseCase {
 
     @Override
     @Cacheable(value = "SessionDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponseSessionDTO getSessionByID(Long id){
+    public ResponseSessionDTO getSessionById(Long id){
         Session session = querySessionUseCase.findById(id);
-        List<ResponseSessionResultDTO> resultList = querySessionResultUseCase.getSessionResultBySession(session);
+        List<ResponseSessionResultDTO> resultList = querySessionResultUseCase.findSessionResultBySessionForDTO(session);
 
         return sessionMapper.toResponseSessionDTO(session, resultList);
     }

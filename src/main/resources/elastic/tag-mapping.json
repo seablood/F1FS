@@ -1,0 +1,31 @@
+{
+  "properties": {
+    "name": {
+      "type": "text",
+      "fields": {
+        "autocomplete_kor": {
+          "type": "text",
+          "analyzer": "kor_autocomplete_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "autocomplete_eng": {
+          "type": "text",
+          "analyzer": "eng_autocomplete_analyzer",
+          "search_analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+        }
+      }
+    }
+  }
+}

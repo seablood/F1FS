@@ -17,6 +17,7 @@ import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.notification.FCMPushDTO;
 import kr.co.F1FS.app.global.util.AuthorCertification;
 import kr.co.F1FS.app.global.util.FCMUtil;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,13 +36,15 @@ public class FCMLiveService implements FCMLiveUseCase {
 
     @Override
     public NotificationRedis sendPushForLiveInfo(FCMPushDTO dto){
+        dto.setTopics(Topic.NEWS);
+
         Notification notification = Notification.builder()
                 .setTitle(dto.getTitle())
                 .setBody(dto.getContent())
                 .build();
 
         Message message = Message.builder()
-                .setTopic(dto.getTopic())
+                .setTopic(dto.getTopics().toString())
                 .setNotification(notification)
                 .build();
 
@@ -49,8 +52,8 @@ public class FCMLiveService implements FCMLiveUseCase {
 
         try{
             String response = String.valueOf(FirebaseMessaging.getInstance().sendAsync(message));
-            createNotificationUseCase.save(redis, dto.getContent());
-            saveNotificationRedisUseCase.saveNotification(redis, "topic:"+dto.getTopic());
+            createNotificationUseCase.save(redis, dto.getContent(), dto.getAuthor());
+            saveNotificationRedisUseCase.saveNotification(redis, "topic:"+dto.getTopics().toString());
             log.info("토픽 푸시 알림 전송 성공 : {}", response);
         } catch (Exception e){
             log.error("토픽 푸시 알림 전송 실패");
@@ -118,7 +121,7 @@ public class FCMLiveService implements FCMLiveUseCase {
     @Override
     public void sendPushAfterPosting(Post post, User author) {
         List<FCMToken> tokens = fcmUtil.getFollowerToken(author).stream()
-                .filter(token -> subscribeNotificationRedisUseCase.isSubscribe(token.getUserId(), "post"))
+                .filter(token -> subscribeNotificationRedisUseCase.isSubscribe(token.getUserId(), Topic.POST))
                 .toList();
         if(!tokens.isEmpty()){
             FCMPushDTO pushDTO = fcmUtil.sendPushForPost(author, post.getTitle());
@@ -130,7 +133,7 @@ public class FCMLiveService implements FCMLiveUseCase {
     @Override
     public void sendPushAfterPostLike(User user, Post post, Long id) {
         if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
-            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), "like")){
+            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), Topic.LIKE)){
                 FCMPushDTO pushDTO = fcmUtil.sendPushForLike(user);
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);
@@ -141,7 +144,7 @@ public class FCMLiveService implements FCMLiveUseCase {
     @Override
     public void sendPushAfterReply(User user, Reply reply, Post post, Long id) {
         if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
-            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), "reply")){
+            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), Topic.REPLY)){
                 FCMPushDTO pushDTO = fcmUtil.sendPushForReply(user, reply.getContent());
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);
@@ -152,7 +155,7 @@ public class FCMLiveService implements FCMLiveUseCase {
     @Override
     public void sendPushAfterReplyComment(User user, ReplyComment replyComment, Post post, Long id) {
         if(!AuthorCertification.certification(user.getUsername(), post.getAuthor().getUsername())){
-            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), "reply")){
+            if(subscribeNotificationRedisUseCase.isSubscribe(post.getAuthor().getId(), Topic.REPLY)){
                 FCMPushDTO pushDTO = fcmUtil.sendPushForReply(user, replyComment.getContent());
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);

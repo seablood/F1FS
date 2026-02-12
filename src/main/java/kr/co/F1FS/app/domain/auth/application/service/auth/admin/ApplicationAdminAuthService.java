@@ -1,5 +1,6 @@
 package kr.co.F1FS.app.domain.auth.application.service.auth.admin;
 
+import kr.co.F1FS.app.domain.auth.application.mapper.AuthMapper;
 import kr.co.F1FS.app.domain.auth.application.port.in.auth.admin.AdminAuthUseCase;
 import kr.co.F1FS.app.domain.auth.application.port.in.verification.CheckVerificationUseCase;
 import kr.co.F1FS.app.domain.auth.application.port.in.verification.QueryVerificationUseCase;
@@ -32,12 +33,13 @@ public class ApplicationAdminAuthService implements AdminAuthUseCase {
     private final QueryUserUseCase queryUserUseCase;
     private final VerifyAndDeleteVerificationUseCase verifyAndDeleteVerificationUseCase;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AuthMapper authMapper;
 
     @Override
     @Transactional
     public ResponseUserDTO save(CreateAdminUserDTO dto){
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
-        ResponseUserDTO userDTO = createUserUseCase.createAdminUser(dto);
+        ResponseUserDTO userDTO = createUserUseCase.createAdminUser(authMapper.toCreateAdminUserCommand(dto));
 
         log.info("관리자 계정 전환(생성) 완료 : {}", userDTO.getUsername());
 

@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.grandprix.application.mapper.GrandPrixMapper;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.CreateGrandPrixCommand;
 import kr.co.F1FS.app.domain.grandprix.presentation.dto.ModifyGrandPrixCommand;
+import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.global.util.SessionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GrandPrixDomainService {
     private final GrandPrixMapper grandPrixMapper;
+    private final ValidationService validationService;
 
     public GrandPrix createEntity(CreateGrandPrixCommand command){
-        return grandPrixMapper.toGrandPrix(command);
+        GrandPrix grandPrix = grandPrixMapper.toGrandPrix(command);
+        validationService.checkValid(grandPrix);
+
+        return grandPrix;
     }
 
     public void modify(ModifyGrandPrixCommand command, GrandPrix grandPrix){

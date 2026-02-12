@@ -30,25 +30,25 @@ public class FollowUserController {
 
     @GetMapping("/follower")
     @Operation(summary = "팔로워 확인 기능(로그인)", description = "로그인 유저의 팔로워를 확인")
-    public ResponseEntity<List<ResponseFollowUserDTO>> getFollowerAuth(@AuthenticationPrincipal PrincipalDetails details){
-        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.findFollowersAuth(details.getUser()));
+    public ResponseEntity<List<ResponseFollowUserDTO>> getFollowersByUser(@AuthenticationPrincipal PrincipalDetails details){
+        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.getFollowersByUser(details.getUser()));
     }
 
     @GetMapping("/followee")
     @Operation(summary = "팔로잉 확인 기능(로그인)", description = "로그인 유저의 팔로잉을 확인")
-    public ResponseEntity<List<ResponseFollowUserDTO>> getFolloweeAuth(@AuthenticationPrincipal PrincipalDetails details){
-        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.findFolloweesAuth(details.getUser()));
+    public ResponseEntity<List<ResponseFollowUserDTO>> getFolloweesByUser(@AuthenticationPrincipal PrincipalDetails details){
+        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.getFolloweesByUser(details.getUser()));
     }
 
     @GetMapping("/follower/not-auth/{nickname}")
     @Operation(summary = "팔로워 확인 기능", description = "특정 유저의 팔로워를 확인")
-    public ResponseEntity<List<ResponseFollowUserDTO>> getFollower(@PathVariable String nickname){
-        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.findFollowers(nickname));
+    public ResponseEntity<List<ResponseFollowUserDTO>> getFollowersByNickname(@PathVariable String nickname){
+        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.getFollowersByNickname(nickname));
     }
 
     @GetMapping("/followee/not-auth/{nickname}")
     @Operation(summary = "팔로잉 확인 기능", description = "특정 유저의 팔로잉을 확인")
-    public ResponseEntity<List<ResponseFollowUserDTO>> getFollowee(@PathVariable String nickname){
-        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.findFollowees(nickname));
+    public ResponseEntity<List<ResponseFollowUserDTO>> getFolloweesByNickname(@PathVariable String nickname){
+        return ResponseEntity.status(HttpStatus.OK).body(followUserUseCase.getFolloweesByNickname(nickname));
     }
 }

@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostUseCase {
     ResponsePostDTO save(CreatePostDTO dto, User author);
-    Page<ResponseSimplePostDTO> findAll(int page, int size, String condition);
-    ResponsePostDTO findById(Long id);
+    Page<ResponseSimplePostDTO> getPostAll(int page, int size, String condition);
+    ResponsePostDTO getPostById(Long id);
     ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user);
     void delete(Long id, User user);
     Pageable conditionSwitch(int page, int size, String condition);

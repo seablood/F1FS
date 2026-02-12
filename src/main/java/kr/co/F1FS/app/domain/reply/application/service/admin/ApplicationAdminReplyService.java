@@ -23,7 +23,7 @@ public class ApplicationAdminReplyService implements AdminReplyUseCase {
         Pageable pageable = switchCondition(page, size, condition);
         User user = queryUserUseCase.findById(id);
 
-        return queryReplyUseCase.findAllByUser(user, pageable);
+        return queryReplyUseCase.findAllByUserForDTO(user, pageable);
     }
 
     @Override

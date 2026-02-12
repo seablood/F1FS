@@ -46,7 +46,7 @@ public class ApplicationAdminConstructorService implements AdminConstructorUseCa
     }
 
     @Override
-    public Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition){
+    public Page<SimpleResponseConstructorDTO> getConstructorAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
         return queryConstructorUseCase.findAllForSimpleDTO(pageable);

@@ -9,6 +9,9 @@ import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCas
 import kr.co.F1FS.app.domain.post.application.mapper.PostMapper;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.*;
 import kr.co.F1FS.app.domain.post.presentation.dto.*;
+import kr.co.F1FS.app.domain.tag.application.port.in.tag.CreateTagUseCase;
+import kr.co.F1FS.app.domain.tag.application.port.in.tag.QueryTagUseCase;
+import kr.co.F1FS.app.domain.tag.domain.Tag;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
 import kr.co.F1FS.app.domain.post.domain.Post;
@@ -25,6 +28,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -37,6 +42,8 @@ public class ApplicationPostService implements PostUseCase {
     private final UpdatePostSearchUseCase updatePostSearchUseCase;
     private final DeletePostSearchUseCase deletePostSearchUseCase;
     private final QueryPostSearchUseCase queryPostSearchUseCase;
+    private final CreateTagUseCase createTagUseCase;
+    private final QueryTagUseCase queryTagUseCase;
     private final FCMLiveUseCase fcmLiveUseCase;
     private final PostMapper postMapper;
 
@@ -44,36 +51,44 @@ public class ApplicationPostService implements PostUseCase {
     @Transactional
     public ResponsePostDTO save(CreatePostDTO dto, User author){
         Post post = createPostUseCase.save(dto, author);
-        createPostSearchUseCase.save(post);
+        List<String> tags = dto.getTags();
+        if(!tags.isEmpty()) {
+            List<Tag> tagList = queryTagUseCase.saveTagList(tags);
+            createTagUseCase.save(post, tagList);
+        }
+
+        createPostSearchUseCase.save(post, tags);
 
         fcmLiveUseCase.sendPushAfterPosting(post, author);
 
-        return postMapper.toResponsePostDTO(post);
+        return postMapper.toResponsePostDTO(post, tags);
     }
 
     @Override
-    public Page<ResponseSimplePostDTO> findAll(int page, int size, String condition){
+    public Page<ResponseSimplePostDTO> getPostAll(int page, int size, String condition){
         Pageable pageable = conditionSwitch(page, size, condition);
 
-        return queryPostUseCase.findAll(pageable);
+        return queryPostUseCase.findAllForDTO(pageable);
     }
 
     @Override
     @Cacheable(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponsePostDTO findById(Long id){
+    public ResponsePostDTO getPostById(Long id){
         return queryPostUseCase.findByIdForDTO(id);
     }
 
     @Override
     @Transactional
+    @Cacheable(value = "PostDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponsePostDTO modify(Long id, ModifyPostDTO dto, User user){
         Post post = queryPostUseCase.findById(id);
         PostDocument document = queryPostSearchUseCase.findById(id);
+        List<String> tags = dto.getTags();
 
         updatePostUseCase.modify(dto, post, user);
-        updatePostSearchUseCase.modify(document, post);
+        updatePostSearchUseCase.modify(document, post, tags);
 
-        return postMapper.toResponsePostDTO(post);
+        return postMapper.toResponsePostDTO(post, tags);
     }
 
     @Override

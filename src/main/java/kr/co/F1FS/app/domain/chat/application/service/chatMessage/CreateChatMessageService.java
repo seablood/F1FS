@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.chat.application.service.chatMessage;
 
-import kr.co.F1FS.app.domain.chat.application.mapper.ChatMessageMapper;
 import kr.co.F1FS.app.domain.chat.application.port.in.chatMessage.CreateChatMessageUseCase;
-import kr.co.F1FS.app.domain.chat.application.port.out.ChatMessageJpaPort;
+import kr.co.F1FS.app.domain.chat.application.port.out.chatMessage.ChatMessageJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatMessage;
-import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatMessageDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatMessage.CreateChatMessageDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CreateChatMessageService implements CreateChatMessageUseCase {
     private final ChatMessageJpaPort chatMessageJpaPort;
-    private final ChatMessageMapper chatMessageMapper;
+    private final ChatMessageDomainService chatMessageDomainService;
 
     @Override
-    public ResponseChatMessageDTO save(ChatMessage chatMessage) {
-        chatMessageJpaPort.save(chatMessage);
-        return chatMessageMapper.toResponseChatMessageDTO(chatMessage);
+    public ChatMessage save(Long roomId, CreateChatMessageDTO dto, String username) {
+        ChatMessage chatMessage = chatMessageDomainService.createEntity(roomId, dto, username);
+
+        return chatMessageJpaPort.save(chatMessage);
     }
 }

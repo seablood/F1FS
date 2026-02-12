@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface AdminGrandPrixUseCase {
     ResponseGrandPrixDTO save(CreateGrandPrixDTO dto);
-    List<SimpleResponseGrandPrixDTO> findAll(Integer season);
+    List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season);
     ResponseGrandPrixDTO getGrandPrixById(Long id);
     ResponseGrandPrixDTO modify(ModifyGrandPrixDTO dto, Long id);
 }

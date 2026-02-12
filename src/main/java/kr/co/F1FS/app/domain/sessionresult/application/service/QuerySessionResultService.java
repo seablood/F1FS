@@ -19,7 +19,7 @@ public class QuerySessionResultService implements QuerySessionResultUseCase {
     private final SessionResultMapper sessionResultMapper;
 
     @Override
-    public List<ResponseSessionResultDTO> getSessionResultBySession(Session session) {
+    public List<ResponseSessionResultDTO> findSessionResultBySessionForDTO(Session session) {
         List<SessionResult> resultList = sessionResultJpaPort.findSessionResultsBySession(session);
         List<ResponseSessionResultDTO> dtoList = resultList.stream()
                 .map(sessionResult -> sessionResultMapper.toResponseSessionResultDTO(sessionResult))

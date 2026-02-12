@@ -1,9 +1,9 @@
 package kr.co.F1FS.app.domain.chat.application.service.chatRoom;
 
 import kr.co.F1FS.app.domain.chat.application.port.in.chatRoom.CreateChatRoomUseCase;
-import kr.co.F1FS.app.domain.chat.application.port.out.ChatRoomJpaPort;
+import kr.co.F1FS.app.domain.chat.application.port.out.chatRoom.ChatRoomJpaPort;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
-import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.CreateChatRoomDTO;
 import kr.co.F1FS.app.domain.elastic.application.port.in.chatRoom.CreateChatRoomSearchUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

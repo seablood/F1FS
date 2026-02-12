@@ -1,14 +1,17 @@
 {
   "analysis": {
     "tokenizer": {
-      "autocomplete_nori_tokenizer": {
-        "type": "nori_tokenizer"
-      },
-      "autocomplete_tokenizer": {
+      "kor_autocomplete_tokenizer": {
         "type": "edge_ngram",
         "min_gram": 1,
-        "max_gram": 30,
-        "token_chars": ["letter", "digit"]
+        "max_gram": 20,
+        "token_chars": ["letter"]
+      },
+      "eng_autocomplete_tokenizer": {
+        "type": "edge_ngram",
+        "min_gram": 2,
+        "max_gram": 20,
+        "token_chars": ["letter"]
       },
       "ngram_tokenizer": {
         "type": "ngram",
@@ -18,14 +21,14 @@
       }
     },
     "analyzer": {
-      "autocomplete_nori": {
+      "kor_autocomplete_analyzer": {
         "type": "custom",
-        "tokenizer": "autocomplete_nori_tokenizer",
-        "filter": ["lowercase", "nori_filter"]
+        "tokenizer": "kor_autocomplete_tokenizer",
+        "filter": ["lowercase"]
       },
-      "autocomplete_standard": {
+      "eng_autocomplete_analyzer": {
         "type": "custom",
-        "tokenizer": "autocomplete_tokenizer",
+        "tokenizer": "eng_autocomplete_tokenizer",
         "filter": ["lowercase"]
       },
       "nori_search": {
@@ -36,6 +39,12 @@
       "ngram_analyzer": {
         "type": "custom",
         "tokenizer": "ngram_tokenizer",
+        "filter": ["lowercase"]
+      }
+    },
+    "normalizer": {
+      "lowercase_normalizer": {
+        "type": "custom",
         "filter": ["lowercase"]
       }
     },

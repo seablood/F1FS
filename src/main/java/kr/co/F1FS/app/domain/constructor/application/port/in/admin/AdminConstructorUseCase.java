@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminConstructorUseCase {
     AdminResponseConstructorDTO save(CombinedConstructorRequest request);
-    Page<SimpleResponseConstructorDTO> findAll(int page, int size, String condition);
+    Page<SimpleResponseConstructorDTO> getConstructorAll(int page, int size, String condition);
     AdminResponseConstructorDTO getConstructorById(Long id);
     AdminResponseConstructorDTO modify(Long id, ModifyConstructorDTO dto);
     Pageable switchCondition(int page, int size, String condition);

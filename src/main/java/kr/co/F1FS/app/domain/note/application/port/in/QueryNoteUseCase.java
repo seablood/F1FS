@@ -8,6 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface QueryNoteUseCase {
     Note findById(Long id);
-    Page<ResponseSimpleNoteDTO> findAllByToUser(User user, Pageable pageable);
-    Page<ResponseSimpleNoteDTO> findAllByFromUser(User user, Pageable pageable);
+    Page<ResponseSimpleNoteDTO> findAllByToUserForDTO(User user, Pageable pageable);
+    Page<ResponseSimpleNoteDTO> findAllByFromUserForDTO(User user, Pageable pageable);
 }

@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.domain.post.presentation.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import kr.co.F1FS.app.domain.post.domain.Post;
-import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -15,12 +15,5 @@ public class CreatePostDTO {
     private String title;
     @NotBlank(message = "content는 필수 입력 항목입니다.")
     private String content;
-
-    public static Post toEntity(CreatePostDTO dto, User author){
-        return Post.builder()
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .author(author)
-                .build();
-    }
+    private List<String> tags;
 }

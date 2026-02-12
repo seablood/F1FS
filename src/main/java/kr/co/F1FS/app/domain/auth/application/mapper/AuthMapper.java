@@ -1,10 +1,10 @@
 package kr.co.F1FS.app.domain.auth.application.mapper;
 
 import kr.co.F1FS.app.domain.auth.domain.VerificationCode;
+import kr.co.F1FS.app.domain.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.auth.presentation.dto.CreateUserDTO;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.presentation.dto.CreateAdminUserCommand;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
-import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,16 +18,18 @@ public class AuthMapper {
                 .build();
     }
 
-    public VerificationCode toVerificationCode(User user, String code){
-        return VerificationCode.builder()
-                .email(user.getEmail())
-                .code(code)
+    public CreateAdminUserCommand toCreateAdminUserCommand(CreateAdminUserDTO dto){
+        return CreateAdminUserCommand.builder()
+                .username(dto.getUsername())
+                .password(dto.getPassword())
+                .email(dto.getEmail())
+                .nickname(dto.getNickname())
                 .build();
     }
 
-    public VerificationCode toVerificationCode(ResponseUserDTO dto, String code){
+    public VerificationCode toVerificationCode(String email, String code){
         return VerificationCode.builder()
-                .email(dto.getEmail())
+                .email(email)
                 .code(code)
                 .build();
     }

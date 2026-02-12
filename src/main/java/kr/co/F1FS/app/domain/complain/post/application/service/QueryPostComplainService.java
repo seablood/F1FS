@@ -5,7 +5,8 @@ import kr.co.F1FS.app.domain.complain.post.application.port.in.QueryPostComplain
 import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
 import kr.co.F1FS.app.domain.user.domain.User;
-import kr.co.F1FS.app.global.presentation.dto.complain.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.ResponsePostComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.post.SimpleResponsePostComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,8 +24,9 @@ public class QueryPostComplainService implements QueryPostComplainUseCase {
     }
 
     @Override
-    public Page<PostComplain> findAll(Pageable pageable) {
-        return postComplainJpaPort.findAll(pageable);
+    public Page<SimpleResponsePostComplainDTO> findAllForDTO(Pageable pageable) {
+        return postComplainJpaPort.findAll(pageable)
+                .map(postComplain -> postComplainMapper.toSimpleResponsePostComplainDTO(postComplain));
     }
 
     @Override
@@ -33,8 +35,8 @@ public class QueryPostComplainService implements QueryPostComplainUseCase {
     }
 
     @Override
-    public Page<ResponsePostComplainDTO> findAllByUserForDTO(User user, Pageable pageable) {
+    public Page<SimpleResponsePostComplainDTO> findAllByUserForDTO(User user, Pageable pageable) {
         return postComplainJpaPort.findAllByUser(user, pageable)
-                .map(postComplain -> postComplainMapper.toResponsePostComplainDTO(postComplain));
+                .map(postComplain -> postComplainMapper.toSimpleResponsePostComplainDTO(postComplain));
     }
 }

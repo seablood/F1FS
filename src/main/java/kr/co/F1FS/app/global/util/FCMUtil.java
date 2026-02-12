@@ -20,9 +20,9 @@ public class FCMUtil {
 
     public FCMPushDTO sendPushForPost(User author, String title){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
-                .topic("post")
                 .title("새로운 게시글")
                 .content(author.getNickname()+"님이 새로운 글을 작성하였습니다! : "+title)
+                .topics(Topic.POST)
                 .build();
 
         return pushDTO;
@@ -30,9 +30,9 @@ public class FCMUtil {
 
     public FCMPushDTO sendPushForReply(User user, String content){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
-                .topic("reply")
                 .title("새로운 댓글")
                 .content(user.getNickname()+"님이 댓글을 작성하였습니다! : "+content)
+                .topics(Topic.REPLY)
                 .build();
 
         return pushDTO;
@@ -40,9 +40,9 @@ public class FCMUtil {
 
     public FCMPushDTO sendPushForLike(User user){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
-                .topic("like")
                 .title("본인의 게시글이 추천되었습니다!!")
                 .content(user.getNickname()+"님이 게시글을 좋아합니다.")
+                .topics(Topic.LIKE)
                 .build();
 
         return pushDTO;
@@ -50,9 +50,9 @@ public class FCMUtil {
 
     public FCMPushDTO sendPushForNote(User user){
         FCMPushDTO pushDTO = FCMPushDTO.builder()
-                .topic("note")
                 .title("새로운 쪽지가 도착했습니다.")
                 .content(user.getNickname()+"님이 족지를 보냈습니다.")
+                .topics(Topic.NOTE)
                 .build();
 
         return pushDTO;

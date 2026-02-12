@@ -1,0 +1,50 @@
+{
+  "properties": {
+    "korName": {
+      "type": "text",
+      "analyzer": "nori_search",
+      "fields": {
+        "kor_autocomplete": {
+          "type": "text",
+          "analyzer": "kor_autocomplete_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+        }
+      }
+    },
+    "engName": {
+      "type": "text",
+      "analyzer": "standard",
+      "fields": {
+        "eng_autocomplete": {
+          "type": "text",
+          "analyzer": "eng_autocomplete_analyzer",
+          "search_analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+        }
+      }
+    }
+  }
+}

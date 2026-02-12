@@ -9,7 +9,8 @@ import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.global.application.service.SlackService;
-import kr.co.F1FS.app.global.presentation.dto.complain.ResponseUserComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
+import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,7 +35,7 @@ public class ApplicationUserComplainService implements UserComplainUseCase {
 
     @Override
     @Transactional
-    public void userComplain(User user, CreateUserComplainDTO dto){
+    public void save(User user, CreateUserComplainDTO dto){
         User toUser = queryUserUseCase.findByNickname(dto.getToUserNickname());
         UserComplain complain = createUserComplainUseCase.save(dto, toUser, user);
 
@@ -44,12 +45,12 @@ public class ApplicationUserComplainService implements UserComplainUseCase {
 
     @Override
     @Cacheable(value = "UserComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponseUserComplainDTO getUserComplain(Long id) {
+    public ResponseUserComplainDTO getUserComplainById(Long id) {
         return queryUserComplainUseCase.findByIdForDTO(id);
     }
 
     @Override
-    public Page<ResponseUserComplainDTO> getUserComplainListByFromUser(int page, int size, String condition, User fromUser) {
+    public Page<SimpleResponseUserComplainDTO> getUserComplainListByFromUser(int page, int size, String condition, User fromUser) {
         Pageable pageable = switchCondition(page, size, condition);
         return queryUserComplainUseCase.findAllByFromUserForDTO(fromUser, pageable);
     }

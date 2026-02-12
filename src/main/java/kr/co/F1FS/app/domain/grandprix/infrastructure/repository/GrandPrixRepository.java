@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface GrandPrixRepository extends JpaRepository<GrandPrix, Long> {
     List<GrandPrix> findGrandPrixesBySeason(Integer season);
+    boolean existsGrandPrixByNameAndEngName(String name, String engName);
 }

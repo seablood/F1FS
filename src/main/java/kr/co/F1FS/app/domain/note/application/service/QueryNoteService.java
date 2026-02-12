@@ -23,7 +23,7 @@ public class QueryNoteService implements QueryNoteUseCase {
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> findAllByToUser(User user, Pageable pageable) {
+    public Page<ResponseSimpleNoteDTO> findAllByToUserForDTO(User user, Pageable pageable) {
         return noteJpaPort.findAllByToUser(user, pageable).map(note -> {
             String fromNickname = note.getFromUser() == null ? "알 수 없음" : note.getFromUser().getNickname();
             return noteMapper.toResponseSimpleNoteDTO(note, fromNickname+"님으로부터 온 쪽지");
@@ -31,7 +31,7 @@ public class QueryNoteService implements QueryNoteUseCase {
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> findAllByFromUser(User user, Pageable pageable) {
+    public Page<ResponseSimpleNoteDTO> findAllByFromUserForDTO(User user, Pageable pageable) {
         return noteJpaPort.findAllByFromUser(user, pageable).map(note -> {
             String toNickname = note.getToUser() == null ? "알 수 없음" : note.getToUser().getNickname();
             return noteMapper.toResponseSimpleNoteDTO(note, toNickname+"님에게 보낸 쪽지");

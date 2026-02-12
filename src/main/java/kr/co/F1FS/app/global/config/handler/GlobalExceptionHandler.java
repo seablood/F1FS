@@ -1,4 +1,4 @@
-/*package kr.co.F1FS.app.global.config.handler;
+package kr.co.F1FS.app.global.config.handler;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -6,21 +6,30 @@ import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.util.BaseException;
 import kr.co.F1FS.app.global.util.ErrorMessages;
 import kr.co.F1FS.app.global.util.ExceptionType;
+import kr.co.F1FS.app.global.util.exception.authentication.*;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
+import kr.co.F1FS.app.global.util.exception.chat.ChatRoomException;
+import kr.co.F1FS.app.global.util.exception.chat.StompException;
+import kr.co.F1FS.app.global.util.exception.circuit.CircuitException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.driver.DriverException;
 import kr.co.F1FS.app.global.util.exception.email.EmailException;
+import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
+import kr.co.F1FS.app.global.util.exception.note.NoteException;
 import kr.co.F1FS.app.global.util.exception.notification.NotificationException;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyException;
+import kr.co.F1FS.app.global.util.exception.session.SessionException;
 import kr.co.F1FS.app.global.util.exception.suggest.SuggestException;
 import kr.co.F1FS.app.global.util.exception.user.UserException;
+import kr.co.F1FS.app.global.util.exception.verify.VerifyException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -83,19 +92,30 @@ public class GlobalExceptionHandler {
                         EmailException.class,
                         CDSearchException.class,
                         NotificationException.class,
-                        SuggestException.class})
+                        SuggestException.class,
+                        ChatRoomException.class,
+                        StompException.class,
+                        CircuitException.class,
+                        GrandPrixException.class,
+                        NoteException.class,
+                        SessionException.class,
+                        VerifyException.class})
     public ResponseEntity<String> handleCustomException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
-        sendExceptionType(exceptionType);
         log.error(exceptionType.getMessage());
 
         return ResponseEntity.status(exceptionType.getHttpStatus()).body(exceptionType.getMessage());
     }
 
-    public void sendExceptionType(ExceptionType exceptionType){
-        HashMap<String, String> data = new HashMap<>();
-        data.put("에러 로그", exceptionType.getMessage());
-        slackService.sendErrorMessage(exceptionType.getErrorName(), data);
+    @ExceptionHandler({AccountPasswordException.class,
+                        AccountDormantException.class,
+                        AccountTemporaryException.class,
+                        AccountLockedException.class,
+                        AccountSuspendException.class})
+    public ResponseEntity<String> handleAccountException(AuthenticationException ex){
+        log.error(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     public void sendMessage(Exception e, HttpStatus httpStatus){
@@ -103,4 +123,4 @@ public class GlobalExceptionHandler {
         data.put("에러 로그", e.getMessage());
         slackService.sendErrorMessage(httpStatus.name(), data);
     }
-}*/
+}

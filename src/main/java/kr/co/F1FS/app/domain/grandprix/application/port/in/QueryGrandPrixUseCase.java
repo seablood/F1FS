@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface QueryGrandPrixUseCase {
     GrandPrix findById(Long id);
-    List<SimpleResponseGrandPrixDTO> findAll(Integer season);
+    List<SimpleResponseGrandPrixDTO> findAllForDTO(Integer season);
 }

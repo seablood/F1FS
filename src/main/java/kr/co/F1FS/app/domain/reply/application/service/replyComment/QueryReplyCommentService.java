@@ -25,7 +25,7 @@ public class QueryReplyCommentService implements QueryReplyCommentUseCase {
     }
 
     @Override
-    public Map<Long, List<ResponseReplyCommentDTO>> findByReply(List<Reply> replies) {
+    public Map<Long, List<ResponseReplyCommentDTO>> findByReplyForDTO(List<Reply> replies) {
         List<ReplyComment> comments = replyCommentJpaPort.findAllByReply(replies);
 
         Map<Long, List<ResponseReplyCommentDTO>> commentMap = comments.stream()

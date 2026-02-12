@@ -6,6 +6,6 @@ import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixD
 import java.util.List;
 
 public interface GrandPrixUseCase {
-    List<SimpleResponseGrandPrixDTO> findAll(Integer season);
+    List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season);
     ResponseGrandPrixDTO getGrandPrixById(Long id);
 }

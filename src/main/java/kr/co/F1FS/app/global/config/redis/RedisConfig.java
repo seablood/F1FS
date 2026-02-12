@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
+import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -55,6 +57,68 @@ public class RedisConfig {
 
         Jackson2JsonRedisSerializer<NotificationRedis> serializer =
                 new Jackson2JsonRedisSerializer<>(mapper, NotificationRedis.class);
+
+        // 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, String> stringListRedisTemplate(
+            RedisConnectionFactory connectionFactory
+    ) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new StringRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new StringRedisSerializer());
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> grandPrixSuggestListRedisTemplate() {
+        RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Jackson2JsonRedisSerializer<ResponseSuggestGrandPrixSearchDTO> serializer =
+                new Jackson2JsonRedisSerializer<>(mapper, ResponseSuggestGrandPrixSearchDTO.class);
+
+        // 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, CDSearchSuggestionDTO> cdSuggestListRedisTemplate() {
+        RedisTemplate<String, CDSearchSuggestionDTO> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Jackson2JsonRedisSerializer<CDSearchSuggestionDTO> serializer =
+                new Jackson2JsonRedisSerializer<>(mapper, CDSearchSuggestionDTO.class);
 
         // 직렬화 설정
         template.setKeySerializer(new StringRedisSerializer());

@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.suggest.domain.Suggest;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.CreateSuggestDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
+import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
 
@@ -24,10 +25,22 @@ public class SuggestMapper {
         String author = suggest.getFromUser() == null ? "탈퇴한 회원" : suggest.getFromUser().getNickname();
 
         return ResponseSuggestDTO.builder()
-                .id(suggest.getId())
                 .author(author)
                 .title(suggest.getTitle())
                 .content(suggest.getContent())
+                .createdAt(TimeUtil.formatPostTime(suggestTime))
+                .isConfirmed(suggest.isConfirmed())
+                .build();
+    }
+
+    public SimpleResponseSuggestDTO toSimpleResponseSuggestDTO(Suggest suggest){
+        LocalDateTime suggestTime = TimeUtil.convertToKoreanTime(suggest.getCreatedAt());
+        String author = suggest.getFromUser() == null ? "탈퇴한 회원" : suggest.getFromUser().getNickname();
+
+        return SimpleResponseSuggestDTO.builder()
+                .id(suggest.getId())
+                .author(author)
+                .title(suggest.getTitle())
                 .createdAt(TimeUtil.formatPostTime(suggestTime))
                 .isConfirmed(suggest.isConfirmed())
                 .build();

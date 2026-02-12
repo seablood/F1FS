@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface FollowUserUseCase {
     void toggle(User followerUser, String followeeNickname);
-    List<ResponseFollowUserDTO> findFollowers(String nickname);
-    List<ResponseFollowUserDTO> findFollowees(String nickname);
-    List<ResponseFollowUserDTO> findFollowersAuth(User user);
-    List<ResponseFollowUserDTO> findFolloweesAuth(User user);
+    List<ResponseFollowUserDTO> getFollowersByNickname(String nickname);
+    List<ResponseFollowUserDTO> getFolloweesByNickname(String nickname);
+    List<ResponseFollowUserDTO> getFollowersByUser(User user);
+    List<ResponseFollowUserDTO> getFolloweesByUser(User user);
 }

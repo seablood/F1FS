@@ -1,6 +1,5 @@
 package kr.co.F1FS.app.global.presentation.dto.constructor;
 
-import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseCurrentSeasonDTO;
 import kr.co.F1FS.app.global.presentation.dto.record.ResponseSinceDebutDTO;
 import lombok.AllArgsConstructor;
@@ -26,13 +25,4 @@ public class ResponseConstructorDTO {
     private Integer followerNum;
     private ResponseCurrentSeasonDTO currentSeason;
     private ResponseSinceDebutDTO sinceDebut;
-
-    public static ResponseConstructorDTO toDto(Constructor constructor, List<String> drivers,
-                                               ResponseCurrentSeasonDTO currentSeason,
-                                               ResponseSinceDebutDTO sinceDebut){
-        return new ResponseConstructorDTO(constructor.getName(), constructor.getEngName(), drivers,
-                constructor.getChampionships(), constructor.getBase(), constructor.getTeamChief(),
-                constructor.getChassis(), constructor.getPowerUnit(), constructor.getFollowerNum(),
-                currentSeason, sinceDebut);
-    }
 }

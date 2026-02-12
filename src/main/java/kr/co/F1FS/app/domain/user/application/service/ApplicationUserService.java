@@ -22,7 +22,7 @@ public class ApplicationUserService implements UserUseCase {
 
     @Override
     @Cacheable(value = "UserDTO", key = "#nickname", cacheManager = "redisLongCacheManager")
-    public ResponseUserDTO findByNickname(String nickname){
+    public ResponseUserDTO getUserByNickname(String nickname){
         return queryUserUseCase.findByNicknameForDTO(nickname);
     }
 

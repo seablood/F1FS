@@ -34,7 +34,7 @@ public class ApplicationAdminSuspensionLogService implements AdminSuspensionLogU
 
         List<UserComplain> list = queryUserComplainUseCase.findAllByToUser(suspendUser);
         if(!list.isEmpty()){
-            list.stream().forEach(complain -> deleteUserComplainUseCase.delete(complain));
+            deleteUserComplainUseCase.delete(list);
         }
     }
 }

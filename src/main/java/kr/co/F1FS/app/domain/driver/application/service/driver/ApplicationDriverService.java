@@ -22,7 +22,7 @@ public class ApplicationDriverService implements DriverUseCase {
     private final DriverQueryAggregatorUseCase aggregatorUseCase;
 
     @Override
-    public Page<SimpleResponseDriverDTO> findAll(int page, int size, String condition){
+    public Page<SimpleResponseDriverDTO> getDriverAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
         return queryDriverUseCase.findAllForSimpleDTO(pageable);
@@ -30,7 +30,7 @@ public class ApplicationDriverService implements DriverUseCase {
 
     @Override
     @Cacheable(value = "DriverDTO", key = "#id", cacheManager = "redisLongCacheManager")
-    public ResponseDriverDTO findById(Long id){
+    public ResponseDriverDTO getDriverById(Long id){
         return aggregatorUseCase.findByIdForDTO(id);
     }
 

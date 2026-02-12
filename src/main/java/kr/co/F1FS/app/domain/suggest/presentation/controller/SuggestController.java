@@ -8,6 +8,7 @@ import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.CreateSuggestDTO;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.ModifySuggestDTO;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
+import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,16 +35,16 @@ public class SuggestController {
 
     @GetMapping("/find/{id}")
     @Operation(summary = "건의 사항 상세 페이지", description = "특정 ID의 건의 사항 반환")
-    public ResponseEntity<ResponseSuggestDTO> findById(@PathVariable Long id){
+    public ResponseEntity<ResponseSuggestDTO> getSuggestById(@PathVariable Long id){
         return ResponseEntity.status(HttpStatus.OK).body(suggestUseCase.getSuggestById(id));
     }
 
     @GetMapping("/find-all")
     @Operation(summary = "작성한 모든 건의 사항 검색", description = "로그인 유저가 작성한 모든 건의 사항을 반환")
-    public ResponseEntity<List<ResponseSuggestDTO>> findByUser(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                               @RequestParam(value = "page", defaultValue = "0") int page,
-                                                               @RequestParam(value = "size", defaultValue = "10") int size){
-        Page<ResponseSuggestDTO> newPage = suggestUseCase.getSuggestByUser(page, size, principalDetails.getUser());
+    public ResponseEntity<List<SimpleResponseSuggestDTO>> getSuggestListByUser(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                               @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                               @RequestParam(value = "size", defaultValue = "10") int size){
+        Page<SimpleResponseSuggestDTO> newPage = suggestUseCase.getSuggestListByUser(page, size, principalDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 

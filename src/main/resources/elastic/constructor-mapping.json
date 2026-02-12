@@ -2,29 +2,53 @@
   "properties": {
     "korName": {
       "type": "text",
-      "analyzer": "autocomplete_nori",
-      "search_analyzer": "nori_search",
+      "analyzer": "nori_search",
       "fields": {
-        "ngram": {
+        "kor_autocomplete": {
           "type": "text",
-          "analyzer": "autocomplete_nori",
+          "analyzer": "kor_autocomplete_analyzer",
           "search_analyzer": "nori_search"
         },
-        "ngram_search": {
+        "ngram": {
           "type": "text",
-          "analyzer": "ngram_analyzer"
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         }
       }
     },
     "engName": {
       "type": "text",
-      "analyzer": "autocomplete_standard",
-      "search_analyzer": "standard"
+      "analyzer": "standard",
+      "fields": {
+        "eng_autocomplete": {
+          "type": "text",
+          "analyzer": "eng_autocomplete_analyzer",
+          "search_analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+        }
+      }
     },
     "racingClass": {
       "type": "text",
-      "analyzer": "autocomplete_standard",
-      "search_analyzer": "standard"
+      "analyzer": "standard"
     }
   }
 }

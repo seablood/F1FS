@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.domain.notification.presentation.dto.fcm;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import kr.co.F1FS.app.global.util.Topic;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FCMTopicRequestDTO {
-    @NotBlank(message = "구독할 토픽을 지정해주세요.")
-    private String topic;
+    @Enumerated(value = EnumType.STRING)
+    private Topic topic;
 }

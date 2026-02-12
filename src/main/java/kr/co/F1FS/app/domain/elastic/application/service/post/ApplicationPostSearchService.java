@@ -1,10 +1,15 @@
 package kr.co.F1FS.app.domain.elastic.application.service.post;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.post.PostSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.PostSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.PostSearchRepository;
+import kr.co.F1FS.app.domain.elastic.presentation.dto.TagListRequestDTO;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -26,20 +32,16 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     private final DocumentMapper documentMapper;
     private final PostSearchRepository postSearchRepository;
     private final PostSearchRepoPort postSearchRepoPort;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
     public NativeQuery setQueryTitle(String keyword){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .bool(b -> b
-                                .should(s -> s.match(m -> m
-                                        .field("title.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("title.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                        .multiMatch(mm -> mm
+                                .query(keyword)
+                                .fields("title.kor", "title.eng")
+                                .operator(Operator.Or)))
                 .build();
 
         return query;
@@ -48,15 +50,10 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     public NativeQuery setQueryContent(String keyword){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .bool(b -> b
-                                .should(s -> s.match(m -> m
-                                        .field("content.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("content.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                        .multiMatch(mm -> mm
+                                .query(keyword)
+                                .fields("content.kor", "content.eng")
+                                .operator(Operator.Or)))
                 .build();
 
         return query;
@@ -66,39 +63,120 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
-                                .should(s -> s.match(m -> m
-                                        .field("title.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("title.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("content.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("content.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                                .must(m -> m.multiMatch(mm -> {
+                                    mm.query(keyword)
+                                            .fields("title.kor^3", "title.eng^3", "content.kor", "content.eng")
+                                            .operator(Operator.Or);
+                                    return mm;
+                                }))))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
                 .build();
 
         return query;
     }
 
     public NativeQuery setQueryAuthor(String keyword){
+        String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
+        String trimmed = keyword.trim();
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> {
+                            b.must(m -> m.bool(bb -> {
+                                bb.should(s -> s.prefix(p -> {
+                                    p.field("author.normalized")
+                                            .value(normalized)
+                                            .boost(6.0f);
+                                    return p;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("author.kor")
+                                            .query(trimmed)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("author.eng")
+                                            .query(normalized)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.minimumShouldMatch("1");
+
+                                return bb;
+                            }));
+                            b.should(s -> s.match(m -> {
+                                m.field("author.ngram")
+                                        .query(normalized)
+                                        .boost(1.5f);
+                                return m;
+                            }));
+
+                            return b;
+                        }))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .build();
+
+        return query;
+    }
+
+    public NativeQuery setQueryTags(String keyword){
+        String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
+        String trimmed = keyword.trim();
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .bool(b -> {
+                            b.must(m -> m.bool(bb -> {
+                                bb.should(s -> s.prefix(p -> {
+                                    p.field("tags.normalized")
+                                            .value(normalized)
+                                            .boost(6.0f);
+                                    return p;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("tags.kor")
+                                            .query(trimmed)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.should(s -> s.match(mm -> {
+                                    mm.field("tags.eng")
+                                            .query(normalized)
+                                            .boost(4.0f);
+                                    return mm;
+                                }));
+                                bb.minimumShouldMatch("1");
+
+                                return bb;
+                            }));
+                            b.should(s -> s.match(m -> {
+                                m.field("tags.ngram")
+                                        .query(normalized)
+                                        .boost(1.5f);
+                                return m;
+                            }));
+
+                            return b;
+                        }))
+                .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .build();
+
+        return query;
+    }
+
+    public NativeQuery setQueryTagsFilter(List<String> tags){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
-                                .should(s -> s.match(m -> m
-                                        .field("author.kor")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))
-                                .should(s -> s.match(m -> m
-                                        .field("author.eng")
-                                        .query(keyword)
-                                        .fuzziness("AUTO")))))
+                                .filter(f -> f
+                                        .terms(t -> t
+                                                .field("tags.keyword")
+                                                .terms(v -> v.value(
+                                                        tags.stream()
+                                                                .map(FieldValue::of)
+                                                                .toList()
+                                                ))))))
                 .build();
 
         return query;
@@ -111,19 +189,31 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         switch (option){
             case "title" :
                 NativeQuery query = setQueryTitle(keyword);
-                return getPageImpl(query, pageable);
+                return getPageImpl(query, pageable, keyword);
             case "content" :
                 NativeQuery query2 = setQueryContent(keyword);
-                return getPageImpl(query2, pageable);
+                return getPageImpl(query2, pageable, keyword);
             case "titleOrContent" :
                 NativeQuery query3 = setQueryTitleOrContent(keyword);
-                return getPageImpl(query3, pageable);
+                return getPageImpl(query3, pageable, keyword);
             case "author" :
+                if (keyword.length() < 3) return new PageImpl<>(List.of());
                 NativeQuery query4 = setQueryAuthor(keyword);
-                return getPageImpl(query4, pageable);
+                return getPageImpl(query4, pageable, keyword);
+            case "tags" :
+                NativeQuery query5 = setQueryTags(keyword);
+                return getPageImpl(query5, pageable, keyword);
             default:
                 throw new PostException(PostExceptionType.SEARCH_ERROR_POST);
         }
+    }
+
+    @Override
+    public Page<ResponsePostDocumentDTO> getPostListByTags(int page, int size, String condition, TagListRequestDTO dto) {
+        Pageable pageable = switchCondition(page, size, condition);
+        NativeQuery query = setQueryTagsFilter(dto.getTags());
+
+        return getPageImpl(query, pageable, null);
     }
 
     public Pageable switchCondition(int page, int size, String condition){
@@ -159,7 +249,7 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         };
     }
 
-    public PageImpl getPageImpl(NativeQuery query, Pageable pageable){
+    public PageImpl getPageImpl(NativeQuery query, Pageable pageable, String keyword){
         SearchHits<PostDocument> hits = elasticsearchTemplate.search(query, PostDocument.class);
         List<PostDocument> list = hits.stream()
                 .map(hit -> hit.getContent())
@@ -170,6 +260,8 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                 .sorted(comparator)
                 .map(postDocument -> documentMapper.toResponsePostDocumentDTO(postDocument))
                 .toList();
+
+        if (keyword != null) saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
 
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), sorted.size());

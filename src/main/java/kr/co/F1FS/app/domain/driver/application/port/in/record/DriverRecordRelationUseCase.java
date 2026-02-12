@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.driver.application.port.in.record;
 
-import kr.co.F1FS.app.domain.driver.presentation.dto.ResponseDriverStandingDTO;
+import kr.co.F1FS.app.domain.driver.presentation.dto.record.ResponseDriverStandingDTO;
 
 import java.util.List;
 

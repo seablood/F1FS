@@ -22,6 +22,6 @@ public class SessionController {
     @GetMapping("/find/{id}")
     @Operation(summary = "세션 상세 정보", description = "세션 결과 포함 세션 상세 정보 반환")
     public ResponseEntity<ResponseSessionDTO> getSessionById(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(sessionUseCase.getSessionByID(id));
+        return ResponseEntity.status(HttpStatus.OK).body(sessionUseCase.getSessionById(id));
     }
 }

@@ -29,14 +29,14 @@ public class FollowDriverController {
 
     @GetMapping("/following/not-auth/{nickname}")
     @Operation(summary = "팔로잉 확인 기능", description = "특정 유저의 드라이버 팔로잉 확인")
-    public ResponseEntity<List<ResponseFollowDriverDTO>> getFollowing(@PathVariable String nickname){
+    public ResponseEntity<List<ResponseFollowDriverDTO>> getFollowingDriverByNickname(@PathVariable String nickname){
         return ResponseEntity.status(HttpStatus.OK).body(followDriverUseCase.getFollowingDriverByNickname(nickname));
     }
 
     @GetMapping("/following")
     @Operation(summary = "팔로잉 확인 기능(로그인)", description = "로그인 유저의 드라이버 팔로잉 확인")
-    public ResponseEntity<List<ResponseFollowDriverDTO>> getFollowingDriverAuth(
+    public ResponseEntity<List<ResponseFollowDriverDTO>> getFollowingDriverByUser(
                                         @AuthenticationPrincipal PrincipalDetails details){
-        return ResponseEntity.status(HttpStatus.OK).body(followDriverUseCase.getFollowingDriver(details.getUser()));
+        return ResponseEntity.status(HttpStatus.OK).body(followDriverUseCase.getFollowingDriverByUser(details.getUser()));
     }
 }

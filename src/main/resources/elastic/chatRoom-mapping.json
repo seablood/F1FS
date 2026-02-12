@@ -5,13 +5,11 @@
       "fields": {
         "kor": {
           "type": "text",
-          "analyzer": "ngram_analyzer",
-          "search_analyzer": "nori_search"
+          "analyzer": "nori_search"
         },
         "eng": {
           "type": "text",
-          "analyzer": "autocomplete_standard",
-          "search_analyzer": "standard"
+          "analyzer": "standard"
         }
       }
     },
@@ -20,13 +18,11 @@
       "fields": {
         "kor": {
           "type": "text",
-          "analyzer": "ngram_analyzer",
-          "search_analyzer": "nori_search"
+          "analyzer": "nori_search"
         },
         "eng": {
           "type": "text",
-          "analyzer": "autocomplete_standard",
-          "search_analyzer": "standard"
+          "analyzer": "standard"
         }
       }
     },

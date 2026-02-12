@@ -2,7 +2,7 @@ package kr.co.F1FS.app.domain.driver.application.mapper.record;
 
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverRecordRelation;
-import kr.co.F1FS.app.domain.driver.presentation.dto.ResponseDriverStandingDTO;
+import kr.co.F1FS.app.domain.driver.presentation.dto.record.ResponseDriverStandingDTO;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import org.springframework.stereotype.Component;
 

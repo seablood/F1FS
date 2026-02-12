@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.domain.chat.application.port.in.chatRoom;
 
-import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.CreateChatRoomDTO;
 
 public interface CreateChatRoomUseCase {
     void createEntity(CreateChatRoomDTO dto, String masterUser);

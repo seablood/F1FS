@@ -49,7 +49,7 @@ public class ApplicationFollowConstructorService implements FollowConstructorUse
     }
 
     @Override
-    public List<ResponseFollowConstructorDTO> getFollowingConstructor(User user){
+    public List<ResponseFollowConstructorDTO> getFollowingConstructorByUser(User user){
         return queryFollowConstructorUseCase.findByFollowerUserForDTO(user);
     }
 

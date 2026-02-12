@@ -6,7 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.F1FS.app.domain.auth.application.port.in.BlackListUseCase;
+import kr.co.F1FS.app.domain.auth.application.port.in.blackList.CheckBlackListUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class JwtTokenService {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    private final BlackListUseCase blackListUseCase;
+    private final CheckBlackListUseCase checkBlackListUseCase;
     private final static String TOKEN_PREFIX = "Bearer ";
 
     // AccessToken 및 RefreshToken 생성
@@ -51,6 +51,7 @@ public class JwtTokenService {
                 .claim("id", user.getId())
                 .claim("email", user.getEmail())
                 .claim("username", user.getUsername())
+                .claim("nickname", user.getNickname())
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
@@ -88,10 +89,14 @@ public class JwtTokenService {
         return Optional.ofNullable(getClaims(token).get("username", String.class));
     }
 
+    public Optional<String> getNickname(String token){
+        return Optional.ofNullable(getClaims(token).get("nickname", String.class));
+    }
+
     // 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
-            return (!getClaims(token).getExpiration().before(new Date())) && !blackListUseCase.isBlacklisted(token);
+            return (!getClaims(token).getExpiration().before(new Date())) && !checkBlackListUseCase.isBlacklisted(token);
         } catch (Exception e) {
             return false;
         }

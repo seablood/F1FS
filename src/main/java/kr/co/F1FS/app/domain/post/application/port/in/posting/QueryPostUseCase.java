@@ -10,6 +10,6 @@ import org.springframework.data.domain.Pageable;
 public interface QueryPostUseCase {
     Post findById(Long id);
     ResponsePostDTO findByIdForDTO(Long id);
-    Page<ResponseSimplePostDTO> findAll(Pageable pageable);
-    Page<ResponseSimplePostDTO> findAllByAuthor(User user, Pageable pageable);
+    Page<ResponseSimplePostDTO> findAllForDTO(Pageable pageable);
+    Page<ResponseSimplePostDTO> findAllByAuthorForDTO(User user, Pageable pageable);
 }

@@ -64,9 +64,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        //
-        // 추후 프론트 연결을 고려한 CORS 처리 코드 추가 필요
-                                                //
+        // dev 버전
+        // CORS 처리 코드  //
+                        //
 
         http.formLogin((formLogin) -> formLogin.disable());
         http.httpBasic((httpBasic) -> httpBasic.disable());
@@ -103,7 +103,9 @@ public class SecurityConfig {
                                     "/api/v1/session/**",
                                     "/api/v1/search-grand-prix/**",
                                     "/ws/stomp",
-                                    "/api/v1/search-chat-room/**").permitAll()
+                                    "/api/v1/search-chat-room/**",
+                                    "/api/v1/search-tag/**",
+                                    "/api/v1/search-grand-prix-suggest/**").permitAll()
                     .anyRequest().authenticated());
 
         http.oauth2Login((oauth2Login) ->

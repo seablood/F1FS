@@ -11,6 +11,8 @@ import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class DeleteUserComplainService implements DeleteUserComplainUseCase {
@@ -31,5 +33,10 @@ public class DeleteUserComplainService implements DeleteUserComplainUseCase {
     public void delete(UserComplain userComplain) {
         cacheEvictUtil.evictCachingUserComplain(userComplain);
         userComplainJpaPort.delete(userComplain);
+    }
+
+    @Override
+    public void delete(List<UserComplain> list) {
+        list.stream().forEach(complain -> delete(complain));
     }
 }

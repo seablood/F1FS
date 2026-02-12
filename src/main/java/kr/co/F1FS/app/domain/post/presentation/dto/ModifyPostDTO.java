@@ -2,10 +2,12 @@ package kr.co.F1FS.app.domain.post.presentation.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Getter
+import java.util.List;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyPostDTO {
@@ -13,4 +15,5 @@ public class ModifyPostDTO {
     private String title;
     @NotBlank(message = "content는 필수 입력 항목입니다.")
     private String content;
+    private List<String> tags;
 }

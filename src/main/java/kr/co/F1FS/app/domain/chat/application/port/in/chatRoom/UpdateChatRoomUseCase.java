@@ -1,7 +1,7 @@
 package kr.co.F1FS.app.domain.chat.application.port.in.chatRoom;
 
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
-import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.ModifyChatRoomDTO;
 
 import java.time.LocalDateTime;
 

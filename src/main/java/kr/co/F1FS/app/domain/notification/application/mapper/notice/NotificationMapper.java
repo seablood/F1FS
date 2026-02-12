@@ -28,7 +28,7 @@ public class NotificationMapper {
                         .id(sequence.getAndAdd(1L))
                         .title(dto.getTitle())
                         .content(dto.getSimpleContent())
-                        .topic(dto.getTopic())
+                        .topic(dto.getTopics())
                         .type(NotificationType.OFFICIAL)
                         .build();
             case "personal" :
@@ -36,7 +36,7 @@ public class NotificationMapper {
                         .id(sequence.getAndAdd(1L))
                         .title(dto.getTitle())
                         .content(dto.getSimpleContent())
-                        .topic(dto.getTopic())
+                        .topic(dto.getTopics())
                         .type(NotificationType.PERSONAL)
                         .build();
             default:
@@ -44,10 +44,11 @@ public class NotificationMapper {
         }
     }
 
-    public Notification toNotification(NotificationRedis redis, String content){
+    public Notification toNotification(NotificationRedis redis, String content, String author){
         return Notification.builder()
                 .redis(redis)
                 .content(content)
+                .author(author)
                 .build();
     }
 
@@ -58,7 +59,7 @@ public class NotificationMapper {
                 .id(notification.getId())
                 .title(notification.getTitle())
                 .content(notification.getContent())
-                .topic(notification.getTopic())
+                .topic(notification.getTopic().toString())
                 .createdAt(TimeUtil.formatPostTime(notificationTime))
                 .build();
     }
@@ -85,7 +86,7 @@ public class NotificationMapper {
                 .redisId(notification.getRedisId())
                 .title(notification.getTitle())
                 .simpleContent(notification.getSimpleContent())
-                .topic(notification.getTopic())
+                .topic(notification.getTopic().toString())
                 .createdAt(TimeUtil.formatPostTime(notificationTime))
                 .build();
     }

@@ -23,7 +23,7 @@ public class User {
     private String username;
     private String password;
     @Column(unique = true)
-    @Size(min = 1, max = 20, message = "nickname은 20자 이하로 설정해주세요.")
+    @Size(min = 4, max = 20, message = "nickname은 20자 이하로 설정해주세요.")
     private String nickname;
     @Column(unique = true)
     private String email;

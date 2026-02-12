@@ -6,17 +6,19 @@ import kr.co.F1FS.app.domain.post.domain.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PostSearchDocumentService {
     private final DocumentMapper documentMapper;
 
-    public PostDocument createDocument(Post post){
-        return documentMapper.toPostDocument(post);
+    public PostDocument createDocument(Post post, List<String> tags){
+        return documentMapper.toPostDocument(post, tags);
     }
 
-    public void modify(PostDocument document, Post post){
-        document.modify(post);
+    public void modify(PostDocument document, Post post, List<String> tags){
+        document.modify(post, tags);
     }
 
     public void increaseLikeNum(PostDocument document){

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.domain.suggest.application.port.in.admin.AdminSuggestUseCase;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
+import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,10 +22,16 @@ public class AdminSuggestController {
 
     @GetMapping("/find-all")
     @Operation(summary = "모든 건의 사항 검색", description = "모든 건의 사항 리스트 반환")
-    public ResponseEntity<List<ResponseSuggestDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                            @RequestParam(value = "size", defaultValue = "10") int size){
-        Page<ResponseSuggestDTO> newPage = adminSuggestUseCase.findAll(page, size);
+    public ResponseEntity<List<SimpleResponseSuggestDTO>> getSuggestAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                        @RequestParam(value = "size", defaultValue = "10") int size){
+        Page<SimpleResponseSuggestDTO> newPage = adminSuggestUseCase.getSuggestAll(page, size);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
+    @GetMapping("/find/{id}")
+    @Operation(summary = "건의 사항 상세 페이지", description = "특정 ID의 건의 사항 반환")
+    public ResponseEntity<ResponseSuggestDTO> getSuggestById(@PathVariable Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(adminSuggestUseCase.getSuggestById(id));
     }
 
     @PostMapping("/confirm-toggle/{id}")

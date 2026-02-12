@@ -8,10 +8,12 @@ import kr.co.F1FS.app.domain.driver.application.port.in.record.CreateDriverRecor
 import kr.co.F1FS.app.domain.driver.application.port.out.driver.DriverJpaPort;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.presentation.dto.driver.ModifyDriverCommand;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.currentSeason.CreateCurrentSeasonUseCase;
 import kr.co.F1FS.app.domain.record.application.port.in.sinceDebut.CreateSinceDebutUseCase;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
+import kr.co.F1FS.app.global.application.service.ValidationService;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,10 +30,15 @@ public class UpdateDriverService implements UpdateDriverUseCase {
     private final CreateSinceDebutUseCase createSinceDebutUseCase;
     private final CreateDriverRecordRelationUseCase createDriverRecordRelationUseCase;
     private final CreateDriverDebutRelationUseCase createDriverDebutRelationUseCase;
+    private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
+    private final ValidationService validationService;
 
     @Override
     public void modify(Driver driver, ModifyDriverCommand command) {
         driverDomainService.modify(driver, command);
+        validationService.checkValid(driver);
+
+        saveSuggestKeyword(driver);
         driverJpaPort.saveAndFlush(driver);
     }
 
@@ -70,5 +77,10 @@ public class UpdateDriverService implements UpdateDriverUseCase {
         driverDomainService.decreaseFollower(driver);
 
         driverJpaPort.saveAndFlush(driver);
+    }
+
+    public void saveSuggestKeyword(Driver driver){
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(driver.getName());
+        saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(driver.getEngName());
     }
 }

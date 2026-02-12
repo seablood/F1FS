@@ -2,9 +2,11 @@ package kr.co.F1FS.app.domain.user.application.mapper;
 
 import kr.co.F1FS.app.domain.auth.presentation.dto.CreateAdminUserDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.user.presentation.dto.CreateAdminUserCommand;
 import kr.co.F1FS.app.domain.user.presentation.dto.CreateUserCommand;
 import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.SimpleResponseUserDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,6 +30,15 @@ public class UserMapper {
                 .build();
     }
 
+    public User toUser(CreateAdminUserCommand command){
+        return User.builder()
+                .username(command.getUsername())
+                .password(command.getPassword())
+                .email(command.getEmail())
+                .nickname(command.getNickname())
+                .build();
+    }
+
     public User toUser(OAuth2UserInfo userInfo){
         return User.builder()
                 .username(userInfo.getProvider()+userInfo.getProviderId())
@@ -45,6 +56,14 @@ public class UserMapper {
                 .email(user.getEmail())
                 .follower(user.getFollowerNum())
                 .following(user.getFollowingNum())
+                .build();
+    }
+
+    public SimpleResponseUserDTO toSimpleResponseUserDTO(User user){
+        return SimpleResponseUserDTO.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .nickname(user.getNickname())
                 .build();
     }
 }

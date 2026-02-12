@@ -33,9 +33,15 @@ public class QueryNotificationService implements QueryNotificationUseCase {
     }
 
     @Override
-    public Page<SimpleResponseNotificationDTO> findAll(Pageable pageable) {
+    public Page<SimpleResponseNotificationDTO> findAllForDTO(Pageable pageable) {
         return notificationJpaPort.findAll(pageable).map(notification -> notificationMapper.toSimpleResponseNotificationDTO(
                 notification
         ));
+    }
+
+    @Override
+    public Page<SimpleResponseNotificationDTO> findAllByAuthorForSimpleDTO(String author, Pageable pageable) {
+        return notificationJpaPort.findAllByAuthor(author, pageable)
+                .map(notification -> notificationMapper.toSimpleResponseNotificationDTO(notification));
     }
 }

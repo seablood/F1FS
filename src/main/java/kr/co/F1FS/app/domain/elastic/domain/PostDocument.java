@@ -11,6 +11,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Document(indexName = "posts")
 @Setting(settingPath = "/elastic/post-setting.json")
@@ -31,6 +32,8 @@ public class PostDocument {
     @Field(type = FieldType.Text)
     private String author;
 
+    private List<String> tags;
+
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
@@ -38,9 +41,10 @@ public class PostDocument {
     @Field(type = FieldType.Integer)
     private int likeNum;
 
-    public void modify(Post post){
+    public void modify(Post post, List<String> tags){
         this.title = post.getTitle();
         this.content = post.getContent();
+        this.tags = tags;
     }
 
     public void increaseLikeNum(){
@@ -52,11 +56,12 @@ public class PostDocument {
     }
 
     @Builder
-    public PostDocument(Post post){
+    public PostDocument(Post post, List<String> tags){
         this.id = post.getId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.author = post.getAuthor().getNickname();
+        this.tags = tags;
         this.createdAt = TimeUtil.convertToKoreanTime(post.getCreatedAt());
         this.likeNum = post.getLikeNum();
     }

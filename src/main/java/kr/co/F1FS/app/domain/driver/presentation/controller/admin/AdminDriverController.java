@@ -31,10 +31,10 @@ public class AdminDriverController {
 
     @GetMapping("/find-all")
     @Operation(summary = "드라이버 전체 리스트", description = "드라이버 전체 리스트 반환")
-    public ResponseEntity<List<SimpleResponseDriverDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<SimpleResponseDriverDTO>> getDriverAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
                                                                  @RequestParam(value = "condition", defaultValue = "nameASC") String condition){
-        Page<SimpleResponseDriverDTO> newPage = adminDriverUseCase.findAll(page, size, condition);
+        Page<SimpleResponseDriverDTO> newPage = adminDriverUseCase.getDriverAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 

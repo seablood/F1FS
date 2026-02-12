@@ -39,6 +39,12 @@
         "filter": ["lowercase"]
       }
     },
+    "normalizer": {
+      "lowercase_normalizer": {
+        "type": "custom",
+        "filter": ["lowercase"]
+      }
+    },
     "filter": {
       "nori_filter": {
         "type": "nori_part_of_speech",

@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.suggest.application.port.out.SuggestJpaPort;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
+import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,13 +19,13 @@ public class QuerySuggestService implements QuerySuggestUseCase {
     private final SuggestMapper suggestMapper;
 
     @Override
-    public Page<ResponseSuggestDTO> findAllForDTO(Pageable pageable) {
-        return suggestJpaPort.findAll(pageable).map(suggest -> suggestMapper.toResponseSuggestDTO(suggest));
+    public Page<SimpleResponseSuggestDTO> findAllForDTO(Pageable pageable) {
+        return suggestJpaPort.findAll(pageable).map(suggest -> suggestMapper.toSimpleResponseSuggestDTO(suggest));
     }
 
     @Override
-    public Page<ResponseSuggestDTO> findAllByFromUserForDTO(User user, Pageable pageable) {
-        return suggestJpaPort.findAllByFromUser(user, pageable).map(suggest -> suggestMapper.toResponseSuggestDTO(suggest));
+    public Page<SimpleResponseSuggestDTO> findAllByFromUserForDTO(User user, Pageable pageable) {
+        return suggestJpaPort.findAllByFromUser(user, pageable).map(suggest -> suggestMapper.toSimpleResponseSuggestDTO(suggest));
     }
 
     @Override

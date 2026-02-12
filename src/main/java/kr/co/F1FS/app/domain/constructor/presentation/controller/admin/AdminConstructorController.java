@@ -31,10 +31,10 @@ public class AdminConstructorController {
 
     @GetMapping("/find-all")
     @Operation(summary = "컨스트럭터 전체 리스트", description = "컨스트럭터 전체 리스트 반환")
-    public ResponseEntity<List<SimpleResponseConstructorDTO>> findAll(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<SimpleResponseConstructorDTO>> getConstructorAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                       @RequestParam(value = "size", defaultValue = "10") int size,
                                                                       @RequestParam(value = "condition", defaultValue = "nameASC") String condition){
-        Page<SimpleResponseConstructorDTO> newPage = adminConstructorUseCase.findAll(page, size, condition);
+        Page<SimpleResponseConstructorDTO> newPage = adminConstructorUseCase.getConstructorAll(page, size, condition);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 

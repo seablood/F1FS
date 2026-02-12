@@ -1,10 +1,11 @@
 package kr.co.F1FS.app.domain.chat.application.service.chatRoom;
 
-import kr.co.F1FS.app.domain.chat.application.port.in.*;
 import kr.co.F1FS.app.domain.chat.application.port.in.chatRoom.*;
+import kr.co.F1FS.app.domain.chat.application.port.in.subscribe.AddAndRemoveChatSubscribeUseCase;
+import kr.co.F1FS.app.domain.chat.application.port.in.subscribe.FindChatSubscribeUseCase;
 import kr.co.F1FS.app.domain.chat.domain.ChatRoom;
-import kr.co.F1FS.app.domain.chat.presentation.dto.CreateChatRoomDTO;
-import kr.co.F1FS.app.domain.chat.presentation.dto.ModifyChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.CreateChatRoomDTO;
+import kr.co.F1FS.app.domain.chat.presentation.dto.chatRoom.ModifyChatRoomDTO;
 import kr.co.F1FS.app.domain.elastic.application.port.in.chatRoom.DeleteChatRoomSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.chatRoom.QueryChatRoomSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.chatRoom.UpdateChatRoomSearchUseCase;
@@ -26,7 +27,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ApplicationChatRoomService implements ChatRoomUseCase {
-    private final ChatSubscribeUseCase chatSubscribeUseCase;
     private final CreateChatRoomUseCase createChatRoomUseCase;
     private final UpdateChatRoomUseCase updateChatRoomUseCase;
     private final DeleteChatRoomUseCase deleteChatRoomUseCase;
@@ -34,6 +34,8 @@ public class ApplicationChatRoomService implements ChatRoomUseCase {
     private final UpdateChatRoomSearchUseCase updateChatRoomSearchUseCase;
     private final QueryChatRoomSearchUseCase queryChatRoomSearchUseCase;
     private final DeleteChatRoomSearchUseCase deleteChatRoomSearchUseCase;
+    private final AddAndRemoveChatSubscribeUseCase addAndRemoveChatSubscribeUseCase;
+    private final FindChatSubscribeUseCase findChatSubscribeUseCase;
 
     @Override
     @Transactional
@@ -42,18 +44,18 @@ public class ApplicationChatRoomService implements ChatRoomUseCase {
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findAll(int page, int size, String condition) {
+    public Page<ResponseChatRoomDTO> getChatRoomAll(int page, int size, String condition) {
         Pageable pageable = conditionSwitch(page, size, condition);
 
-        return queryChatRoomUseCase.findAll(pageable);
+        return queryChatRoomUseCase.findAllForDTO(pageable);
     }
 
     @Override
-    public Page<ResponseChatRoomDTO> findSubscribeChatRoom(int page, int size, String condition, String username) {
+    public Page<ResponseChatRoomDTO> getChatRoomListByIdIn(int page, int size, String condition, String username) {
         Pageable pageable = conditionSwitch(page, size, condition);
-        List<Long> roomIds = chatSubscribeUseCase.findSubscribeChatRoom(username);
+        List<Long> roomIds = findChatSubscribeUseCase.findSubscribeChatRoom(username);
 
-        return queryChatRoomUseCase.findByIdIn(roomIds, pageable);
+        return queryChatRoomUseCase.findByIdInForDTO(roomIds, pageable);
     }
 
     @Override
@@ -78,7 +80,7 @@ public class ApplicationChatRoomService implements ChatRoomUseCase {
         if(!AuthorCertification.certification(username, chatRoom.getMasterUser())){
             throw new ChatRoomException(ChatRoomExceptionType.NOT_AUTHORITY_UPDATE_CHAT_ROOM);
         }
-        chatSubscribeUseCase.deleteChatRoom(roomId);
+        addAndRemoveChatSubscribeUseCase.deleteChatRoom(roomId);
 
         deleteChatRoomUseCase.delete(chatRoom);
         deleteChatRoomSearchUseCase.delete(document);

@@ -2,6 +2,9 @@ package kr.co.F1FS.app.domain.user.application.port.in;
 
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.SimpleResponseUserDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.Optional;
 
 public interface QueryUserUseCase {
     User findById(Long id);
+    Page<SimpleResponseUserDTO> findAllForSimpleDTO(Pageable pageable);
     User findByUsername(String username);
     Optional<User> findByUsernameForOptional(String username);
     User findByUsernameOrNull(String username);

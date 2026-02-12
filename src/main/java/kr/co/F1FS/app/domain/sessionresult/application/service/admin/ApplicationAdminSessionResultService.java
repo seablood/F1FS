@@ -19,7 +19,7 @@ public class ApplicationAdminSessionResultService implements AdminSessionResultU
 
     @Override
     @Transactional
-    public void saveSessionResult(List<CreateSessionResultDTO> dtoList, Long id, String racingClassCode){
+    public void save(List<CreateSessionResultDTO> dtoList, Long id, String racingClassCode){
         List<CreateSessionResultCommand> commandList = dtoList.stream()
                 .map(dto -> adminSessionResultMapper.toCreateSessionResultCommand(dto))
                 .toList();

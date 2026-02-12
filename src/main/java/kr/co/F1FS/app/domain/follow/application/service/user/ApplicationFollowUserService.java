@@ -43,24 +43,24 @@ public class ApplicationFollowUserService implements FollowUserUseCase {
     }
 
     @Override
-    public List<ResponseFollowUserDTO> findFollowers(String nickname){
+    public List<ResponseFollowUserDTO> getFollowersByNickname(String nickname){
         User user = queryUserUseCase.findByNickname(nickname);
         return queryFollowUserUseCase.findByFolloweeUserForDTO(user);
     }
 
     @Override
-    public List<ResponseFollowUserDTO> findFollowees(String nickname){
+    public List<ResponseFollowUserDTO> getFolloweesByNickname(String nickname){
         User user = queryUserUseCase.findByNickname(nickname);
         return queryFollowUserUseCase.findByFollowerUserForDTO(user);
     }
 
     @Override
-    public List<ResponseFollowUserDTO> findFollowersAuth(User user){
+    public List<ResponseFollowUserDTO> getFollowersByUser(User user){
         return queryFollowUserUseCase.findByFolloweeUserForDTO(user);
     }
 
     @Override
-    public List<ResponseFollowUserDTO> findFolloweesAuth(User user){
+    public List<ResponseFollowUserDTO> getFolloweesByUser(User user){
         return queryFollowUserUseCase.findByFollowerUserForDTO(user);
     }
 }

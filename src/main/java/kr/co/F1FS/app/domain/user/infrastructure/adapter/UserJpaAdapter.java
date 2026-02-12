@@ -7,6 +7,8 @@ import kr.co.F1FS.app.global.util.Role;
 import kr.co.F1FS.app.global.util.exception.user.UserException;
 import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -29,14 +31,14 @@ public class UserJpaAdapter implements UserJpaPort {
     }
 
     @Override
-    public void saveAllAndFlush(List<User> list) {
-        userRepository.saveAllAndFlush(list);
-    }
-
-    @Override
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(UserExceptionType.USER_NOT_FOUND));
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 
     @Override

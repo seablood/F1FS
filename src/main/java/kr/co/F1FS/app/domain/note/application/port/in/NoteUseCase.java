@@ -10,10 +10,9 @@ import org.springframework.data.domain.Page;
 
 public interface NoteUseCase {
     ResponseNoteDTO save(CreateNoteDTO dto, User user, String nickname);
-    Page<ResponseSimpleNoteDTO> getNoteByToUser(User user, int page, int size);
-    Page<ResponseSimpleNoteDTO> getNoteByFromUser(User user, int page, int size);
-    Note findByIdNotDTO(Long id);
-    ResponseNoteDTO findByIdDTO(Long id);
+    Page<ResponseSimpleNoteDTO> getNoteListByToUser(User user, int page, int size);
+    Page<ResponseSimpleNoteDTO> getNoteListByFromUser(User user, int page, int size);
+    ResponseNoteDTO getNoteById(Long id);
     void updateIsRead(Note note);
     ResponseNoteDTO modify(Long id, ModifyNoteDTO dto);
     void delete(Long id);
