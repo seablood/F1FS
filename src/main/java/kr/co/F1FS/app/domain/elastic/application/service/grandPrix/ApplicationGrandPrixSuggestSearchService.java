@@ -4,11 +4,11 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.grandPrix.GrandPrixSuggestSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.grandPrix.redis.SaveGrandPrixSuggestListRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.GrandPrixSuggestSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.GrandPrixSuggestDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.GrandPrixSuggestSearchRepository;
-import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
@@ -17,7 +17,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -29,13 +28,13 @@ public class ApplicationGrandPrixSuggestSearchService implements GrandPrixSugges
     private final GrandPrixSuggestSearchRepository suggestSearchRepository;
     private final GrandPrixSuggestSearchRepoPort suggestSearchRepoPort;
     private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
+    private final SaveGrandPrixSuggestListRedisUseCase saveGrandPrixSuggestListRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final RedisHandler redisHandler;
 
     @Override
     public List<ResponseSuggestGrandPrixSearchDTO> getAutoGrandPrixList(String keyword) {
-        if(redisHandler.getGrandPrixSuggestListRedisTemplate().hasKey("grand-prix-suggest:"+keyword)){
-            return redisHandler.getGrandPrixSuggestListRedisTemplate().opsForList().range("grand-prix-suggest:"+keyword, 0, -1);
+        if(saveGrandPrixSuggestListRedisUseCase.hasKey(keyword)){
+            return saveGrandPrixSuggestListRedisUseCase.getSuggestList(keyword);
         }
         if(keyword == null || keyword.length() < 2) return List.of();
 
@@ -47,8 +46,7 @@ public class ApplicationGrandPrixSuggestSearchService implements GrandPrixSugges
                 .map(hit -> hit.getContent())
                 .map(suggestDocument -> documentMapper.toResponseSuggestGrandPrixSearchDTO(suggestDocument))
                 .toList();
-        redisHandler.getGrandPrixSuggestListRedisTemplate().opsForList().rightPushAll("grand-prix-suggest:"+keyword, list);
-        redisHandler.getGrandPrixSuggestListRedisTemplate().expire("grand-prix-suggest:"+keyword, Duration.ofMinutes(5));
+        saveGrandPrixSuggestListRedisUseCase.saveSuggestList(keyword, list);
 
         return list;
     }

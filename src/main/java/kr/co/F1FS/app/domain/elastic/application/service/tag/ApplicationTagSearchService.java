@@ -1,18 +1,17 @@
 package kr.co.F1FS.app.domain.elastic.application.service.tag;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
+import kr.co.F1FS.app.domain.elastic.application.port.in.tag.redis.SaveTagSuggestListRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.tag.TagSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.TagSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.TagDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.TagSearchRepository;
-import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,8 +20,8 @@ import java.util.Locale;
 public class ApplicationTagSearchService implements TagSearchUseCase {
     private final TagSearchRepository tagSearchRepository;
     private final TagSearchRepoPort tagSearchRepoPort;
+    private final SaveTagSuggestListRedisUseCase saveTagSuggestListRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final RedisHandler redisHandler;
 
     public NativeQuery setQuery(String keyword){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
@@ -72,8 +71,8 @@ public class ApplicationTagSearchService implements TagSearchUseCase {
 
     @Override
     public List<String> getAutoTagList(String keyword) {
-        if(redisHandler.getStringListRedisTemplate().hasKey("tag-suggest:"+keyword)){
-            return redisHandler.getStringListRedisTemplate().opsForList().range("tag-suggest:"+keyword, 0, -1);
+        if(saveTagSuggestListRedisUseCase.hasKey(keyword)){
+            return saveTagSuggestListRedisUseCase.getSuggestList(keyword);
         }
         if(keyword == null || keyword.length() < 2) return List.of();
 
@@ -85,8 +84,7 @@ public class ApplicationTagSearchService implements TagSearchUseCase {
                 .map(hit -> hit.getContent())
                 .map(TagDocument::getName)
                 .toList();
-        redisHandler.getStringListRedisTemplate().opsForList().rightPushAll("tag-suggest:"+keyword, tags);
-        redisHandler.getStringListRedisTemplate().expire("tag-suggest:"+keyword, Duration.ofMinutes(5));
+        saveTagSuggestListRedisUseCase.saveSuggestList(keyword, tags);
 
         return tags;
     }

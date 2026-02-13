@@ -4,13 +4,13 @@ import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
 import kr.co.F1FS.app.domain.elastic.application.mapper.DocumentMapper;
 import kr.co.F1FS.app.domain.elastic.application.port.in.cdSearch.CDSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.cdSearch.redis.SaveCDSuggestListRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestKeywordSearchRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.CDSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.ConstructorDocument;
 import kr.co.F1FS.app.domain.elastic.domain.DriverDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.ConstructorSearchRepository;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.DriverSearchRepository;
-import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchExceptionType;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
@@ -22,7 +22,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.*;
 
 @Service
@@ -34,20 +33,19 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
     private final DriverSearchRepository driverSearchRepository;
     private final CDSearchRepoPort cdSearchRepoPort;
     private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
+    private final SaveCDSuggestListRedisUseCase saveCDSuggestListRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final RedisHandler redisHandler;
 
     @Override
     public List<CDSearchSuggestionDTO> suggestCD(String keyword){
-        if (redisHandler.getCdSuggestListRedisTemplate().hasKey("cd-suggest:"+keyword)){
-            return redisHandler.getCdSuggestListRedisTemplate().opsForList().range("cd-suggest:"+keyword, 0, -1);
+        if (saveCDSuggestListRedisUseCase.hasKey(keyword)){
+            return saveCDSuggestListRedisUseCase.getSuggestList(keyword);
         }
         NativeQuery query = setSuggestQuery(keyword);
         query.setMaxResults(5);
 
         List<CDSearchSuggestionDTO> combine = getCombineList(query);
-        redisHandler.getCdSuggestListRedisTemplate().opsForList().rightPushAll("cd-suggest:"+keyword, combine);
-        redisHandler.getCdSuggestListRedisTemplate().expire("cd-suggest:"+keyword, Duration.ofMinutes(5));
+        saveCDSuggestListRedisUseCase.saveSuggestList(keyword, combine);
 
         return combine;
     }

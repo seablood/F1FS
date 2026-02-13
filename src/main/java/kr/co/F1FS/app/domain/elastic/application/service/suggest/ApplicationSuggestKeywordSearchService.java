@@ -2,17 +2,16 @@ package kr.co.F1FS.app.domain.elastic.application.service.suggest;
 
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.SuggestKeywordSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.suggest.redis.SaveSuggestListRedisUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.out.SuggestKeywordSearchRepoPort;
 import kr.co.F1FS.app.domain.elastic.domain.SuggestKeywordDocument;
 import kr.co.F1FS.app.domain.elastic.infrastructure.repository.SuggestKeywordSearchRepository;
-import kr.co.F1FS.app.global.config.redis.RedisHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,13 +20,13 @@ import java.util.Locale;
 public class ApplicationSuggestKeywordSearchService implements SuggestKeywordSearchUseCase {
     private final SuggestKeywordSearchRepository suggestKeywordSearchRepository;
     private final SuggestKeywordSearchRepoPort suggestKeywordSearchRepoPort;
+    private final SaveSuggestListRedisUseCase saveSuggestListRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final RedisHandler redisHandler;
 
     @Override
     public List<String> getAutoKeywordList(String keyword) {
-        if(redisHandler.getStringListRedisTemplate().hasKey("keyword-suggest:"+keyword)){
-            return redisHandler.getStringListRedisTemplate().opsForList().range("keyword-suggest:"+keyword, 0, -1);
+        if(saveSuggestListRedisUseCase.hasKey(keyword)){
+            return saveSuggestListRedisUseCase.getSuggestList(keyword);
         }
         if(keyword == null || keyword.length() < 2) return List.of();
 
@@ -39,8 +38,7 @@ public class ApplicationSuggestKeywordSearchService implements SuggestKeywordSea
                 .map(hit -> hit.getContent())
                 .map(SuggestKeywordDocument::getSuggest)
                 .toList();
-        redisHandler.getStringListRedisTemplate().opsForList().rightPushAll("keyword-suggest:"+keyword, keywords);
-        redisHandler.getStringListRedisTemplate().expire("keyword-suggest:"+keyword, Duration.ofMinutes(5));
+        saveSuggestListRedisUseCase.saveSuggestList(keyword, keywords);
 
         return keywords;
     }
