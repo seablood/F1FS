@@ -41,10 +41,7 @@ public class UpdateConstructorRecordRelationService implements UpdateConstructor
     @Override
     public void updateChampionshipRank(String racingClassCode) {
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
-        List<ConstructorRecordRelation> relationList = relationJpaPort.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(
-                        racingClass, true
-                ).stream().sorted((o1, o2) -> Integer.compare(o2.getCurrentSeason().getChampionshipPoint(), o1.getCurrentSeason().getChampionshipPoint()))
-                .toList();
+        List<ConstructorRecordRelation> relationList = relationJpaPort.findAllByRacingClassAndEntryClassSeasonNotDTO(racingClass);
 
         int rank = 1;
         for (ConstructorRecordRelation relation : relationList){

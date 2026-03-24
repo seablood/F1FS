@@ -3,8 +3,8 @@ package kr.co.F1FS.app.domain.post.presentation.controller.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.domain.post.application.port.in.admin.AdminPostUseCase;
+import kr.co.F1FS.app.domain.post.presentation.dto.ResponsePostListDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDTO;
-import kr.co.F1FS.app.global.presentation.dto.post.ResponseSimplePostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,11 +22,11 @@ public class AdminPostController {
 
     @GetMapping("/find-all/{id}")
     @Operation(summary = "특정 유저 게시글 모두 보기", description = "특정 유저가 작성한 게시글들 전부 반환")
-    public ResponseEntity<List<ResponseSimplePostDTO>> getPostByUser(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                     @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                     @RequestParam(value = "condition", defaultValue = "new") String condition,
-                                                                     @PathVariable Long id){
-        Page<ResponseSimplePostDTO> newPage = adminPostUseCase.getPostByUser(page, size, condition, id);
+    public ResponseEntity<List<ResponsePostListDTO>> getPostByUser(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                   @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                   @RequestParam(value = "condition", defaultValue = "new") String condition,
+                                                                   @PathVariable Long id){
+        Page<ResponsePostListDTO> newPage = adminPostUseCase.getPostByUser(page, size, condition, id);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 

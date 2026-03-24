@@ -63,7 +63,7 @@ public class FCMUtil {
     }
 
     public List<FCMToken> getFollowerToken(User author){
-        List<ResponseUserIdDTO> followerList = queryFollowUserUseCase.findByFolloweeUserIdForDTO(author);
+        List<ResponseUserIdDTO> followerList = queryFollowUserUseCase.findByFolloweeUserIdForDTO(author.getId());
         List<FCMToken> tokens = new ArrayList<>();
 
         for (ResponseUserIdDTO followerId : followerList){

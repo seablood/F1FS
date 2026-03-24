@@ -6,7 +6,7 @@ import kr.co.F1FS.app.domain.post.domain.Post;
 import java.util.List;
 
 public interface UpdatePostSearchUseCase {
-    void modify(PostDocument document, Post post, List<String> tags);
+    void modify(PostDocument document, Post post, List<String> addTags, List<String> deleteTags);
     void increaseLikeNum(PostDocument document);
     void decreaseLikeNum(PostDocument document);
 }

@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.follow.infrastructure.adapter.user;
 import kr.co.F1FS.app.domain.follow.application.port.out.user.FollowUserJpaPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowUser;
 import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowUserRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.follow.infrastructure.repository.dsl.FollowUserDSLRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowUserJpaAdapter implements FollowUserJpaPort {
     private final FollowUserRepository followUserRepository;
+    private final FollowUserDSLRepository followUserDSLRepository;
 
     @Override
     public FollowUser save(FollowUser followUser) {
@@ -20,23 +21,23 @@ public class FollowUserJpaAdapter implements FollowUserJpaPort {
     }
 
     @Override
-    public FollowUser findByFollowerUserAndFolloweeUser(User followerUser, User followeeUser) {
-        return followUserRepository.findByFollowerUserAndFolloweeUser(followerUser, followeeUser);
+    public FollowUser findByFollowerUserAndFolloweeUser(Long followerUserId, Long followeeUserId) {
+        return followUserDSLRepository.findByFollowerUserAndFolloweeUser(followerUserId, followeeUserId);
     }
 
     @Override
-    public List<FollowUser> findByFolloweeUser(User user) {
-        return followUserRepository.findByFolloweeUser(user);
+    public List<FollowUser> findAllByFollowerUser(Long followerUserId) {
+        return followUserDSLRepository.findAllByFollowerUser(followerUserId);
     }
 
     @Override
-    public List<FollowUser> findByFollowerUser(User user) {
-        return followUserRepository.findByFollowerUser(user);
+    public List<FollowUser> findAllByFolloweeUser(Long followeeUserId) {
+        return followUserDSLRepository.findAllByFolloweeUser(followeeUserId);
     }
 
     @Override
-    public boolean existsFollowUserByFollowerUserAndFolloweeUser(User followerUser, User followeeUser) {
-        return followUserRepository.existsFollowUserByFollowerUserAndFolloweeUser(followerUser, followeeUser);
+    public boolean existsByFollowerUserAndFolloweeUser(Long followerUserId, Long followeeUserId) {
+        return followUserDSLRepository.existsByFollowerUserAndFolloweeUser(followerUserId, followeeUserId);
     }
 
     @Override

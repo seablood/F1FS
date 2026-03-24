@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.sessionresult.application.port.in;
 
-import kr.co.F1FS.app.domain.session.domain.Session;
-import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
+import kr.co.F1FS.app.domain.sessionresult.presentation.dto.ResponseSessionResultListDTO;
 
 import java.util.List;
 
 public interface QuerySessionResultUseCase {
-    List<ResponseSessionResultDTO> findSessionResultBySessionForDTO(Session session);
+    List<ResponseSessionResultListDTO> findAllBySessionForDTO(Long sessionId);
 }

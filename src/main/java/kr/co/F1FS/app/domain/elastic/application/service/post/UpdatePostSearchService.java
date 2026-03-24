@@ -8,7 +8,10 @@ import kr.co.F1FS.app.domain.post.domain.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +21,12 @@ public class UpdatePostSearchService implements UpdatePostSearchUseCase {
     private final PostSearchDocumentService postSearchDocumentService;
 
     @Override
-    public void modify(PostDocument document, Post post, List<String> tags) {
-        postSearchDocumentService.modify(document, post, tags);
+    public void modify(PostDocument document, Post post, List<String> addTags, List<String> deleteTags) {
+        Set<String> tagSet = new HashSet<>(document.getTags());
+        tagSet.removeAll(deleteTags);
+        tagSet.addAll(addTags);
+
+        postSearchDocumentService.modify(document, post, new ArrayList<>(tagSet));
 
         postSearchRepoPort.save(document);
     }

@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.driver.application.port.in.debut.QueryDriverDebutRe
 import kr.co.F1FS.app.domain.driver.application.port.out.debut.DriverDebutRelationJpaPort;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverDebutRelation;
+import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ public class QueryDriverDebutRelationService implements QueryDriverDebutRelation
     private final DriverDebutRelationJpaPort relationJpaPort;
 
     @Override
-    public DriverDebutRelation findDriverDebutRelationByDriverSinceInfoAndRacingClass(Driver driver) {
-        return relationJpaPort.findDriverDebutRelationByDriverSinceInfoAndRacingClass(driver, driver.getRacingClass());
+    public DriverDebutRelation findByDriverAndRacingClass(Driver driver) {
+        return relationJpaPort.findByDriverAndRacingClass(driver.getId(), driver.getRacingClass());
     }
 }

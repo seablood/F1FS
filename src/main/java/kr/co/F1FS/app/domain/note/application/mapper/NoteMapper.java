@@ -4,11 +4,7 @@ import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.note.presentation.dto.CreateNoteDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseNoteDTO;
-import kr.co.F1FS.app.global.presentation.dto.note.ResponseSimpleNoteDTO;
-import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 @Component
 public class NoteMapper {
@@ -30,17 +26,6 @@ public class NoteMapper {
                 .fromNickname(fromNickname)
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
-                .build();
-    }
-
-    public ResponseSimpleNoteDTO toResponseSimpleNoteDTO(Note note, String simpleContent){
-        LocalDateTime noteTime = TimeUtil.convertToKoreanTime(note.getCreatedAt());
-
-        return ResponseSimpleNoteDTO.builder()
-                .id(note.getId())
-                .simpleContent(simpleContent)
-                .createdAt(TimeUtil.formatPostTime(noteTime))
-                .isRead(note.isRead())
                 .build();
     }
 }

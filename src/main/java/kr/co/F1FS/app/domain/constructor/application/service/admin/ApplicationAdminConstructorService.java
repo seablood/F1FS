@@ -46,6 +46,7 @@ public class ApplicationAdminConstructorService implements AdminConstructorUseCa
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleResponseConstructorDTO> getConstructorAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 

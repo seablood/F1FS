@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class ApplicationConstructorService implements ConstructorUseCase {
     private final ConstructorQueryAggregatorUseCase aggregatorUseCase;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleResponseConstructorDTO> getConstructorAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 
@@ -29,6 +31,7 @@ public class ApplicationConstructorService implements ConstructorUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "ConstructorDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseConstructorDTO getConstructorById(Long id){
         return aggregatorUseCase.findByIdForDTO(id);

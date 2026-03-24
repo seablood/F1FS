@@ -35,8 +35,8 @@ public class ApplicationAdminConstructorDriverRelationService implements Constru
 
         if(checkConstructorDriverRelationUseCase.existsConstructorDriverRelationByDriverAndRacingClass(driver, constructor.getRacingClass())){
             if (!checkConstructorDriverRelationUseCase.existsConstructorDriverRelationByDriverAndConstructor(driver, constructor)) {
-                ConstructorDriverRelation relation = queryCDRelationUseCase.findConstructorDriverRelationByDriverAndRacingClass(
-                        driver, constructor.getRacingClass()
+                ConstructorDriverRelation relation = queryCDRelationUseCase.findByDriverAndRacingClass(
+                        driver.getId(), constructor.getRacingClass()
                 );
                 updateConstructorDriverRelationUseCase.updateConstructor(relation, constructor);
             }

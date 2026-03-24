@@ -1,11 +1,10 @@
 package kr.co.F1FS.app.domain.driver.application.port.out.debut;
 
-import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.driver.domain.rdb.DriverDebutRelation;
 import kr.co.F1FS.app.global.util.RacingClass;
 
 public interface DriverDebutRelationJpaPort {
     DriverDebutRelation save(DriverDebutRelation debutRelation);
-    DriverDebutRelation findDriverDebutRelationByDriverSinceInfoAndRacingClass(Driver driver, RacingClass racingClass);
-    boolean existsDriverDebutRelationByDriverSinceInfoAndRacingClass(Driver driver, RacingClass racingClass);
+    DriverDebutRelation findByDriverAndRacingClass(Long driverId, RacingClass racingClass);
+    boolean existsByDriverAndRacingClass(Long driverId, RacingClass racingClass);
 }

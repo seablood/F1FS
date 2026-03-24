@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.domain.follow.presentation.dto.constructor.ResponseFollowConstructorDTO;
+import kr.co.F1FS.app.domain.follow.presentation.dto.driver.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import org.springframework.beans.factory.annotation.Value;
@@ -119,6 +121,52 @@ public class RedisConfig {
 
         Jackson2JsonRedisSerializer<CDSearchSuggestionDTO> serializer =
                 new Jackson2JsonRedisSerializer<>(mapper, CDSearchSuggestionDTO.class);
+
+        // 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ResponseFollowConstructorDTO> followConstructorListRedisTemplate() {
+        RedisTemplate<String, ResponseFollowConstructorDTO> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Jackson2JsonRedisSerializer<ResponseFollowConstructorDTO> serializer =
+                new Jackson2JsonRedisSerializer<>(mapper, ResponseFollowConstructorDTO.class);
+
+        // 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ResponseFollowDriverDTO> followDriverListRedisTemplate() {
+        RedisTemplate<String, ResponseFollowDriverDTO> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Jackson2JsonRedisSerializer<ResponseFollowDriverDTO> serializer =
+                new Jackson2JsonRedisSerializer<>(mapper, ResponseFollowDriverDTO.class);
 
         // 직렬화 설정
         template.setKeySerializer(new StringRedisSerializer());

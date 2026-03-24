@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class ApplicationAdminUserService implements AdminUserUseCase {
     private final AdminUserMapper adminUserMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleResponseUserDTO> getUserAll(int page, int size, String condition) {
         Pageable pageable = conditionSwitch(page, size, condition);
 

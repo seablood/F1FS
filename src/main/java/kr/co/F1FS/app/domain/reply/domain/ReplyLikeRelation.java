@@ -15,13 +15,11 @@ public class ReplyLikeRelation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    @ManyToOne
-    @JoinColumn(name = "reply_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_id", nullable = false)
     private Reply reply;
 
     @Builder

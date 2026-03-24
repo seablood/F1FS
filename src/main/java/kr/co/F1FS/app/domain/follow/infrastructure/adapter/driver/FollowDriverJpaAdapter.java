@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.follow.infrastructure.adapter.driver;
 
-import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.follow.application.port.out.driver.FollowDriverJpaPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowDriver;
 import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowDriverRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.follow.infrastructure.repository.dsl.FollowDriverDSLRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowDriverJpaAdapter implements FollowDriverJpaPort {
     private final FollowDriverRepository followDriverRepository;
+    private final FollowDriverDSLRepository followDriverDSLRepository;
 
     @Override
     public FollowDriver save(FollowDriver followDriver) {
@@ -21,18 +21,18 @@ public class FollowDriverJpaAdapter implements FollowDriverJpaPort {
     }
 
     @Override
-    public FollowDriver findByFollowerUserAndFolloweeDriver(User user, Driver driver) {
-        return followDriverRepository.findByFollowerUserAndFolloweeDriver(user, driver);
+    public FollowDriver findByUserAndDriver(Long userId, Long driverId) {
+        return followDriverDSLRepository.findByUserAndDriver(userId, driverId);
     }
 
     @Override
-    public List<FollowDriver> findByFollowerUser(User user) {
-        return followDriverRepository.findByFollowerUser(user);
+    public List<FollowDriver> findAllByUser(Long userId) {
+        return followDriverDSLRepository.findAllByUser(userId);
     }
 
     @Override
-    public boolean existsFollowDriverByFollowerUserAndFolloweeDriver(User user, Driver driver) {
-        return followDriverRepository.existsFollowDriverByFollowerUserAndFolloweeDriver(user, driver);
+    public boolean existsByUserAndDriver(Long userId, Long driverId) {
+        return followDriverDSLRepository.existsByUserAndDriver(userId, driverId);
     }
 
     @Override

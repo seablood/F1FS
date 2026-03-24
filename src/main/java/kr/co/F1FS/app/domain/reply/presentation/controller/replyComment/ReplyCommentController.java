@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.domain.reply.application.port.in.replyComment.ReplyCommentUseCase;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.CreateReplyCommentDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.ModifyReplyCommentDTO;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.ResponseReplyCommentListDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyCommentDTO;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +29,12 @@ public class ReplyCommentController {
                                      @PathVariable Long replyId, @RequestBody CreateReplyCommentDTO dto){
         replyCommentUseCase.save(dto, principalDetails.getUser(), replyId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @GetMapping("/find/{replyId}")
+    @Operation(summary = "대댓글 리스트", description = "특정 댓글의 대댓글 리스트 반환")
+    public ResponseEntity<List<ResponseReplyCommentListDTO>> getReplyCommentListByReply(@PathVariable Long replyId){
+        return ResponseEntity.status(HttpStatus.OK).body(replyCommentUseCase.getReplyCommentListByReply(replyId));
     }
 
     @PatchMapping("/modify/{replyCommentId}")

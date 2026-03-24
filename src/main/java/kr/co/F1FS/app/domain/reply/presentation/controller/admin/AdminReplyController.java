@@ -3,7 +3,7 @@ package kr.co.F1FS.app.domain.reply.presentation.controller.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.domain.reply.application.port.in.admin.AdminReplyUseCase;
-import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyByUserDTO;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ResponseReplyListByUserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,11 +21,11 @@ public class AdminReplyController {
 
     @GetMapping("/find/{id}")
     @Operation(summary = "유저 댓글 내역", description = "특정 유저의 댓글 목록 반환")
-    public ResponseEntity<List<ResponseReplyByUserDTO>> findReplyByUser(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                        @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                        @RequestParam(value = "condition", defaultValue = "new") String condition,
-                                                                        @PathVariable Long id){
-        Page<ResponseReplyByUserDTO> newPage = adminReplyUseCase.findReplyByUser(page, size, condition, id);
+    public ResponseEntity<List<ResponseReplyListByUserDTO>> findReplyByUser(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                            @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                            @RequestParam(value = "condition", defaultValue = "new") String condition,
+                                                                            @PathVariable Long id){
+        Page<ResponseReplyListByUserDTO> newPage = adminReplyUseCase.findReplyByUser(page, size, condition, id);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 }

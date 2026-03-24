@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -20,14 +18,12 @@ public class DriverRecordRelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_DRR_driver_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_DRR_driver_id"), nullable = false)
     private Driver driverInfo;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "currentSeason_id", foreignKey = @ForeignKey(name = "FK_DRR_currentSeason_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currentSeason_id", foreignKey = @ForeignKey(name = "FK_DRR_currentSeason_id"), nullable = false)
     private CurrentSeason currentSeason;
 
     @Enumerated(value = EnumType.STRING)

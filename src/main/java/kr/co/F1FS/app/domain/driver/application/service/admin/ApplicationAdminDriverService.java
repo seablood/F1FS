@@ -45,6 +45,7 @@ public class ApplicationAdminDriverService implements AdminDriverUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleResponseDriverDTO> getDriverAll(int page, int size, String condition){
         Pageable pageable = switchCondition(page, size, condition);
 

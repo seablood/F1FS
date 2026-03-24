@@ -4,9 +4,8 @@ import kr.co.F1FS.app.domain.suggest.application.mapper.SuggestMapper;
 import kr.co.F1FS.app.domain.suggest.application.port.in.QuerySuggestUseCase;
 import kr.co.F1FS.app.domain.suggest.application.port.out.SuggestJpaPort;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.suggest.presentation.dto.ResponseSuggestListDTO;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
-import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,13 +18,13 @@ public class QuerySuggestService implements QuerySuggestUseCase {
     private final SuggestMapper suggestMapper;
 
     @Override
-    public Page<SimpleResponseSuggestDTO> findAllForDTO(Pageable pageable) {
-        return suggestJpaPort.findAll(pageable).map(suggest -> suggestMapper.toSimpleResponseSuggestDTO(suggest));
+    public Page<ResponseSuggestListDTO> findSuggestListForDTO(Pageable pageable) {
+        return suggestJpaPort.findSuggestList(pageable);
     }
 
     @Override
-    public Page<SimpleResponseSuggestDTO> findAllByFromUserForDTO(User user, Pageable pageable) {
-        return suggestJpaPort.findAllByFromUser(user, pageable).map(suggest -> suggestMapper.toSimpleResponseSuggestDTO(suggest));
+    public Page<ResponseSuggestListDTO> findAllByUserForDTO(Long userId, Pageable pageable) {
+        return suggestJpaPort.findAllByUser(userId, pageable);
     }
 
     @Override
@@ -34,7 +33,12 @@ public class QuerySuggestService implements QuerySuggestUseCase {
     }
 
     @Override
+    public Suggest findByIdWithJoin(Long id) {
+        return suggestJpaPort.findByIdWithJoin(id);
+    }
+
+    @Override
     public ResponseSuggestDTO findByIdForDTO(Long id) {
-        return suggestMapper.toResponseSuggestDTO(suggestJpaPort.findById(id));
+        return suggestMapper.toResponseSuggestDTO(suggestJpaPort.findByIdWithJoin(id));
     }
 }

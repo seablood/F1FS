@@ -36,9 +36,7 @@ public class UpdateDriverRecordRelationService implements UpdateDriverRecordRela
     @Override
     public void updateChampionshipRank(String racingClassCode) {
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
-        List<DriverRecordRelation> relationList = relationJpaPort.findDriverRecordRelationsByRacingClassAndEntryClassSeason(
-                racingClass, true
-        ).stream().sorted((o1, o2) -> Integer.compare(o2.getCurrentSeason().getChampionshipPoint(), o1.getCurrentSeason().getChampionshipPoint())).toList();
+        List<DriverRecordRelation> relationList = relationJpaPort.findAllByRacingClassAndEntryClassSeasonNotDTO(racingClass);
 
         int rank = 1;
         for (DriverRecordRelation relation : relationList){

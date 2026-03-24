@@ -30,7 +30,7 @@ public class FindNotificationRedisService implements FindNotificationRedisUseCas
     }
 
     @Override
-    public Page<ResponseNotificationRedisDTO> getNotificationRedisList(Pageable pageable, User user) {
+    public Page<ResponseNotificationRedisDTO> getNotificationRedisListForDTO(Pageable pageable, User user) {
         List<NotificationRedis> list = getNotificationList(user);
 
         Comparator<NotificationRedis> comparator = Comparator.comparing(NotificationRedis::getCreatedAt).reversed();

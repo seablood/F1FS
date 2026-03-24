@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.reply.application.port.in.replying.ReplyUseCase;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ResponseReplyListDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replying.CreateReplyDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ModifyReplyDTO;
@@ -33,7 +34,7 @@ public class ReplyController {
 
     @GetMapping("/find/{postId}")
     @Operation(summary = "댓글 불러오기", description = "특정 게시글의 모든 댓글 리스트로 반환")
-    public ResponseEntity<List<ResponseReplyDTO>> getReplyListByPost(@PathVariable Long postId){
+    public ResponseEntity<List<ResponseReplyListDTO>> getReplyListByPost(@PathVariable Long postId){
         return ResponseEntity.status(HttpStatus.OK).body(replyUseCase.getReplyListByPost(postId));
     }
 

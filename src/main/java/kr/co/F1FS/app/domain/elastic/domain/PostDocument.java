@@ -2,6 +2,8 @@ package kr.co.F1FS.app.domain.elastic.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.co.F1FS.app.domain.post.domain.Post;
+import kr.co.F1FS.app.domain.post.domain.PostBlock;
+import kr.co.F1FS.app.global.util.PostBlockType;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,6 +14,7 @@ import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Document(indexName = "posts")
 @Setting(settingPath = "/elastic/post-setting.json")
@@ -43,7 +46,10 @@ public class PostDocument {
 
     public void modify(Post post, List<String> tags){
         this.title = post.getTitle();
-        this.content = post.getContent();
+        this.content = post.getBlocks().stream()
+                .filter(block -> block.getBlockType() == PostBlockType.TEXT)
+                .map(PostBlock::getContent)
+                .collect(Collectors.joining(" "));
         this.tags = tags;
     }
 
@@ -59,7 +65,10 @@ public class PostDocument {
     public PostDocument(Post post, List<String> tags){
         this.id = post.getId();
         this.title = post.getTitle();
-        this.content = post.getContent();
+        this.content = post.getBlocks().stream()
+                .filter(block -> block.getBlockType() == PostBlockType.TEXT)
+                .map(PostBlock::getContent)
+                .collect(Collectors.joining(" "));
         this.author = post.getAuthor().getNickname();
         this.tags = tags;
         this.createdAt = TimeUtil.convertToKoreanTime(post.getCreatedAt());

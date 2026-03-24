@@ -16,14 +16,12 @@ public class FollowUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "follower_user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "follower_user_id", nullable = false)
     private User followerUser;
 
-    @ManyToOne
-    @JoinColumn(name = "followee_user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "followee_user_id", nullable = false)
     private User followeeUser;
 
     @Builder

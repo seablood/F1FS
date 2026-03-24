@@ -1,8 +1,8 @@
 package kr.co.F1FS.app.domain.session.application.mapper;
 
 import kr.co.F1FS.app.domain.session.domain.Session;
+import kr.co.F1FS.app.domain.sessionresult.presentation.dto.ResponseSessionResultListDTO;
 import kr.co.F1FS.app.global.presentation.dto.session.ResponseSessionDTO;
-import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.SessionType;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ public class SessionMapper {
                 .build();
     }
 
-    public ResponseSessionDTO toResponseSessionDTO(Session session, List<ResponseSessionResultDTO> resultList) {
+    public ResponseSessionDTO toResponseSessionDTO(Session session, List<ResponseSessionResultListDTO> resultList) {
         return ResponseSessionDTO.builder()
                 .id(session.getId())
                 .sessionTime(session.getTime())

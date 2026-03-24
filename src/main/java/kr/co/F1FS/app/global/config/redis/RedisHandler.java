@@ -1,6 +1,8 @@
 package kr.co.F1FS.app.global.config.redis;
 
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.domain.follow.presentation.dto.constructor.ResponseFollowConstructorDTO;
+import kr.co.F1FS.app.domain.follow.presentation.dto.driver.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
@@ -26,6 +28,10 @@ public class RedisHandler {
     private final RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> grandPrixSuggestListRedisTemplate;
     @Qualifier("cdSuggestListRedisTemplate")
     private final RedisTemplate<String, CDSearchSuggestionDTO>  cdSuggestListRedisTemplate;
+    @Qualifier("followConstructorListRedisTemplate")
+    private final RedisTemplate<String, ResponseFollowConstructorDTO> followConstructorListRedisTemplate;
+    @Qualifier("followDriverListRedisTemplate")
+    private final RedisTemplate<String, ResponseFollowDriverDTO> followDriverListRedisTemplate;
 
     public RedisTemplate<String, NotificationRedis> getNotificationRedisTemplate() {
         return notificationRedisTemplate;
@@ -41,6 +47,14 @@ public class RedisHandler {
 
     public RedisTemplate<String, CDSearchSuggestionDTO> getCdSuggestListRedisTemplate(){
         return cdSuggestListRedisTemplate;
+    }
+
+    public RedisTemplate<String, ResponseFollowConstructorDTO> getFollowConstructorListRedisTemplate(){
+        return followConstructorListRedisTemplate;
+    }
+
+    public RedisTemplate<String, ResponseFollowDriverDTO> getFollowDriverListRedisTemplate(){
+        return followDriverListRedisTemplate;
     }
 
     public RedisTemplate<String, Object> getRedisTemplate(){

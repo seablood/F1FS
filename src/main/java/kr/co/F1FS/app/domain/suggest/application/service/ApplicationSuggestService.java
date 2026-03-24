@@ -2,11 +2,11 @@ package kr.co.F1FS.app.domain.suggest.application.service;
 
 import kr.co.F1FS.app.domain.suggest.application.port.in.*;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
+import kr.co.F1FS.app.domain.suggest.presentation.dto.ResponseSuggestListDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.CreateSuggestDTO;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.ModifySuggestDTO;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
-import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,21 +33,24 @@ public class ApplicationSuggestService implements SuggestUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "SuggestDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSuggestDTO getSuggestById(Long id){
         return querySuggestUseCase.findByIdForDTO(id);
     }
 
     @Override
-    public Page<SimpleResponseSuggestDTO> getSuggestListByUser(int page, int size, User user){
+    @Transactional(readOnly = true)
+    public Page<ResponseSuggestListDTO> getSuggestListByUser(int page, int size, User user){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return querySuggestUseCase.findAllByFromUserForDTO(user, pageable);
+
+        return querySuggestUseCase.findAllByUserForDTO(user.getId(), pageable);
     }
 
     @Override
     @Transactional
     public ResponseSuggestDTO modify(Long id, ModifySuggestDTO dto, User user){
-        Suggest suggest = querySuggestUseCase.findById(id);
+        Suggest suggest = querySuggestUseCase.findByIdWithJoin(id);
 
         return updateSuggestUseCase.modify(user, suggest, dto);
     }
@@ -55,7 +58,7 @@ public class ApplicationSuggestService implements SuggestUseCase {
     @Override
     @Transactional
     public void delete(Long id, User user){
-        Suggest suggest = querySuggestUseCase.findById(id);
+        Suggest suggest = querySuggestUseCase.findByIdWithJoin(id);
 
         deleteSuggestUseCase.delete(user, suggest);
     }

@@ -6,12 +6,12 @@ import kr.co.F1FS.app.domain.complain.reply.application.port.in.QueryReplyCompla
 import kr.co.F1FS.app.domain.complain.reply.application.port.in.ReplyComplainUseCase;
 import kr.co.F1FS.app.domain.complain.reply.domain.ReplyComplain;
 import kr.co.F1FS.app.domain.complain.reply.presentation.dto.CreateReplyComplainDTO;
+import kr.co.F1FS.app.domain.complain.reply.presentation.dto.ResponseReplyComplainListDTO;
 import kr.co.F1FS.app.domain.reply.application.port.in.replying.QueryReplyUseCase;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.presentation.dto.complain.reply.ResponseReplyComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.reply.SimpleResponseReplyComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,7 +37,7 @@ public class ApplicationReplyComplainService implements ReplyComplainUseCase {
     @Override
     @Transactional
     public void save(Long id, User user, CreateReplyComplainDTO dto) {
-        Reply reply = queryReplyUseCase.findById(id);
+        Reply reply = queryReplyUseCase.findByIdForPostWithJoin(id);
         ReplyComplain replyComplain = createReplyComplainUseCase.save(reply, user, dto);
 
         sendMessage(replyComplain);
@@ -45,21 +45,24 @@ public class ApplicationReplyComplainService implements ReplyComplainUseCase {
     }
 
     @Override
-    public Page<SimpleResponseReplyComplainDTO> getReplyComplainListByUser(int page, int size, String condition, User user) {
+    @Transactional(readOnly = true)
+    public Page<ResponseReplyComplainListDTO> getReplyComplainListByUser(int page, int size, String condition, User user) {
         Pageable pageable = switchCondition(page, size, condition);
 
-        return queryReplyComplainUseCase.findAllByFromUserForDTO(user, pageable);
+        return queryReplyComplainUseCase.findAllByUserForDTO(user.getId(), pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "ReplyComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseReplyComplainDTO getReplyComplainById(Long id) {
         return queryReplyComplainUseCase.findByIdForDTO(id);
     }
 
     @Override
+    @Transactional
     public void delete(Long id, User user) {
-        ReplyComplain replyComplain = queryReplyComplainUseCase.findById(id);
+        ReplyComplain replyComplain = queryReplyComplainUseCase.findByIdWithJoin(id);
 
         deleteReplyComplainUseCase.delete(replyComplain, user);
     }

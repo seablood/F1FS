@@ -10,5 +10,5 @@ import java.util.List;
 
 public interface FindNotificationRedisUseCase {
     List<NotificationRedis> getNotificationList(User user);
-    Page<ResponseNotificationRedisDTO> getNotificationRedisList(Pageable pageable, User user);
+    Page<ResponseNotificationRedisDTO> getNotificationRedisListForDTO(Pageable pageable, User user);
 }

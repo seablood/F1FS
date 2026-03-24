@@ -3,7 +3,8 @@ package kr.co.F1FS.app.domain.complain.note.infrastructure.adapter;
 import kr.co.F1FS.app.domain.complain.note.application.port.out.NoteComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.note.domain.NoteComplain;
 import kr.co.F1FS.app.domain.complain.note.infrastructure.repository.NoteComplainRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.complain.note.infrastructure.repository.dsl.NoteComplainDSLRepository;
+import kr.co.F1FS.app.domain.complain.note.presentation.dto.ResponseNoteComplainListDTO;
 import kr.co.F1FS.app.global.util.exception.note.NoteException;
 import kr.co.F1FS.app.global.util.exception.note.NoteExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NoteComplainJpaAdapter implements NoteComplainJpaPort {
     private final NoteComplainRepository noteComplainRepository;
+    private final NoteComplainDSLRepository noteComplainDSLRepository;
 
     @Override
     public NoteComplain save(NoteComplain noteComplain) {
@@ -22,19 +24,19 @@ public class NoteComplainJpaAdapter implements NoteComplainJpaPort {
     }
 
     @Override
-    public Page<NoteComplain> findAll(Pageable pageable) {
-        return noteComplainRepository.findAll(pageable);
+    public Page<ResponseNoteComplainListDTO> findNoteComplainList(Pageable pageable) {
+        return noteComplainDSLRepository.findNoteComplainList(pageable);
     }
 
     @Override
-    public NoteComplain findById(Long id) {
-        return noteComplainRepository.findById(id)
+    public NoteComplain findByIdWithJoin(Long id) {
+        return noteComplainDSLRepository.findById(id)
                 .orElseThrow(() -> new NoteException(NoteExceptionType.NOTE_COMPLAIN_NOT_FOUND));
     }
 
     @Override
-    public Page<NoteComplain> findAllByFromUser(User user, Pageable pageable) {
-        return noteComplainRepository.findAllByFromUser(user, pageable);
+    public Page<ResponseNoteComplainListDTO> findAllByUser(Long userId, Pageable pageable) {
+        return noteComplainDSLRepository.findAllByUser(userId, pageable);
     }
 
     @Override

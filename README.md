@@ -37,7 +37,8 @@ app/
 │   ├── domain/ (도메인 엔터티)
 │   ├── infrastructure/
 │   │   ├── adapter/ (JpaPort 구현체)
-│   │   └── repository/ (레포지토리)
+│   │   └── repository/ (JPA Repository 및 QueryDSL 구현체)
+│   │      └── dsl/ (QueryDSL 인터페이스)
 │   └── presentation/
 │   │   ├── controller/ (컨트롤러)
 │   │   └── dto/ (DTO)
@@ -69,7 +70,8 @@ app/
 - **domain** : 해당 도메인의 엔터티와 애그리거트 루트 등 핵심 도메인 모델이 존재하는 계층입니다. 
 - **infrastructure** : 포트의 구현체인 Adapter와 영속성 처리를 담당하는 Repository가 포함된 계층입니다. 
     - **adapter** : Port 인터페이스를 구현하여 실제 외부 시스템과 연결되는 어댑터 클래스가 위치합니다. 
-    - **repository** : JPA/Hibernate 등의 영속성 구현체로 Repository 인터페이스 혹은 Spring Data JPA 레포지토리 클래스가 위치합니다. 
+    - **repository** : JPA/Hibernate 등의 영속성 구현체로 Repository 인터페이스 혹은 Spring Data JPA 레포지토리 클래스와 QueryDSL 구현체 클래스가 위치합니다.  
+        - **dsl** : QueryDSL 관련 인터페이스가 위치합니다. 
 - **presentation** : 사용자의 요청과 응답을 처리하는 컨트롤러와 DTO가 존재하는 계층입니다. API 엔드포인트를 제공하며, 요청을 UseCase 또는 Service에 전달하고 결과를 반환합니다. 
     - **controller** : HTTP API 요청을 처리하는 컨트롤러 클래스가 위치합니다.
     - **dto** : 클라이언트와 데이터를 교환하기 위한 요청/응답 DTO 클래스가 위치합니다.

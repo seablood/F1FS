@@ -6,12 +6,12 @@ import kr.co.F1FS.app.domain.complain.note.application.port.in.NoteComplainUseCa
 import kr.co.F1FS.app.domain.complain.note.application.port.in.QueryNoteComplainUseCase;
 import kr.co.F1FS.app.domain.complain.note.domain.NoteComplain;
 import kr.co.F1FS.app.domain.complain.note.presentation.dto.CreateNoteComplainDTO;
+import kr.co.F1FS.app.domain.complain.note.presentation.dto.ResponseNoteComplainListDTO;
 import kr.co.F1FS.app.domain.note.application.port.in.QueryNoteUseCase;
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.presentation.dto.complain.note.ResponseNoteComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.note.SimpleResponseNoteComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,7 +37,7 @@ public class ApplicationNoteComplainService implements NoteComplainUseCase {
     @Override
     @Transactional
     public void save(Long id, User user, CreateNoteComplainDTO dto) {
-        Note note = queryNoteUseCase.findById(id);
+        Note note = queryNoteUseCase.findByIdWithJoin(id);
         NoteComplain noteComplain = createNoteComplainUseCase.save(note, user, dto);
 
         sendMessage(noteComplain);
@@ -45,13 +45,15 @@ public class ApplicationNoteComplainService implements NoteComplainUseCase {
     }
 
     @Override
-    public Page<SimpleResponseNoteComplainDTO> getNoteComplainListByUser(int page, int size, String condition, User user) {
+    @Transactional(readOnly = true)
+    public Page<ResponseNoteComplainListDTO> getNoteComplainListByUser(int page, int size, String condition, User user) {
         Pageable pageable = switchCondition(page, size, condition);
 
-        return queryNoteComplainUseCase.findAllByFromUserForDTO(user, pageable);
+        return queryNoteComplainUseCase.findAllByUserForDTO(user.getId(), pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "NoteComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseNoteComplainDTO getNoteComplainById(Long id) {
         return queryNoteComplainUseCase.findByIdForDTO(id);
@@ -60,7 +62,7 @@ public class ApplicationNoteComplainService implements NoteComplainUseCase {
     @Override
     @Transactional
     public void delete(Long id, User user) {
-        NoteComplain noteComplain = queryNoteComplainUseCase.findById(id);
+        NoteComplain noteComplain = queryNoteComplainUseCase.findByIdWithJoin(id);
 
         deleteNoteComplainUseCase.delete(noteComplain, user);
     }

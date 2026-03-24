@@ -100,7 +100,7 @@ public class CreateSessionResultService implements CreateSessionResultUseCase {
         DriverRecordRelation recordRelation = queryDriverRecordRelationUseCase
                 .findDriverRecordRelationByDriverInfoAndRacingClass(driver);
         DriverDebutRelation debutRelation = queryDriverDebutRelationUseCase
-                .findDriverDebutRelationByDriverSinceInfoAndRacingClass(driver);
+                .findByDriverAndRacingClass(driver);
 
         updateDriverRecordRelationUseCase.updateRecordForRace(recordRelation, position, points, isFastestLap);
         updateSinceDebutUseCase.updateSinceDebutForRace(debutRelation.getSinceDebut(), position, isFastestLap);
@@ -111,21 +111,21 @@ public class CreateSessionResultService implements CreateSessionResultUseCase {
         DriverRecordRelation recordRelation = queryDriverRecordRelationUseCase
                 .findDriverRecordRelationByDriverInfoAndRacingClass(driver);
         DriverDebutRelation debutRelation = queryDriverDebutRelationUseCase
-                .findDriverDebutRelationByDriverSinceInfoAndRacingClass(driver);
+                .findByDriverAndRacingClass(driver);
 
         updateDriverRecordRelationUseCase.updateRecordForQualifying(recordRelation, position);
         updateSinceDebutUseCase.updateSinceDebutForQualifying(debutRelation.getSinceDebut(), position);
     }
 
     public void constructorUpdateRecordForRace(Constructor constructor, int position, int points, boolean isFastestLap, String racingClassCode){
-        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor);
+        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor.getId());
 
         updateConstructorRecordRelationUseCase.updateRecordForRace(relation, position, points, isFastestLap);
         updateConstructorRecordRelationUseCase.updateChampionshipRank(racingClassCode);
     }
 
     public void constructorUpdateRecordForQualifying(Constructor constructor, int position){
-        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor);
+        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor.getId());
 
         updateConstructorRecordRelationUseCase.updateRecordForQualifying(relation, position);
     }

@@ -5,7 +5,6 @@ import kr.co.F1FS.app.domain.complain.note.presentation.dto.CreateNoteComplainDT
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.complain.note.ResponseNoteComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.note.SimpleResponseNoteComplainDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,14 +26,6 @@ public class NoteComplainMapper {
                 .fromUserNickname(noteComplain.getFromUser().getNickname())
                 .description(noteComplain.getDescription())
                 .paraphrase(noteComplain.getParaphrase())
-                .build();
-    }
-
-    public SimpleResponseNoteComplainDTO toSimpleResponseNoteComplainDTO(NoteComplain noteComplain){
-        return SimpleResponseNoteComplainDTO.builder()
-                .id(noteComplain.getId())
-                .noteId(noteComplain.getToNote().getId())
-                .description(noteComplain.getDescription())
                 .build();
     }
 }

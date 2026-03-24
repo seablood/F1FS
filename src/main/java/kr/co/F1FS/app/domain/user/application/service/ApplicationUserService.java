@@ -21,6 +21,7 @@ public class ApplicationUserService implements UserUseCase {
     private final QueryUserUseCase queryUserUseCase;
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "UserDTO", key = "#nickname", cacheManager = "redisLongCacheManager")
     public ResponseUserDTO getUserByNickname(String nickname){
         return queryUserUseCase.findByNicknameForDTO(nickname);

@@ -4,9 +4,9 @@ import kr.co.F1FS.app.domain.complain.user.application.mapper.UserComplainMapper
 import kr.co.F1FS.app.domain.complain.user.application.port.in.QueryUserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.out.UserComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
+import kr.co.F1FS.app.domain.complain.user.presentation.dto.ResponseUserComplainListDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,19 +21,18 @@ public class QueryUserComplainService implements QueryUserComplainUseCase {
     private final UserComplainMapper userComplainMapper;
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> findAllForDTO(Pageable pageable) {
-        return userComplainJpaPort.findAll(pageable)
-                .map(userComplain -> userComplainMapper.toSimpleResponseUserComplainDTO(userComplain));
+    public Page<ResponseUserComplainListDTO> findUserComplainListForDTO(Pageable pageable) {
+        return userComplainJpaPort.findUserComplainList(pageable);
     }
 
     @Override
-    public UserComplain findById(Long id) {
-        return userComplainJpaPort.findById(id);
+    public UserComplain findByIdWithJoin(Long id) {
+        return userComplainJpaPort.findByIdWithJoin(id);
     }
 
     @Override
     public ResponseUserComplainDTO findByIdForDTO(Long id) {
-        return userComplainMapper.toResponseUserComplainDTO(userComplainJpaPort.findById(id));
+        return userComplainMapper.toResponseUserComplainDTO(userComplainJpaPort.findByIdWithJoin(id));
     }
 
     @Override
@@ -42,14 +41,12 @@ public class QueryUserComplainService implements QueryUserComplainUseCase {
     }
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> findAllByToUserForDTO(User toUser, Pageable pageable) {
-        return userComplainJpaPort.findAllByToUser(toUser, pageable)
-                .map(userComplain -> userComplainMapper.toSimpleResponseUserComplainDTO(userComplain));
+    public Page<ResponseUserComplainListDTO> findAllByToUserForDTO(Long userId, Pageable pageable) {
+        return userComplainJpaPort.findAllByToUser(userId, pageable);
     }
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> findAllByFromUserForDTO(User fromUser, Pageable pageable) {
-        return userComplainJpaPort.findAllByFromUser(fromUser, pageable)
-                .map(userComplain -> userComplainMapper.toSimpleResponseUserComplainDTO(userComplain));
+    public Page<ResponseUserComplainListDTO> findAllByFromUserForDTO(Long userId, Pageable pageable) {
+        return userComplainJpaPort.findAllByFromUser(userId, pageable);
     }
 }

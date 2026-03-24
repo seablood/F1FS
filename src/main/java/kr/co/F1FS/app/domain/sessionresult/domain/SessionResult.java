@@ -21,15 +21,14 @@ public class SessionResult {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "session_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id", nullable = false)
     private Session session;
-    @ManyToOne
-    @JoinColumn(name = "driver_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
-    @ManyToOne
-    @JoinColumn(name = "constructor_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "constructor_id", nullable = false)
     private Constructor constructor;
     @Positive(message = "position값을 확인해주세요.")
     private Integer position;

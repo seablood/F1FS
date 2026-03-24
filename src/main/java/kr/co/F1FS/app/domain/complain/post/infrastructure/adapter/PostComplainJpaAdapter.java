@@ -3,7 +3,8 @@ package kr.co.F1FS.app.domain.complain.post.infrastructure.adapter;
 import kr.co.F1FS.app.domain.complain.post.application.port.out.PostComplainJpaPort;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
 import kr.co.F1FS.app.domain.complain.post.infrastructure.repository.PostComplainRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.complain.post.infrastructure.repository.dsl.PostComplainDSLRepository;
+import kr.co.F1FS.app.domain.complain.post.presentation.dto.ResponsePostComplainListDTO;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PostComplainJpaAdapter implements PostComplainJpaPort {
     private final PostComplainRepository postComplainRepository;
+    private final PostComplainDSLRepository postComplainDSLRepository;
 
     @Override
     public PostComplain save(PostComplain postComplain) {
@@ -22,18 +24,18 @@ public class PostComplainJpaAdapter implements PostComplainJpaPort {
     }
 
     @Override
-    public Page<PostComplain> findAll(Pageable pageable) {
-        return postComplainRepository.findAll(pageable);
+    public Page<ResponsePostComplainListDTO> findPostComplainList(Pageable pageable) {
+        return postComplainDSLRepository.findPostComplainList(pageable);
     }
 
     @Override
-    public Page<PostComplain> findAllByUser(User fromUser, Pageable pageable) {
-        return postComplainRepository.findAllByFromUser(fromUser, pageable);
+    public Page<ResponsePostComplainListDTO> findAllByUser(Long userId, Pageable pageable) {
+        return postComplainDSLRepository.findAllByUser(userId, pageable);
     }
 
     @Override
-    public PostComplain findById(Long id) {
-        return postComplainRepository.findById(id)
+    public PostComplain findByIdWithJoin(Long id) {
+        return postComplainDSLRepository.findById(id)
                 .orElseThrow(() -> new PostException(PostExceptionType.POST_COMPLAIN_NOT_FOUND));
     }
 

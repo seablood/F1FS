@@ -12,6 +12,7 @@ import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class ApplicationAdminSuspensionLogService implements AdminSuspensionLogU
     private final AdminSuspensionLogMapper adminSuspensionLogMapper;
 
     @Override
+    @Transactional
     public void setSuspend(SuspendRequestDTO dto) {
         User suspendUser = queryUserUseCase.findByNickname(dto.getNickname());
         updateUserUseCase.suspendUser(suspendUser, dto.getDurationDays());

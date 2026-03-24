@@ -5,9 +5,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
+import kr.co.F1FS.app.domain.complain.user.presentation.dto.ResponseUserComplainListDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,11 +34,11 @@ public class UserComplainController {
 
     @GetMapping("/find-list")
     @Operation(summary = "신고 목록", description = "유저 신고 목록 반환")
-    public ResponseEntity<List<SimpleResponseUserComplainDTO>> getUserComplainListByFromUser(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                                                             @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                                             @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                                             @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<SimpleResponseUserComplainDTO> newPage = userComplainUseCase.getUserComplainListByFromUser(
+    public ResponseEntity<List<ResponseUserComplainListDTO>> getUserComplainListByFromUser(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                                                           @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                           @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                           @RequestParam(value = "condition", defaultValue = "new") String condition){
+        Page<ResponseUserComplainListDTO> newPage = userComplainUseCase.getUserComplainListByFromUser(
                 page, size, condition, principalDetails.getUser()
         );
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());

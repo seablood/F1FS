@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -20,14 +18,12 @@ public class DriverDebutRelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_DDR_driver_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_DDR_driver_id"), nullable = false)
     private Driver driverSinceInfo;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "sinceDebut_id", foreignKey = @ForeignKey(name = "FK_DDR_sinceDebut_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sinceDebut_id", foreignKey = @ForeignKey(name = "FK_DDR_sinceDebut_id"), nullable = false)
     private SinceDebut sinceDebut;
 
     @Enumerated(value = EnumType.STRING)

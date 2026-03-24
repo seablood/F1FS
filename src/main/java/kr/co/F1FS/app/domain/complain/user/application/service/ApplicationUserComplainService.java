@@ -4,13 +4,13 @@ import kr.co.F1FS.app.domain.complain.user.application.port.in.CreateUserComplai
 import kr.co.F1FS.app.domain.complain.user.application.port.in.DeleteUserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.QueryUserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.UserComplainUseCase;
+import kr.co.F1FS.app.domain.complain.user.presentation.dto.ResponseUserComplainListDTO;
 import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
 import kr.co.F1FS.app.domain.complain.user.presentation.dto.CreateUserComplainDTO;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -44,21 +44,24 @@ public class ApplicationUserComplainService implements UserComplainUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "UserComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseUserComplainDTO getUserComplainById(Long id) {
         return queryUserComplainUseCase.findByIdForDTO(id);
     }
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> getUserComplainListByFromUser(int page, int size, String condition, User fromUser) {
+    @Transactional(readOnly = true)
+    public Page<ResponseUserComplainListDTO> getUserComplainListByFromUser(int page, int size, String condition, User fromUser) {
         Pageable pageable = switchCondition(page, size, condition);
-        return queryUserComplainUseCase.findAllByFromUserForDTO(fromUser, pageable);
+
+        return queryUserComplainUseCase.findAllByFromUserForDTO(fromUser.getId(), pageable);
     }
 
     @Override
     @Transactional
     public void delete(Long id, User user) {
-        UserComplain userComplain = queryUserComplainUseCase.findById(id);
+        UserComplain userComplain = queryUserComplainUseCase.findByIdWithJoin(id);
 
         deleteUserComplainUseCase.delete(userComplain, user);
     }

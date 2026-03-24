@@ -14,6 +14,6 @@ public class CheckDriverDebutRelationService implements CheckDriverDebutRelation
 
     @Override
     public boolean existsDriverDebutRelationByDriverSinceInfoAndRacingClass(Driver driver, RacingClass racingClass) {
-        return relationJpaPort.existsDriverDebutRelationByDriverSinceInfoAndRacingClass(driver, racingClass);
+        return relationJpaPort.existsByDriverAndRacingClass(driver.getId(), racingClass);
     }
 }

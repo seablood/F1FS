@@ -1,13 +1,11 @@
 package kr.co.F1FS.app.domain.note.domain;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import kr.co.F1FS.app.domain.note.presentation.dto.ModifyNoteDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import java.sql.Timestamp;
 
@@ -16,19 +14,18 @@ import java.sql.Timestamp;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "notes")
+@SQLDelete(sql = "UPDATE notes SET deleted = true WHERE id = ?")
 public class Note {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, length = 500)
     private String content;
-    @ManyToOne
-    @JoinColumn(name = "to_user_id")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_user_id", nullable = false)
     private User toUser;
-    @ManyToOne
-    @JoinColumn(name = "from_user_id")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
     @CreationTimestamp
     @Column(name = "created_time")
@@ -37,6 +34,8 @@ public class Note {
     @Column(name = "update_time")
     private Timestamp updatedAt;
     private boolean isRead;
+    @Column(nullable = false)
+    private boolean deleted = false;
 
     public void modify(ModifyNoteDTO dto){
         this.content = dto.getContent();

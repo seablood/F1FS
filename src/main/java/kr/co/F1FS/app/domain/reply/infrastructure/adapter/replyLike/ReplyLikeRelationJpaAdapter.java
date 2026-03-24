@@ -1,10 +1,9 @@
 package kr.co.F1FS.app.domain.reply.infrastructure.adapter.replyLike;
 
 import kr.co.F1FS.app.domain.reply.application.port.out.replyLike.ReplyLikeRelationJpaPort;
-import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.reply.domain.ReplyLikeRelation;
 import kr.co.F1FS.app.domain.reply.infrastructure.repository.ReplyLikeRelationRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.reply.infrastructure.repository.dsl.ReplyLikeRelationDSLRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ReplyLikeRelationJpaAdapter implements ReplyLikeRelationJpaPort {
     private final ReplyLikeRelationRepository replyLikeRelationRepository;
+    private final ReplyLikeRelationDSLRepository replyLikeRelationDSLRepository;
 
     @Override
     public ReplyLikeRelation save(ReplyLikeRelation relation) {
@@ -19,13 +19,13 @@ public class ReplyLikeRelationJpaAdapter implements ReplyLikeRelationJpaPort {
     }
 
     @Override
-    public ReplyLikeRelation findReplyLikeRelationByUserAndReply(User user, Reply reply) {
-        return replyLikeRelationRepository.findReplyLikeRelationByUserAndReply(user, reply);
+    public ReplyLikeRelation findByUserAndReply(Long userId, Long replyId) {
+        return replyLikeRelationDSLRepository.findByUserAndReply(userId, replyId);
     }
 
     @Override
-    public boolean existsReplyLikeRelationByUserAndReply(User user, Reply reply) {
-        return replyLikeRelationRepository.existsReplyLikeRelationByUserAndReply(user, reply);
+    public boolean existsByUserAndReply(Long userId, Long replyId) {
+        return replyLikeRelationDSLRepository.existsByUserAndReply(userId, replyId);
     }
 
     @Override

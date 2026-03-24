@@ -5,7 +5,6 @@ import kr.co.F1FS.app.domain.complain.reply.presentation.dto.CreateReplyComplain
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.complain.reply.ResponseReplyComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.reply.SimpleResponseReplyComplainDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,14 +26,6 @@ public class ReplyComplainMapper {
                 .fromUserNickname(replyComplain.getFromUser().getNickname())
                 .description(replyComplain.getDescription())
                 .paraphrase(replyComplain.getParaphrase())
-                .build();
-    }
-
-    public SimpleResponseReplyComplainDTO toSimpleResponseReplyComplainDTO(ReplyComplain replyComplain){
-        return SimpleResponseReplyComplainDTO.builder()
-                .id(replyComplain.getId())
-                .replyContent(replyComplain.getToReply().getContent())
-                .description(replyComplain.getDescription())
                 .build();
     }
 }

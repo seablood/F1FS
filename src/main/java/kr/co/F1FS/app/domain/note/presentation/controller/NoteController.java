@@ -6,9 +6,9 @@ import jakarta.validation.Valid;
 import kr.co.F1FS.app.domain.note.application.port.in.NoteUseCase;
 import kr.co.F1FS.app.domain.note.presentation.dto.CreateNoteDTO;
 import kr.co.F1FS.app.domain.note.presentation.dto.ModifyNoteDTO;
+import kr.co.F1FS.app.domain.note.presentation.dto.ResponseNoteListDTO;
 import kr.co.F1FS.app.global.config.auth.PrincipalDetails;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseNoteDTO;
-import kr.co.F1FS.app.global.presentation.dto.note.ResponseSimpleNoteDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -34,20 +34,20 @@ public class NoteController {
 
     @GetMapping("/find-all/receive")
     @Operation(summary = "모든 받은 쪽지 보기", description = "로그인한 유저가 받은 모든 쪽지 페이징으로 반환")
-    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteListByToUser(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                       @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                       @AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteListByToUser(principalDetails.getUser(), page, size);
+    public ResponseEntity<List<ResponseNoteListDTO>> getNoteListByToUser(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                         @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                         @AuthenticationPrincipal PrincipalDetails principalDetails){
+        Page<ResponseNoteListDTO> newPage = noteUseCase.getNoteListByToUser(principalDetails.getUser(), page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
     @GetMapping("/find-all/send")
     @Operation(summary = "모든 보낸 쪽지 보기", description = "로그인한 유저가 보낸 모든 쪽지 페이징으로 반환")
-    public ResponseEntity<List<ResponseSimpleNoteDTO>> getNoteListByFromUser(@RequestParam(value = "page", defaultValue = "0") int page,
+    public ResponseEntity<List<ResponseNoteListDTO>> getNoteListByFromUser(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                        @RequestParam(value = "size", defaultValue = "10") int size,
                                                                        @AuthenticationPrincipal PrincipalDetails principalDetails){
-        Page<ResponseSimpleNoteDTO> newPage = noteUseCase.getNoteListByFromUser(principalDetails.getUser(), page, size);
+        Page<ResponseNoteListDTO> newPage = noteUseCase.getNoteListByFromUser(principalDetails.getUser(), page, size);
 
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }

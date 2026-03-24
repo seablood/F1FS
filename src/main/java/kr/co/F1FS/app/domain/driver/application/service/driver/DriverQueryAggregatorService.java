@@ -29,7 +29,7 @@ public class DriverQueryAggregatorService implements DriverQueryAggregatorUseCas
                 queryDriverRecordRelationUseCase.findDriverRecordRelationByDriverInfoAndRacingClass(driver).getCurrentSeason()
         );
         ResponseSinceDebutDTO sinceDebutDTO = recordMapper.toResponseSinceDebutDTO(
-                queryDriverDebutRelationUseCase.findDriverDebutRelationByDriverSinceInfoAndRacingClass(driver).getSinceDebut()
+                queryDriverDebutRelationUseCase.findByDriverAndRacingClass(driver).getSinceDebut()
         );
 
         return driverMapper.toResponseDriverDTO(driver, currentSeasonDTO, sinceDebutDTO);

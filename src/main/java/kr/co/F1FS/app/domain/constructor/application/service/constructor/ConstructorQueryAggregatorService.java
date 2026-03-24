@@ -28,7 +28,7 @@ public class ConstructorQueryAggregatorService implements ConstructorQueryAggreg
     @Override
     public ResponseConstructorDTO findByIdForDTO(Long id) {
         Constructor constructor = queryConstructorUseCase.findById(id);
-        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor);
+        ConstructorRecordRelation relation = queryConstructorRecordRelationUseCase.findByConstructor(constructor.getId());
         ResponseCurrentSeasonDTO currentSeasonDTO = recordMapper.toResponseCurrentSeasonDTO(relation.getCurrentSeason());
         ResponseSinceDebutDTO sinceDebutDTO = recordMapper.toResponseSinceDebutDTO(relation.getSinceDebut());
 
@@ -37,7 +37,7 @@ public class ConstructorQueryAggregatorService implements ConstructorQueryAggreg
     }
 
     public List<String> getDrivers(Constructor constructor){
-        return queryCDRelationUseCase.findConstructorDriverRelationByConstructor(constructor).stream()
+        return queryCDRelationUseCase.findAllByConstructor(constructor.getId()).stream()
                 .map((relation) -> relation.getDriver().getName())
                 .toList();
     }

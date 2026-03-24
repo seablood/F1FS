@@ -12,6 +12,7 @@ import kr.co.F1FS.app.global.presentation.dto.grandprix.SimpleResponseGrandPrixD
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,12 +25,14 @@ public class ApplicationGrandPrixService implements GrandPrixUseCase {
     private final CircuitMapper circuitMapper;
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "GrandPrixList", key = "#season", cacheManager = "redisLongCacheManager")
     public List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season){
         return queryGrandPrixUseCase.findAllForDTO(season);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "GrandPrixDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseGrandPrixDTO getGrandPrixById(Long id) {
         GrandPrix grandPrix = queryGrandPrixUseCase.findById(id);

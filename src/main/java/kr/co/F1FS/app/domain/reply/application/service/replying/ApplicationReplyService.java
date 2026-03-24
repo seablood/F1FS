@@ -2,9 +2,8 @@ package kr.co.F1FS.app.domain.reply.application.service.replying;
 
 import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCase;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.QueryPostUseCase;
-import kr.co.F1FS.app.domain.reply.application.port.in.replyComment.QueryReplyCommentUseCase;
 import kr.co.F1FS.app.domain.reply.application.port.in.replying.*;
-import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyCommentDTO;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ResponseReplyListDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replying.CreateReplyDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ModifyReplyDTO;
 import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyDTO;
@@ -12,12 +11,10 @@ import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +24,6 @@ public class ApplicationReplyService implements ReplyUseCase {
     private final DeleteReplyUseCase deleteReplyUseCase;
     private final QueryReplyUseCase queryReplyUseCase;
     private final QueryPostUseCase queryPostUseCase;
-    private final QueryReplyCommentUseCase queryReplyCommentUseCase;
     private final FCMLiveUseCase fcmLiveUseCase;
 
     @Override
@@ -41,19 +37,15 @@ public class ApplicationReplyService implements ReplyUseCase {
     }
 
     @Override
-    @Cacheable(value = "PostReplyList", key = "#id", cacheManager = "redisLongCacheManager")
-    public List<ResponseReplyDTO> getReplyListByPost(Long id){
-        Post post = queryPostUseCase.findById(id);
-        List<Reply> replies = queryReplyUseCase.findAllByPost(post);
-        Map<Long, List<ResponseReplyCommentDTO>> commentMap = queryReplyCommentUseCase.findByReplyForDTO(replies);
-
-        return queryReplyUseCase.findReplyListForDTO(post, replies, commentMap);
+    @Transactional(readOnly = true)
+    public List<ResponseReplyListDTO> getReplyListByPost(Long id){
+        return queryReplyUseCase.findAllByPostForDTO(id);
     }
 
     @Override
     @Transactional
     public ResponseReplyDTO modify(Long replyId, ModifyReplyDTO dto, User user){
-        Reply reply = queryReplyUseCase.findById(replyId);
+        Reply reply = queryReplyUseCase.findByIdForPostWithJoin(replyId);
 
         return updateReplyUseCase.modify(reply, user, dto);
     }
@@ -61,7 +53,7 @@ public class ApplicationReplyService implements ReplyUseCase {
     @Override
     @Transactional
     public void delete(Long replyId, User user){
-        Reply reply = queryReplyUseCase.findById(replyId);
+        Reply reply = queryReplyUseCase.findByIdForPostWithJoin(replyId);
 
         deleteReplyUseCase.delete(reply, user);
     }

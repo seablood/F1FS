@@ -58,6 +58,6 @@ public class ApplicationNotificationRedisService implements NotificationRedisUse
     public Page<ResponseNotificationRedisDTO> getNotificationRedisList(int page, int size, User user){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return findNotificationRedisUseCase.getNotificationRedisList(pageable, user);
+        return findNotificationRedisUseCase.getNotificationRedisListForDTO(pageable, user);
     }
 }

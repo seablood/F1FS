@@ -67,12 +67,14 @@ public class ApplicationAdminGrandPrixService implements AdminGrandPrixUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "GrandPrixListForAdmin", key = "#season", cacheManager = "redisLongCacheManager")
     public List<SimpleResponseGrandPrixDTO> getGrandPrixAll(Integer season){
         return queryGrandPrixUseCase.findAllForDTO(season);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "GrandPrixDTOForAdmin", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseGrandPrixDTO getGrandPrixById(Long id){
         GrandPrix grandPrix = queryGrandPrixUseCase.findById(id);

@@ -1,6 +1,6 @@
 package kr.co.F1FS.app.global.presentation.dto.session;
 
-import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
+import kr.co.F1FS.app.domain.sessionresult.presentation.dto.ResponseSessionResultListDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +15,5 @@ import java.util.List;
 public class ResponseSessionDTO {
     private Long id;
     private String sessionTime;
-    private List<ResponseSessionResultDTO> resultList;
+    private List<ResponseSessionResultListDTO> resultList;
 }

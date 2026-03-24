@@ -2,15 +2,15 @@ package kr.co.F1FS.app.domain.suggest.application.port.in;
 
 import kr.co.F1FS.app.domain.suggest.presentation.dto.CreateSuggestDTO;
 import kr.co.F1FS.app.domain.suggest.presentation.dto.ModifySuggestDTO;
+import kr.co.F1FS.app.domain.suggest.presentation.dto.ResponseSuggestListDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
-import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import org.springframework.data.domain.Page;
 
 public interface SuggestUseCase {
     ResponseSuggestDTO save(User user, CreateSuggestDTO dto);
     ResponseSuggestDTO getSuggestById(Long id);
-    Page<SimpleResponseSuggestDTO> getSuggestListByUser(int page, int size, User user);
+    Page<ResponseSuggestListDTO> getSuggestListByUser(int page, int size, User user);
     ResponseSuggestDTO modify(Long id, ModifySuggestDTO dto, User user);
     void delete(Long id, User user);
 }

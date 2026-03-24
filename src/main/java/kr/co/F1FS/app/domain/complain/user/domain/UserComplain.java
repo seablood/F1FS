@@ -22,13 +22,11 @@ public class UserComplain {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "to_user_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_user_id", nullable = false)
     private User toUser;
-    @ManyToOne
-    @JoinColumn(name = "from_user_id")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_user_id", nullable = false)
     private User fromUser;
     // 신고 사유
     private String description;

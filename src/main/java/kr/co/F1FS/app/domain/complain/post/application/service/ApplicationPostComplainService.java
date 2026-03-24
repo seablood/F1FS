@@ -5,13 +5,13 @@ import kr.co.F1FS.app.domain.complain.post.application.port.in.DeletePostComplai
 import kr.co.F1FS.app.domain.complain.post.application.port.in.PostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.QueryPostComplainUseCase;
 import kr.co.F1FS.app.domain.complain.post.domain.PostComplain;
+import kr.co.F1FS.app.domain.complain.post.presentation.dto.ResponsePostComplainListDTO;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.QueryPostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.complain.post.presentation.dto.CreatePostComplainDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.SlackService;
 import kr.co.F1FS.app.global.presentation.dto.complain.post.ResponsePostComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.post.SimpleResponsePostComplainDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -45,13 +45,15 @@ public class ApplicationPostComplainService implements PostComplainUseCase {
     }
 
     @Override
-    public Page<SimpleResponsePostComplainDTO> getPostComplainListByUser(int page, int size, String condition, User user) {
+    @Transactional(readOnly = true)
+    public Page<ResponsePostComplainListDTO> getPostComplainListByUser(int page, int size, String condition, User user) {
         Pageable pageable = switchCondition(page, size, condition);
 
-        return queryPostComplainUseCase.findAllByUserForDTO(user, pageable);
+        return queryPostComplainUseCase.findAllByUserForDTO(user.getId(), pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "PostComplainDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponsePostComplainDTO getPostComplainById(Long id) {
         return queryPostComplainUseCase.findByIdForDTO(id);
@@ -60,7 +62,7 @@ public class ApplicationPostComplainService implements PostComplainUseCase {
     @Override
     @Transactional
     public void delete(Long id, User user) {
-        PostComplain postComplain = queryPostComplainUseCase.findById(id);
+        PostComplain postComplain = queryPostComplainUseCase.findByIdWithJoin(id);
 
         deletePostComplainUseCase.delete(postComplain, user);
     }

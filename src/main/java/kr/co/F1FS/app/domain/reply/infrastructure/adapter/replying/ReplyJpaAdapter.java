@@ -1,11 +1,11 @@
 package kr.co.F1FS.app.domain.reply.infrastructure.adapter.replying;
 
-import kr.co.F1FS.app.domain.post.domain.Post;
-import kr.co.F1FS.app.domain.reply.application.mapper.ReplyMapper;
 import kr.co.F1FS.app.domain.reply.application.port.out.replying.ReplyJpaPort;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.reply.infrastructure.repository.ReplyRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.reply.infrastructure.repository.dsl.ReplyDSLRepository;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ResponseReplyListByUserDTO;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replying.ResponseReplyListDTO;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyException;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReplyJpaAdapter implements ReplyJpaPort {
     private final ReplyRepository replyRepository;
-    private final ReplyMapper replyMapper;
+    private final ReplyDSLRepository replyDSLRepository;
 
     @Override
     public Reply save(Reply reply) {
@@ -32,19 +32,19 @@ public class ReplyJpaAdapter implements ReplyJpaPort {
     }
 
     @Override
-    public Reply findById(Long id) {
-        return replyRepository.findById(id)
+    public Reply findByIdForPostWithJoin(Long id) {
+        return replyDSLRepository.findByIdForPost(id)
                 .orElseThrow(() -> new ReplyException(ReplyExceptionType.REPLY_NOT_FOUND));
     }
 
     @Override
-    public List<Reply> findAllByPost(Post post) {
-        return replyRepository.findAllByPost(post);
+    public List<ResponseReplyListDTO> findAllByPost(Long postId) {
+        return replyDSLRepository.findAllByPost(postId);
     }
 
     @Override
-    public Page<Reply> findAllByUser(User user, Pageable pageable) {
-        return replyRepository.findAllByUser(user, pageable);
+    public Page<ResponseReplyListByUserDTO> findAllByUser(Long userId, Pageable pageable) {
+        return replyDSLRepository.findAllByUser(userId, pageable);
     }
 
     @Override

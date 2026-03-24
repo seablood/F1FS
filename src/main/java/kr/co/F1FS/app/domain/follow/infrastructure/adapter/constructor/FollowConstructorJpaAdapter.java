@@ -1,11 +1,9 @@
 package kr.co.F1FS.app.domain.follow.infrastructure.adapter.constructor;
 
-import kr.co.F1FS.app.domain.constructor.domain.Constructor;
-import kr.co.F1FS.app.domain.follow.application.mapper.FollowMapper;
 import kr.co.F1FS.app.domain.follow.application.port.out.constructor.FollowConstructorJpaPort;
 import kr.co.F1FS.app.domain.follow.domain.FollowConstructor;
 import kr.co.F1FS.app.domain.follow.infrastructure.repository.FollowConstructorRepository;
-import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.domain.follow.infrastructure.repository.dsl.FollowConstructorDSLRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FollowConstructorJpaAdapter implements FollowConstructorJpaPort {
     private final FollowConstructorRepository followConstructorRepository;
-    private final FollowMapper followMapper;
+    private final FollowConstructorDSLRepository followConstructorDSLRepository;
 
     @Override
     public FollowConstructor save(FollowConstructor followConstructor) {
@@ -23,20 +21,18 @@ public class FollowConstructorJpaAdapter implements FollowConstructorJpaPort {
     }
 
     @Override
-    public FollowConstructor findByFollowerUserAndFolloweeConstructor(User user, Constructor constructor) {
-        return followConstructorRepository.findByFollowerUserAndFolloweeConstructor(user, constructor);
+    public FollowConstructor findByUserAndConstructor(Long userId, Long constructorId) {
+        return followConstructorDSLRepository.findByUserAndConstructor(userId, constructorId);
     }
 
     @Override
-    public List<FollowConstructor> findByFollowerUser(User user) {
-        return followConstructorRepository.findByFollowerUser(user);
+    public List<FollowConstructor> findAllByUser(Long userId) {
+        return followConstructorDSLRepository.findAllByUser(userId);
     }
 
     @Override
-    public boolean existsFollowConstructorByFollowerUserAndFolloweeConstructor(User user, Constructor constructor) {
-        return followConstructorRepository.existsFollowConstructorByFollowerUserAndFolloweeConstructor(
-                user, constructor
-        );
+    public boolean existsByUserAndConstructor(Long userId, Long constructorId) {
+        return followConstructorDSLRepository.existsByUserAndConstructor(userId, constructorId);
     }
 
     @Override

@@ -6,7 +6,6 @@ import kr.co.F1FS.app.domain.reply.domain.ReplyComment;
 import kr.co.F1FS.app.domain.reply.domain.ReplyLikeRelation;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.CreateReplyCommentDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replying.CreateReplyDTO;
-import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyByUserDTO;
 import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyCommentDTO;
 import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -43,16 +42,6 @@ public class ReplyMapper {
         return ResponseReplyDTO.builder()
                 .id(reply.getId())
                 .author(author)
-                .content(reply.getContent())
-                .createdAt(reply.getCreatedAt())
-                .updatedAt(reply.getUpdatedAt())
-                .build();
-    }
-
-    public ResponseReplyByUserDTO toResponseReplyByUserDTO(Reply reply){
-        return ResponseReplyByUserDTO.builder()
-                .postId(reply.getPost().getId())
-                .author(reply.getUser().getNickname())
                 .content(reply.getContent())
                 .createdAt(reply.getCreatedAt())
                 .updatedAt(reply.getUpdatedAt())

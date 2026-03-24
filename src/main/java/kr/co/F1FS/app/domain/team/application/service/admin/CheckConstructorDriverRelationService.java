@@ -15,11 +15,11 @@ public class CheckConstructorDriverRelationService implements CheckConstructorDr
 
     @Override
     public boolean existsConstructorDriverRelationByDriverAndRacingClass(Driver driver, RacingClass racingClass) {
-        return cdRelationJpaPort.existsConstructorDriverRelationByDriverAndRacingClass(driver, racingClass);
+        return cdRelationJpaPort.existsByDriverAndRacingClass(driver.getId(), racingClass);
     }
 
     @Override
     public boolean existsConstructorDriverRelationByDriverAndConstructor(Driver driver, Constructor constructor) {
-        return cdRelationJpaPort.existsConstructorDriverRelationByDriverAndConstructor(driver, constructor);
+        return cdRelationJpaPort.existsByDriverAndConstructor(driver.getId(), constructor.getId());
     }
 }

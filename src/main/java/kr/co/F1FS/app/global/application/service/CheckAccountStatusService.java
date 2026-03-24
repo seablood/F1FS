@@ -38,7 +38,7 @@ public class CheckAccountStatusService implements CheckAccountStatusUseCase {
         }
 
         if(principalDetails.getUser().getRole().equals(Role.DISCIPLINE)){
-            SuspensionLog log = querySuspensionLogUseCase.findBySuspendUser(principalDetails.getUser());
+            SuspensionLog log = querySuspensionLogUseCase.findByUser(principalDetails.getUser().getId());
 
             if(principalDetails.getUser().isSuspendUntil()) {
                 throw new AccountSuspendException("이용이 정지된 계정입니다.", suspensionLogMapper.toResponseSuspensionLogDTO(log));

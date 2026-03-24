@@ -28,11 +28,11 @@ public class ApplicationReplyLikeRelationService implements ReplyLikeRelationUse
     @Override
     @Transactional
     public void toggle(User user, Long id) {
-        Reply reply = queryReplyUseCase.findById(id);
+        Reply reply = queryReplyUseCase.findByIdForPostWithJoin(id);
         cacheEvictUtil.evictCachingReply(reply.getPost());
 
-        if(checkReplyLikeRelationUseCase.existsReplyLikeRelationByUserAndReply(user, reply)){
-            ReplyLikeRelation relation = queryReplyLikeRelationUseCase.findReplyLikeRelationByUserAndReply(user, reply);
+        if(checkReplyLikeRelationUseCase.existsByUserAndReply(user.getId(), reply.getId())){
+            ReplyLikeRelation relation = queryReplyLikeRelationUseCase.findByUserAndReply(user.getId(), reply.getId());
             deleteReplyLikeRelationService.delete(relation);
             updateReplyUseCase.decreaseLikeNum(reply);
         }else {

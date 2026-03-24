@@ -5,11 +5,12 @@ import kr.co.F1FS.app.domain.session.application.port.in.QuerySessionUseCase;
 import kr.co.F1FS.app.domain.session.application.port.in.SessionUseCase;
 import kr.co.F1FS.app.domain.session.domain.Session;
 import kr.co.F1FS.app.domain.sessionresult.application.port.in.QuerySessionResultUseCase;
+import kr.co.F1FS.app.domain.sessionresult.presentation.dto.ResponseSessionResultListDTO;
 import kr.co.F1FS.app.global.presentation.dto.session.ResponseSessionDTO;
-import kr.co.F1FS.app.global.presentation.dto.sessionresult.ResponseSessionResultDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,10 +22,11 @@ public class ApplicationSessionService implements SessionUseCase {
     private final SessionMapper sessionMapper;
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "SessionDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSessionDTO getSessionById(Long id){
         Session session = querySessionUseCase.findById(id);
-        List<ResponseSessionResultDTO> resultList = querySessionResultUseCase.findSessionResultBySessionForDTO(session);
+        List<ResponseSessionResultListDTO> resultList = querySessionResultUseCase.findAllBySessionForDTO(session.getId());
 
         return sessionMapper.toResponseSessionDTO(session, resultList);
     }

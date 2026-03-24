@@ -44,6 +44,7 @@ public class ApplicationChatRoomService implements ChatRoomUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ResponseChatRoomDTO> getChatRoomAll(int page, int size, String condition) {
         Pageable pageable = conditionSwitch(page, size, condition);
 
@@ -51,6 +52,7 @@ public class ApplicationChatRoomService implements ChatRoomUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<ResponseChatRoomDTO> getChatRoomListByIdIn(int page, int size, String condition, String username) {
         Pageable pageable = conditionSwitch(page, size, condition);
         List<Long> roomIds = findChatSubscribeUseCase.findSubscribeChatRoom(username);

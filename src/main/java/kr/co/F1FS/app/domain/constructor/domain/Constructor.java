@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import kr.co.F1FS.app.domain.constructor.presentation.dto.constructor.ModifyConstructorCommand;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "constructors")
+@SQLDelete(sql = "UPDATE constructors SET deleted = true WHERE id = ?")
 public class Constructor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +26,8 @@ public class Constructor {
     private Integer followerNum;
     @Enumerated(value = EnumType.STRING)
     private RacingClass racingClass;
+    @Column(nullable = false)
+    private boolean deleted = false;
     //
     // 컨스트럭터 아이콘 이미지 제공 필요
     // 컨스트럭터 F1카 이미지 제공 필요

@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.note.application.port.in.*;
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.note.presentation.dto.CreateNoteDTO;
 import kr.co.F1FS.app.domain.note.presentation.dto.ModifyNoteDTO;
+import kr.co.F1FS.app.domain.note.presentation.dto.ResponseNoteListDTO;
 import kr.co.F1FS.app.domain.notification.application.port.in.redis.SubscribeNotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
@@ -12,7 +13,6 @@ import kr.co.F1FS.app.global.presentation.dto.notification.FCMPushDTO;
 import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.note.ResponseNoteDTO;
-import kr.co.F1FS.app.global.presentation.dto.note.ResponseSimpleNoteDTO;
 import kr.co.F1FS.app.global.util.FCMUtil;
 import kr.co.F1FS.app.global.util.Topic;
 import lombok.RequiredArgsConstructor;
@@ -49,24 +49,26 @@ public class ApplicationNoteService implements NoteUseCase {
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> getNoteListByToUser(User user, int page, int size){
+    @Transactional(readOnly = true)
+    public Page<ResponseNoteListDTO> getNoteListByToUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return queryNoteUseCase.findAllByToUserForDTO(user, pageable);
+        return queryNoteUseCase.findAllByToUserFotDTO(user.getId(), pageable);
     }
 
     @Override
-    public Page<ResponseSimpleNoteDTO> getNoteListByFromUser(User user, int page, int size){
+    @Transactional(readOnly = true)
+    public Page<ResponseNoteListDTO> getNoteListByFromUser(User user, int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return queryNoteUseCase.findAllByFromUserForDTO(user, pageable);
+        return queryNoteUseCase.findAllByFromUserFotDTO(user.getId(), pageable);
     }
 
     @Override
     @Cacheable(value = "NoteDTO", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseNoteDTO getNoteById(Long id){
-        Note note = queryNoteUseCase.findById(id);
-        updateIsRead(note);
+        Note note = queryNoteUseCase.findByIdWithJoin(id);
+        if (!note.isRead()) updateIsRead(note);
 
         return noteMapper.toResponseNoteDTO(note);
     }
@@ -80,7 +82,7 @@ public class ApplicationNoteService implements NoteUseCase {
     @Override
     @Transactional
     public ResponseNoteDTO modify(Long id, ModifyNoteDTO dto){
-        Note note = queryNoteUseCase.findById(id);
+        Note note = queryNoteUseCase.findByIdWithJoin(id);
 
         return updateNoteUseCase.modify(note, dto);
     }

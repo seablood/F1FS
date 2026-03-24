@@ -4,8 +4,8 @@ import kr.co.F1FS.app.domain.suggest.application.port.in.admin.AdminSuggestUseCa
 import kr.co.F1FS.app.domain.suggest.application.port.in.QuerySuggestUseCase;
 import kr.co.F1FS.app.domain.suggest.application.port.in.UpdateSuggestUseCase;
 import kr.co.F1FS.app.domain.suggest.domain.Suggest;
+import kr.co.F1FS.app.domain.suggest.presentation.dto.ResponseSuggestListDTO;
 import kr.co.F1FS.app.global.presentation.dto.suggest.ResponseSuggestDTO;
-import kr.co.F1FS.app.global.presentation.dto.suggest.SimpleResponseSuggestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,13 +24,15 @@ public class ApplicationAdminSuggestService implements AdminSuggestUseCase {
     private final QuerySuggestUseCase querySuggestUseCase;
 
     @Override
-    public Page<SimpleResponseSuggestDTO> getSuggestAll(int page, int size){
+    @Transactional(readOnly = true)
+    public Page<ResponseSuggestListDTO> getSuggestAll(int page, int size){
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        return querySuggestUseCase.findAllForDTO(pageable);
+        return querySuggestUseCase.findSuggestListForDTO(pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "SuggestDTOForAdmin", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseSuggestDTO getSuggestById(Long id) {
         return querySuggestUseCase.findByIdForDTO(id);

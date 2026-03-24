@@ -10,7 +10,6 @@ import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.util.CacheEvictUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,7 @@ public class ApplicationFollowDriverService implements FollowDriverUseCase {
     private final DeleteFollowDriverUseCase deleteFollowDriverUseCase;
     private final QueryFollowDriverUseCase queryFollowDriverUseCase;
     private final CheckFollowDriverUseCase checkFollowDriverUseCase;
+    private final SaveFollowDriverListUseCase saveFollowDriverListUseCase;
     private final UpdateDriverUseCase updateDriverUseCase;
     private final QueryDriverUseCase queryDriverUseCase;
     private final QueryUserUseCase queryUserUseCase;
@@ -30,13 +30,12 @@ public class ApplicationFollowDriverService implements FollowDriverUseCase {
 
     @Override
     @Transactional
-    @CacheEvict(value = "FollowingDriver", key = "#user.id", cacheManager = "redisLongCacheManager")
     public void toggle(User user, Long id){
         Driver driver = queryDriverUseCase.findById(id);
         cacheEvictUtil.evictCachingDriver(driver);
 
-        if(checkFollowDriverUseCase.existsFollowDriverByFollowerUserAndFolloweeDriver(user, driver)){
-            FollowDriver followDriver = queryFollowDriverUseCase.findByFollowerUserAndFolloweeDriver(user, driver);
+        if(checkFollowDriverUseCase.existsByUserAndDriver(user.getId(), driver.getId())){
+            FollowDriver followDriver = queryFollowDriverUseCase.findByUserAndDriver(user.getId(), driver.getId());
             deleteFollowDriverUseCase.delete(followDriver);
             updateDriverUseCase.decreaseFollower(driver);
             return;
@@ -47,13 +46,33 @@ public class ApplicationFollowDriverService implements FollowDriverUseCase {
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowDriverDTO> getFollowingDriverByUser(User user){
-        return queryFollowDriverUseCase.findByFollowerUserForDTO(user);
+        Long userId = user.getId();
+
+        if(saveFollowDriverListUseCase.hasKey(userId)) return saveFollowDriverListUseCase.getFollowingList(userId);
+
+        List<ResponseFollowDriverDTO> list = queryFollowDriverUseCase.findAllByUserForDTO(userId);
+        if(list.isEmpty()) return list;
+
+        saveFollowDriverListUseCase.saveFollowingList(userId, list);
+
+        return list;
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowDriverDTO> getFollowingDriverByNickname(String nickname) {
         User user = queryUserUseCase.findByNickname(nickname);
-        return queryFollowDriverUseCase.findByFollowerUserForDTO(user);
+        Long userId = user.getId();
+
+        if(saveFollowDriverListUseCase.hasKey(userId)) return saveFollowDriverListUseCase.getFollowingList(userId);
+
+        List<ResponseFollowDriverDTO> list = queryFollowDriverUseCase.findAllByUserForDTO(userId);
+        if(list.isEmpty()) return list;
+
+        saveFollowDriverListUseCase.saveFollowingList(userId, list);
+
+        return list;
     }
 }

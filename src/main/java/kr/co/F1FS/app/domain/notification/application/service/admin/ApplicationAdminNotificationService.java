@@ -42,6 +42,7 @@ public class ApplicationAdminNotificationService implements AdminNotificationUse
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleResponseNotificationDTO> getNotificationListByAuthor(int page, int size, String condition, User adminUser) {
         Pageable pageable = switchCondition(page, size, condition);
 
@@ -49,6 +50,7 @@ public class ApplicationAdminNotificationService implements AdminNotificationUse
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponseNotificationDTO getNotificationById(Long id) {
         return queryNotificationUseCase.findByIdForDTO(id);
     }

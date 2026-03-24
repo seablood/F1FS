@@ -5,8 +5,6 @@ import kr.co.F1FS.app.domain.record.domain.CurrentSeason;
 import kr.co.F1FS.app.domain.record.domain.SinceDebut;
 import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -22,19 +20,16 @@ public class ConstructorRecordRelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "constructor_id", foreignKey = @ForeignKey(name = "FK_CRR_constructor_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "constructor_id", foreignKey = @ForeignKey(name = "FK_CRR_constructor_id"), nullable = false)
     private Constructor constructorInfo;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "currentSeason_id", foreignKey = @ForeignKey(name = "FK_CRR_currentSeason_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currentSeason_id", foreignKey = @ForeignKey(name = "FK_CRR_currentSeason_id"), nullable = false)
     private CurrentSeason currentSeason;
 
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "sinceDebut_id", foreignKey = @ForeignKey(name = "FK_CRR_sinceDebut_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sinceDebut_id", foreignKey = @ForeignKey(name = "FK_CRR_sinceDebut_id"), nullable = false)
     private SinceDebut sinceDebut;
     @Enumerated(value = EnumType.STRING)
     private RacingClass racingClass;

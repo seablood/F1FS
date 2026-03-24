@@ -18,9 +18,8 @@ public class SuspensionLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "suspend_user")
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "suspend_user", nullable = false)
     private User suspendUser;
     private int durationDays;
     @Column

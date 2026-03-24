@@ -7,6 +7,7 @@ import kr.co.F1FS.app.global.util.RacingClass;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,12 +17,11 @@ public class ApplicationConstructorRecordRelationService implements ConstructorR
     private final QueryConstructorRecordRelationUseCase queryConstructorRecordRelationUseCase;
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "ConstructorStandingList", key = "#racingClassCode", cacheManager = "redisLongCacheManager")
     public List<ResponseConstructorStandingDTO> getConstructorStandingList(String racingClassCode){
         RacingClass racingClass = RacingClass.valueOf(racingClassCode);
 
-        return queryConstructorRecordRelationUseCase.findConstructorRecordRelationsByRacingClassAndEntryClassSeasonForDTO(
-                racingClass
-        );
+        return queryConstructorRecordRelationUseCase.findAllByRacingClassAndEntryClassSeasonForDTO(racingClass);
     }
 }

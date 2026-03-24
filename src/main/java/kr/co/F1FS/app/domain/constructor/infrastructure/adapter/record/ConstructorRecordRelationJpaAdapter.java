@@ -1,9 +1,10 @@
 package kr.co.F1FS.app.domain.constructor.infrastructure.adapter.record;
 
 import kr.co.F1FS.app.domain.constructor.application.port.out.record.ConstructorRecordRelationJpaPort;
-import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.constructor.domain.ConstructorRecordRelation;
 import kr.co.F1FS.app.domain.constructor.infrastructure.repository.ConstructorRecordRelationRepository;
+import kr.co.F1FS.app.domain.constructor.infrastructure.repository.dsl.ConstructorRecordRelationDSLRepository;
+import kr.co.F1FS.app.domain.constructor.presentation.dto.record.ResponseConstructorStandingDTO;
 import kr.co.F1FS.app.global.util.RacingClass;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorExceptionType;
@@ -16,6 +17,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ConstructorRecordRelationJpaAdapter implements ConstructorRecordRelationJpaPort {
     private final ConstructorRecordRelationRepository relationRepository;
+    private final ConstructorRecordRelationDSLRepository relationDSLRepository;
 
     @Override
     public ConstructorRecordRelation save(ConstructorRecordRelation relation) {
@@ -23,13 +25,18 @@ public class ConstructorRecordRelationJpaAdapter implements ConstructorRecordRel
     }
 
     @Override
-    public List<ConstructorRecordRelation> findConstructorRecordRelationsByRacingClassAndEntryClassSeason(RacingClass racingClass, boolean entryClassSeason) {
-        return relationRepository.findConstructorRecordRelationsByRacingClassAndEntryClassSeason(racingClass, entryClassSeason);
+    public List<ResponseConstructorStandingDTO> findAllByRacingClassAndEntryClassSeason(RacingClass racingClass) {
+        return relationDSLRepository.findAllByRacingClassAndEntryClassSeason(racingClass);
     }
 
     @Override
-    public ConstructorRecordRelation findByConstructorInfo(Constructor constructor) {
-        return relationRepository.findByConstructorInfo(constructor)
+    public List<ConstructorRecordRelation> findAllByRacingClassAndEntryClassSeasonNotDTO(RacingClass racingClass) {
+        return relationDSLRepository.findAllByRacingClassAndEntryClassSeasonNotDTO(racingClass);
+    }
+
+    @Override
+    public ConstructorRecordRelation findByConstructor(Long constructorId) {
+        return relationDSLRepository.findByConstructor(constructorId)
                 .orElseThrow(() -> new ConstructorException(ConstructorExceptionType.CONSTRUCTOR_RECORD_ERROR));
     }
 }

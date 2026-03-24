@@ -21,15 +21,13 @@ public class ConstructorDriverRelation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "constructor_id", foreignKey = @ForeignKey(name = "FK_CDR_constructor_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "constructor_id", foreignKey = @ForeignKey(name = "FK_CDR_constructor_id"), nullable = false)
     private Constructor constructor;
 
     // 릴레이션 테이블 삭제 가능을 위한 단방향 일대일 관계 생성
-    @ManyToOne
-    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_CDR_driver_id"))
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id", foreignKey = @ForeignKey(name = "FK_CDR_driver_id"), nullable = false)
     private Driver driver;
 
     @Enumerated(value = EnumType.STRING)

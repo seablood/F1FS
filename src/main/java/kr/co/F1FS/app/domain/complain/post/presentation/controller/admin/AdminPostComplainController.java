@@ -3,8 +3,8 @@ package kr.co.F1FS.app.domain.complain.post.presentation.controller.admin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.F1FS.app.domain.complain.post.application.port.in.admin.AdminPostComplainUseCase;
+import kr.co.F1FS.app.domain.complain.post.presentation.dto.ResponsePostComplainListDTO;
 import kr.co.F1FS.app.global.presentation.dto.complain.post.ResponsePostComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.post.SimpleResponsePostComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,9 +21,9 @@ public class AdminPostComplainController {
 
     @GetMapping("/list")
     @Operation(summary = "게시글 신고 목록", description = "게시글 신고 목록 반환")
-    public ResponseEntity<List<SimpleResponsePostComplainDTO>> getPostComplainAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                                  @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                                  @RequestParam(value = "condition", defaultValue = "new") String condition){
+    public ResponseEntity<List<ResponsePostComplainListDTO>> getPostComplainAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                @RequestParam(value = "condition", defaultValue = "new") String condition){
         return ResponseEntity.status(HttpStatus.OK).body(adminPostComplainUseCase.getPostComplainAll(
                 page, size, condition).getContent());
     }

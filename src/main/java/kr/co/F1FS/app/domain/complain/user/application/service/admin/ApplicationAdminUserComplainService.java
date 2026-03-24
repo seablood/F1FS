@@ -2,10 +2,10 @@ package kr.co.F1FS.app.domain.complain.user.application.service.admin;
 
 import kr.co.F1FS.app.domain.complain.user.application.port.in.admin.AdminUserComplainUseCase;
 import kr.co.F1FS.app.domain.complain.user.application.port.in.QueryUserComplainUseCase;
+import kr.co.F1FS.app.domain.complain.user.presentation.dto.ResponseUserComplainListDTO;
 import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.complain.user.ResponseUserComplainDTO;
-import kr.co.F1FS.app.global.presentation.dto.complain.user.SimpleResponseUserComplainDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,22 +22,25 @@ public class ApplicationAdminUserComplainService implements AdminUserComplainUse
     private final QueryUserUseCase queryUserUseCase;
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> getUserComplainAll(int page, int size, String condition) {
+    @Transactional(readOnly = true)
+    public Page<ResponseUserComplainListDTO> getUserComplainAll(int page, int size, String condition) {
         Pageable pageable = switchCondition(page, size, condition);
 
-        return queryUserComplainUseCase.findAllForDTO(pageable);
+        return queryUserComplainUseCase.findUserComplainListForDTO(pageable);
     }
 
     @Override
-    public Page<SimpleResponseUserComplainDTO> getUserComplainListByToUser(int page, int size, String condition, String search) {
+    @Transactional(readOnly = true)
+    public Page<ResponseUserComplainListDTO> getUserComplainListByToUser(int page, int size, String condition, String search) {
         Pageable pageable = switchCondition(page, size, condition);
         User toUser = queryUserUseCase.findByUsernameOrNull(search);
         if(toUser == null) toUser = queryUserUseCase.findByNickname(search);
 
-        return queryUserComplainUseCase.findAllByToUserForDTO(toUser, pageable);
+        return queryUserComplainUseCase.findAllByToUserForDTO(toUser.getId(), pageable);
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(value = "UserComplainDTOForAdmin", key = "#id", cacheManager = "redisLongCacheManager")
     public ResponseUserComplainDTO getUserComplainById(Long id) {
         return queryUserComplainUseCase.findByIdForDTO(id);

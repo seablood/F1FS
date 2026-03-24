@@ -26,8 +26,8 @@ public class DeleteConstructorDriverRelationService implements DeleteConstructor
 
         switch (option){
             case "currentTeam" :
-                relation = cdRelationJpaPort.findConstructorDriverRelationByDriverAndRacingClass(
-                        driver, driver.getRacingClass()
+                relation = cdRelationJpaPort.findByDriverAndRacingClass(
+                        driver.getId(), driver.getRacingClass()
                 );
                 cacheEvictUtil.evictCachingConstructor(relation.getConstructor());
                 cdRelationJpaPort.delete(relation);
@@ -35,15 +35,15 @@ public class DeleteConstructorDriverRelationService implements DeleteConstructor
 
             case "F1", "F2", "F3", "F1_ACADEMY", "RESERVE" :
                 RacingClass racingClass = RacingClass.valueOf(option);
-                relation = cdRelationJpaPort.findConstructorDriverRelationByDriverAndRacingClass(
-                        driver, racingClass
+                relation = cdRelationJpaPort.findByDriverAndRacingClass(
+                        driver.getId(), racingClass
                 );
                 cacheEvictUtil.evictCachingConstructor(relation.getConstructor());
                 cdRelationJpaPort.delete(relation);
                 break;
 
             case "all" :
-                List<ConstructorDriverRelation> list = cdRelationJpaPort.findConstructorDriverRelationByDriver(driver);
+                List<ConstructorDriverRelation> list = cdRelationJpaPort.findAllByDriver(driver.getId());
                 list.stream().forEach(relation1 -> {
                     cacheEvictUtil.evictCachingConstructor(relation1.getConstructor());
                     cdRelationJpaPort.delete(relation1);

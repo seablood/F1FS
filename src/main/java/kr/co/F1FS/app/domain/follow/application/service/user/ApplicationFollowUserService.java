@@ -31,8 +31,8 @@ public class ApplicationFollowUserService implements FollowUserUseCase {
         cacheEvictUtil.evictCachingUser(followerUser);
         cacheEvictUtil.evictCachingUser(followeeUser);
 
-        if(checkFollowUserUseCase.existsFollowUserByFollowerUserAndFolloweeUser(followerUser, followeeUser)){
-            FollowUser followUser = queryFollowUserUseCase.findByFollowerUserAndFolloweeUser(followerUser, followeeUser);
+        if(checkFollowUserUseCase.existsByFollowerUserAndFolloweeUser(followerUser.getId(), followeeUser.getId())){
+            FollowUser followUser = queryFollowUserUseCase.findByFollowerUserAndFolloweeUser(followerUser.getId(), followeeUser.getId());
             deleteFollowUserUseCase.delete(followUser);
             updateUserUseCase.decreaseFollow(followerUser, followeeUser);
             return;
@@ -43,24 +43,28 @@ public class ApplicationFollowUserService implements FollowUserUseCase {
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowUserDTO> getFollowersByNickname(String nickname){
         User user = queryUserUseCase.findByNickname(nickname);
-        return queryFollowUserUseCase.findByFolloweeUserForDTO(user);
+        return queryFollowUserUseCase.findAllByFolloweeUserForDTO(user.getId());
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowUserDTO> getFolloweesByNickname(String nickname){
         User user = queryUserUseCase.findByNickname(nickname);
-        return queryFollowUserUseCase.findByFollowerUserForDTO(user);
+        return queryFollowUserUseCase.findAllByFollowerUserForDTO(user.getId());
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowUserDTO> getFollowersByUser(User user){
-        return queryFollowUserUseCase.findByFolloweeUserForDTO(user);
+        return queryFollowUserUseCase.findAllByFolloweeUserForDTO(user.getId());
     }
 
     @Override
+    @Transactional
     public List<ResponseFollowUserDTO> getFolloweesByUser(User user){
-        return queryFollowUserUseCase.findByFollowerUserForDTO(user);
+        return queryFollowUserUseCase.findAllByFollowerUserForDTO(user.getId());
     }
 }

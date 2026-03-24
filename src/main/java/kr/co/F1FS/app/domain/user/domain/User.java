@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import kr.co.F1FS.app.global.util.Role;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
+@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,6 +44,7 @@ public class User {
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private Timestamp lastLoginDate;
+    private boolean deleted = false;
 
     // 징계 관련 필드
     @Column

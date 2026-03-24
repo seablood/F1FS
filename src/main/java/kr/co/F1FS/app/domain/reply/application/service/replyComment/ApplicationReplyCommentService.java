@@ -8,11 +8,14 @@ import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.reply.domain.ReplyComment;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.CreateReplyCommentDTO;
 import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.ModifyReplyCommentDTO;
+import kr.co.F1FS.app.domain.reply.presentation.dto.replyComment.ResponseReplyCommentListDTO;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.reply.ResponseReplyCommentDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,7 @@ public class ApplicationReplyCommentService implements ReplyCommentUseCase {
     @Override
     @Transactional
     public ReplyComment save(CreateReplyCommentDTO dto, User user, Long id) {
-        Reply reply = queryReplyUseCase.findById(id);
+        Reply reply = queryReplyUseCase.findByIdForPostWithJoin(id);
         Post post = reply.getPost();
         ReplyComment replyComment = createReplyCommentUseCase.save(dto, user, reply);
 
@@ -36,9 +39,15 @@ public class ApplicationReplyCommentService implements ReplyCommentUseCase {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<ResponseReplyCommentListDTO> getReplyCommentListByReply(Long replyId) {
+        return queryReplyCommentUseCase.findAllByReplyForDTO(replyId);
+    }
+
+    @Override
     @Transactional
     public ResponseReplyCommentDTO modify(ModifyReplyCommentDTO dto, User user, Long replyCommentId) {
-        ReplyComment replyComment = queryReplyCommentUseCase.findById(replyCommentId);
+        ReplyComment replyComment = queryReplyCommentUseCase.findByIdWithJoin(replyCommentId);
 
         return updateReplyCommentUseCase.modify(dto, user, replyComment);
     }
@@ -46,7 +55,7 @@ public class ApplicationReplyCommentService implements ReplyCommentUseCase {
     @Override
     @Transactional
     public void delete(Long replyCommentId, User user) {
-        ReplyComment replyComment = queryReplyCommentUseCase.findById(replyCommentId);
+        ReplyComment replyComment = queryReplyCommentUseCase.findByIdWithJoin(replyCommentId);
 
         deleteReplyCommentUseCase.delete(user, replyComment);
     }
