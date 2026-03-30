@@ -5,6 +5,7 @@ import kr.co.F1FS.app.domain.follow.presentation.dto.constructor.ResponseFollowC
 import kr.co.F1FS.app.domain.follow.presentation.dto.driver.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDocumentDTO;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisExceptionType;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ public class RedisHandler {
     private final RedisTemplate<String, ResponseSuggestGrandPrixSearchDTO> grandPrixSuggestListRedisTemplate;
     @Qualifier("cdSuggestListRedisTemplate")
     private final RedisTemplate<String, CDSearchSuggestionDTO>  cdSuggestListRedisTemplate;
+    @Qualifier("userSuggestListRedisTemplate")
+    private final RedisTemplate<String, ResponseUserDocumentDTO> userSuggestListRedisTemplate;
     @Qualifier("followConstructorListRedisTemplate")
     private final RedisTemplate<String, ResponseFollowConstructorDTO> followConstructorListRedisTemplate;
     @Qualifier("followDriverListRedisTemplate")
@@ -47,6 +50,10 @@ public class RedisHandler {
 
     public RedisTemplate<String, CDSearchSuggestionDTO> getCdSuggestListRedisTemplate(){
         return cdSuggestListRedisTemplate;
+    }
+
+    public RedisTemplate<String, ResponseUserDocumentDTO> getUserSuggestListRedisTemplate(){
+        return userSuggestListRedisTemplate;
     }
 
     public RedisTemplate<String, ResponseFollowConstructorDTO> getFollowConstructorListRedisTemplate(){

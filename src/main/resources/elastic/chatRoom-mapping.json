@@ -10,6 +10,11 @@
         "eng": {
           "type": "text",
           "analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
         }
       }
     },
@@ -23,6 +28,11 @@
         "eng": {
           "type": "text",
           "analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
         }
       }
     },

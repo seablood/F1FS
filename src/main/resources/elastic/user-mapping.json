@@ -1,50 +1,10 @@
 {
   "properties": {
-    "title": {
+    "username": {
       "type": "text",
+      "analyzer": "standard",
       "fields": {
-        "kor": {
-          "type": "text",
-          "analyzer": "nori_search"
-        },
-        "eng": {
-          "type": "text",
-          "analyzer": "standard"
-        },
-        "ngram": {
-          "type": "text",
-          "analyzer": "ngram_analyzer",
-          "search_analyzer": "ngram_analyzer"
-        }
-      }
-    },
-    "content": {
-      "type": "text",
-      "fields": {
-        "kor": {
-          "type": "text",
-          "analyzer": "nori_search"
-        },
-        "eng": {
-          "type": "text",
-          "analyzer": "standard"
-        },
-        "ngram": {
-          "type": "text",
-          "analyzer": "ngram_analyzer",
-          "search_analyzer": "ngram_analyzer"
-        }
-      }
-    },
-    "author": {
-      "type": "text",
-      "fields": {
-        "kor": {
-          "type": "text",
-          "analyzer": "kor_autocomplete_analyzer",
-          "search_analyzer": "nori_search"
-        },
-        "eng": {
+        "eng_autocomplete": {
           "type": "text",
           "analyzer": "eng_autocomplete_analyzer",
           "search_analyzer": "standard"
@@ -63,15 +23,23 @@
         }
       }
     },
-    "tags": {
+    "nickname": {
       "type": "text",
       "fields": {
         "kor": {
+          "type": "text",
+          "analyzer": "nori_search"
+        },
+        "kor_autocomplete": {
           "type": "text",
           "analyzer": "kor_autocomplete_analyzer",
           "search_analyzer": "nori_search"
         },
         "eng": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "eng_autocomplete": {
           "type": "text",
           "analyzer": "eng_autocomplete_analyzer",
           "search_analyzer": "standard"
@@ -90,11 +58,7 @@
         }
       }
     },
-    "createdAt": {
-      "type": "date",
-      "format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm||yyyy-MM-dd"
-    },
-    "likeNum": {
+    "followerNum": {
       "type": "integer"
     }
   }

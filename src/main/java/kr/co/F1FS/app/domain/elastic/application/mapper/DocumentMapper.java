@@ -7,10 +7,12 @@ import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.tag.domain.Tag;
+import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDocumentDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
 
@@ -51,23 +53,31 @@ public class DocumentMapper {
                 .build();
     }
 
-    public CDSearchSuggestionDTO toCDSearchSuggestionDTO(DriverDocument driverDocument){
+    public UserDocument toUserDocument(User user){
+        return UserDocument.builder()
+                .user(user)
+                .build();
+    }
+
+    public CDSearchSuggestionDTO toCDSearchSuggestionDTO(DriverDocument driverDocument, float score){
         return CDSearchSuggestionDTO.builder()
                 .id(driverDocument.getId())
                 .korName(driverDocument.getKorName())
                 .engName(driverDocument.getEngName())
                 .racingClass(driverDocument.getRacingClass())
                 .type("driver")
+                .score(score)
                 .build();
     }
 
-    public CDSearchSuggestionDTO toCDSearchSuggestionDTO(ConstructorDocument constructorDocument){
+    public CDSearchSuggestionDTO toCDSearchSuggestionDTO(ConstructorDocument constructorDocument, float score){
         return CDSearchSuggestionDTO.builder()
                 .id(constructorDocument.getId())
                 .korName(constructorDocument.getKorName())
                 .engName(constructorDocument.getEngName())
                 .racingClass(constructorDocument.getRacingClass())
                 .type("constructor")
+                .score(score)
                 .build();
     }
 
@@ -104,6 +114,15 @@ public class DocumentMapper {
                 .name(chatRoomDocument.getName())
                 .description(chatRoomDocument.getDescription())
                 .memberCount(chatRoomDocument.getMemberCount())
+                .build();
+    }
+
+    public ResponseUserDocumentDTO toResponseUserDocumentDTO(UserDocument userDocument){
+        return ResponseUserDocumentDTO.builder()
+                .id(userDocument.getId())
+                .username(userDocument.getUsername())
+                .nickname(userDocument.getNickname())
+                .followerNum(userDocument.getFollowerNum())
                 .build();
     }
 }

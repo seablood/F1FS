@@ -26,6 +26,9 @@
           "normalizer": "lowercase_normalizer"
         }
       }
+    },
+    "searchCount": {
+      "type": "long"
     }
   }
 }

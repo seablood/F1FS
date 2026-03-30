@@ -94,7 +94,12 @@
     },
     "racingClass": {
       "type": "text",
-      "analyzer": "standard"
+      "analyzer": "standard",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
     }
   }
 }

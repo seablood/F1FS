@@ -8,12 +8,9 @@ import lombok.*;
 @AllArgsConstructor
 public class CDSearchSuggestionDTO {
     private Long id;
-
     private String korName;
-
     private String engName;
-
     private String racingClass;
-
     private String type;
+    private float score;
 }

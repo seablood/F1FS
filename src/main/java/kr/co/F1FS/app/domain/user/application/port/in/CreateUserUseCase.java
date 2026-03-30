@@ -7,7 +7,7 @@ import kr.co.F1FS.app.global.config.oauth2.provider.OAuth2UserInfo;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDTO;
 
 public interface CreateUserUseCase {
-    ResponseUserDTO createUser(CreateUserCommand command);
+    User createUser(CreateUserCommand command);
     User createEntity(OAuth2UserInfo userInfo);
     ResponseUserDTO createAdminUser(CreateAdminUserCommand command);
 }

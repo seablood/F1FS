@@ -1,5 +1,9 @@
 package kr.co.F1FS.app.domain.user.application.service;
 
+import kr.co.F1FS.app.domain.elastic.application.port.in.user.QueryUserSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.user.UpdateUserSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.domain.UserDocument;
+import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.QueryUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.UserUseCase;
@@ -19,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicationUserService implements UserUseCase {
     private final UpdateUserUseCase updateUserUseCase;
     private final QueryUserUseCase queryUserUseCase;
+    private final UpdateUserSearchUseCase updateUserSearchUseCase;
+    private final QueryUserSearchUseCase queryUserSearchUseCase;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -30,7 +37,12 @@ public class ApplicationUserService implements UserUseCase {
     @Override
     @Transactional
     public ResponseUserDTO modifyNickname(User user, ModifyNicknameDTO dto){
-        return updateUserUseCase.updateNickname(user, dto);
+        UserDocument userDocument = queryUserSearchUseCase.findById(user.getId());
+
+        updateUserUseCase.updateNickname(user, dto);
+        updateUserSearchUseCase.modify(userDocument, user);
+
+        return userMapper.toResponseUserDTO(user);
     }
 
     @Override

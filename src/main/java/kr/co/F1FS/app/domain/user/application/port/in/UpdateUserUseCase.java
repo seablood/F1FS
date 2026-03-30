@@ -10,7 +10,7 @@ public interface UpdateUserUseCase {
     void updateLastLoginDate(User user);
     void updateRole(User user, Role role);
     void updatePassword(User user, String password);
-    ResponseUserDTO updateNickname(User user, ModifyNicknameDTO dto);
+    User updateNickname(User user, ModifyNicknameDTO dto);
     ResponseUserDTO updateDescription(User user, ModifyDescriptionDTO dto);
     void updateRefreshToken(User user, String refreshToken);
     void increaseFollow(User followerUser, User followeeUser);

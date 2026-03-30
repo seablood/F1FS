@@ -17,7 +17,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,22 +38,15 @@ public class ApplicationGrandPrixSuggestSearchService implements GrandPrixSugges
         if(keyword == null || keyword.length() < 2) return List.of();
 
         NativeQuery query = setSuggestQuery(keyword);
-        SearchHits<GrandPrixSuggestDocument> hits = elasticsearchTemplate.search(query, GrandPrixSuggestDocument.class);
-        if (hits.isEmpty()) return List.of();
 
-        List<ResponseSuggestGrandPrixSearchDTO> list = hits.stream()
-                .map(hit -> hit.getContent())
-                .map(suggestDocument -> documentMapper.toResponseSuggestGrandPrixSearchDTO(suggestDocument))
-                .toList();
-        saveGrandPrixSuggestListRedisUseCase.saveSuggestList(keyword, list);
-
-        return list;
+        return getSuggestList(query, keyword);
     }
 
     @Override
     public Page<ResponseSuggestGrandPrixSearchDTO> getGrandPrixList(int page, int size, String condition, String keyword) {
-        Pageable pageable = switchCondition(page, size, condition);
-        NativeQuery query = setPagingQuery(keyword);
+        if(keyword == null || keyword.length() < 2) return new PageImpl<>(List.of());
+        Pageable pageable = PageRequest.of(page, size);
+        NativeQuery query = setPagingQuery(keyword, pageable, condition);
 
         return getPageImpl(query, pageable, keyword);
     }
@@ -117,59 +109,52 @@ public class ApplicationGrandPrixSuggestSearchService implements GrandPrixSugges
         return query;
     }
 
-    public NativeQuery setPagingQuery(String keyword){
+    public NativeQuery setPagingQuery(String keyword, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .multiMatch(mm -> mm
                                 .query(keyword)
-                                .fields("korName", "engName")
+                                .fields("korName", "korName.ngram", "engName", "engName.ngram")
                                 .operator(Operator.Or)))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "nameASC" :
+                            s.field(f -> f.field("korName.keyword").order(SortOrder.Asc));
+                            return s;
+                        case "nameDESC" :
+                            s.field(f -> f.field("korName.keyword").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            s.field(f -> f.field("korName.keyword").order(SortOrder.Asc));
+                            return s;
+                    }
+                })
                 .build();
 
         return query;
     }
 
-    public Pageable switchCondition(int page, int size, String condition){
-        switch (condition){
-            case "nameASC" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "korName"));
-            case "nameDESC" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "korName"));
-            default:
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "korName"));
-        }
-    }
+    public List<ResponseSuggestGrandPrixSearchDTO> getSuggestList(NativeQuery query, String keyword){
+        SearchHits<GrandPrixSuggestDocument> hits = elasticsearchTemplate.search(query, GrandPrixSuggestDocument.class);
+        if(hits.isEmpty()) return List.of();
 
-    public Comparator<GrandPrixSuggestDocument> getComparatorFromPageable(Pageable pageable){
-        if(pageable.getSort().isEmpty()){
-            return Comparator.comparing(GrandPrixSuggestDocument::getKorName); // 기본값
-        }
+        List<ResponseSuggestGrandPrixSearchDTO> list = hits.stream()
+                .map(hit -> documentMapper.toResponseSuggestGrandPrixSearchDTO(hit.getContent()))
+                .toList();
+        saveGrandPrixSuggestListRedisUseCase.saveSuggestList(keyword, list);
 
-        Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
-        boolean ascending = order.getDirection().isAscending(); // 정렬 오름차순 여부
-
-        return ascending ? Comparator.comparing(GrandPrixSuggestDocument::getKorName)
-                : Comparator.comparing(GrandPrixSuggestDocument::getKorName).reversed();
+        return list;
     }
 
     public PageImpl getPageImpl(NativeQuery query, Pageable pageable, String keyword){
         SearchHits<GrandPrixSuggestDocument> hits = elasticsearchTemplate.search(query, GrandPrixSuggestDocument.class);
-        List<GrandPrixSuggestDocument> list = hits.stream()
-                .map(hit -> hit.getContent())
-                .toList();
-
-        Comparator<GrandPrixSuggestDocument> comparator = getComparatorFromPageable(pageable);
-        List<ResponseSuggestGrandPrixSearchDTO> sorted = list.stream()
-                .sorted(comparator)
-                .map(suggestDocument -> documentMapper.toResponseSuggestGrandPrixSearchDTO(suggestDocument))
+        List<ResponseSuggestGrandPrixSearchDTO> list = hits.stream()
+                .map(hit -> documentMapper.toResponseSuggestGrandPrixSearchDTO(hit.getContent()))
                 .toList();
 
         saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), sorted.size());
-        List<ResponseSuggestGrandPrixSearchDTO> paged = sorted.subList(start, end);
-
-        return new PageImpl(paged, pageable, sorted.size());
+        return new PageImpl(list, pageable, hits.getTotalHits());
     }
 }

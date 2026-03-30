@@ -6,7 +6,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.domain.auth.application.mapper.AuthMapper;
 import kr.co.F1FS.app.domain.auth.application.port.in.blackList.AddBlackListUseCase;
 import kr.co.F1FS.app.domain.auth.application.port.in.auth.AuthUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.user.CreateUserSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.user.DeleteUserSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.user.QueryUserSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.domain.UserDocument;
 import kr.co.F1FS.app.domain.email.application.port.in.EmailUseCase;
+import kr.co.F1FS.app.domain.user.application.mapper.UserMapper;
 import kr.co.F1FS.app.domain.user.application.port.in.CreateUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.DeleteUserUseCase;
 import kr.co.F1FS.app.domain.user.application.port.in.UpdateUserUseCase;
@@ -33,9 +38,13 @@ public class ApplicationAuthService implements AuthUseCase {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private final CreateUserSearchUseCase createUserSearchUseCase;
+    private final DeleteUserSearchUseCase deleteUserSearchUseCase;
+    private final QueryUserSearchUseCase queryUserSearchUseCase;
     private final AddBlackListUseCase addBlackListUseCase;
     private final EmailUseCase emailUseCase;
     private final AuthMapper authMapper;
+    private final UserMapper userMapper;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenService jwtTokenService;
 
@@ -43,10 +52,12 @@ public class ApplicationAuthService implements AuthUseCase {
     @Transactional
     public ResponseUserDTO save(CreateUserDTO userDTO){
         userDTO.setPassword(bCryptPasswordEncoder.encode(userDTO.getPassword()));
-        ResponseUserDTO dto = createUserUseCase.createUser(authMapper.toCreateUserCommand(userDTO));
-        emailUseCase.sendCreateAccountEmail(dto.getEmail(), dto.getNickname());
+        User user = createUserUseCase.createUser(authMapper.toCreateUserCommand(userDTO));
+        emailUseCase.sendCreateAccountEmail(user.getEmail(), user.getNickname());
 
-        return dto;
+        createUserSearchUseCase.save(user);
+
+        return userMapper.toResponseUserDTO(user);
     }
 
     @Override
@@ -78,6 +89,9 @@ public class ApplicationAuthService implements AuthUseCase {
             setBlackList(refreshToken);
             CookieUtil.deleteCookie(request, response, "refresh_token");
             deleteUserUseCase.delete(user);
+
+            UserDocument userDocument = queryUserSearchUseCase.findById(user.getId());
+            deleteUserSearchUseCase.delete(userDocument);
         } catch (Exception e) {
             throw new UserException(UserExceptionType.USER_AUTHENTICATION_ERROR);
         }

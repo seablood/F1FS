@@ -41,10 +41,11 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
         if (saveCDSuggestListRedisUseCase.hasKey(keyword)){
             return saveCDSuggestListRedisUseCase.getSuggestList(keyword);
         }
+
         NativeQuery query = setSuggestQuery(keyword);
-        query.setMaxResults(5);
 
         List<CDSearchSuggestionDTO> combine = getCombineList(query);
+
         saveCDSuggestListRedisUseCase.saveSuggestList(keyword, combine);
 
         return combine;
@@ -52,26 +53,25 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
 
     @Override
     public Page<CDSearchSuggestionDTO> searchCDWithPaging(int page, int size, String condition, String keyword){
-        Pageable pageable = switchCondition(page, size, condition);
-        NativeQuery query = setQuery(keyword);
+        Pageable pageable = PageRequest.of(page, size);
+
+        int fetchSize = page * size + size;
+
+        NativeQuery query = setQuery(keyword, condition, fetchSize);
 
         List<CDSearchSuggestionDTO> combine = getCombineList(query);
 
-        Comparator<CDSearchSuggestionDTO> comparator = getComparatorFromPageable(pageable);
-        List<CDSearchSuggestionDTO> sorted = combine.stream()
-                .sorted(comparator)
-                .toList();
-
+        sortCombineList(combine, condition);
         saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
 
         int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), sorted.size());
-        List<CDSearchSuggestionDTO> paged = sorted.subList(start, end);
+        int end = Math.min(start + pageable.getPageSize(), combine.size());
+        List<CDSearchSuggestionDTO> paged = combine.subList(start, end);
 
-        return new PageImpl<>(paged, pageable, sorted.size());
+        return new PageImpl<>(paged, pageable, combine.size());
     }
 
-    public NativeQuery setQuery(String keyword){
+    public NativeQuery setQuery(String keyword, String condition, int fetchSize){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
@@ -81,7 +81,23 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
                                             .operator(Operator.Or);
                                     return mm;
                                 }))))
+                .withMaxResults(fetchSize)
                 .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .withSort(s -> {
+                    switch (condition){
+                        case "nameASC" :
+                            s.field(f -> f.field("korName.keyword").order(SortOrder.Asc));
+                            return s;
+                        case "nameDESC" :
+                            s.field(f -> f.field("korName.keyword").order(SortOrder.Desc));
+                            return s;
+                        case "racingClass" :
+                            s.field(f -> f.field("racingClass.keyword").order(SortOrder.Asc));
+                            return s;
+                        default:
+                            throw new CDSearchException(CDSearchExceptionType.CONDITION_ERROR_CD);
+                    }
+                })
                 .build();
 
         return query;
@@ -152,60 +168,44 @@ public class ApplicationCDSearchService implements CDSearchUseCase {
         List<CDSearchSuggestionDTO> driverResult = driverHits.stream()
                 .map(hit -> {
                     DriverDocument document = hit.getContent();
-                    CDSearchSuggestionDTO dto = documentMapper.toCDSearchSuggestionDTO(document);
+                    CDSearchSuggestionDTO dto = documentMapper.toCDSearchSuggestionDTO(document, hit.getScore());
                     return dto;
                 })
                 .toList();
         List<CDSearchSuggestionDTO> constructorResult = constructorHits.stream()
                 .map(hit -> {
                     ConstructorDocument document = hit.getContent();
-                    CDSearchSuggestionDTO dto = documentMapper.toCDSearchSuggestionDTO(document);
+                    CDSearchSuggestionDTO dto = documentMapper.toCDSearchSuggestionDTO(document, hit.getScore());
                     return dto;
                 })
                 .toList();
 
-        List<CDSearchSuggestionDTO> combine = new ArrayList<>();
+        List<CDSearchSuggestionDTO> combine = new ArrayList<>(driverHits.getSearchHits().size() + constructorHits.getSearchHits().size());
         combine.addAll(driverResult);
         combine.addAll(constructorResult);
 
         return combine;
     }
 
-    public Pageable switchCondition(int page, int size, String condition){
+    public void sortCombineList(List<CDSearchSuggestionDTO> list, String condition){
+        Comparator<CDSearchSuggestionDTO> comparator =
+                Comparator.comparing(CDSearchSuggestionDTO::getScore).reversed();
+
         switch (condition){
             case "nameASC" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "korName"));
+                comparator = comparator.thenComparing(CDSearchSuggestionDTO::getKorName);
+                break;
             case "nameDESC" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "korName"));
+                comparator = comparator.thenComparing(
+                        CDSearchSuggestionDTO::getKorName,
+                        Comparator.reverseOrder()
+                );
+                break;
             case "racingClass" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "racingClass"));
-            case "type" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "type"));
-            default:
-                throw new CDSearchException(CDSearchExceptionType.CONDITION_ERROR_CD);
-        }
-    }
-
-    private Comparator<CDSearchSuggestionDTO> getComparatorFromPageable(Pageable pageable) {
-        if (pageable.getSort().isEmpty()) {
-            return Comparator.comparing(CDSearchSuggestionDTO::getKorName); // 기본값
+                comparator = comparator.thenComparing(CDSearchSuggestionDTO::getRacingClass);
+                break;
         }
 
-        Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
-        String property = order.getProperty(); // 정렬 필드
-        boolean ascending = order.getDirection().isAscending(); // 정렬 오름차순 여부
-
-        return switch (property) {
-            case "korName" -> ascending
-                    ? Comparator.comparing(CDSearchSuggestionDTO::getKorName)
-                    : Comparator.comparing(CDSearchSuggestionDTO::getKorName).reversed();
-            case "racingClass" -> ascending
-                    ? Comparator.comparing(CDSearchSuggestionDTO::getRacingClass)
-                    : Comparator.comparing(CDSearchSuggestionDTO::getRacingClass).reversed();
-            case "type" -> ascending
-                    ? Comparator.comparing(CDSearchSuggestionDTO::getType)
-                    : Comparator.comparing(CDSearchSuggestionDTO::getType).reversed();
-            default -> Comparator.comparing(CDSearchSuggestionDTO::getKorName); // fallback
-        };
+        list.sort(comparator);
     }
 }

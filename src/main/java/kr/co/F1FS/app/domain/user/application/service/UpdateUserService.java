@@ -41,12 +41,11 @@ public class UpdateUserService implements UpdateUserUseCase {
     }
 
     @Override
-    public ResponseUserDTO updateNickname(User user, ModifyNicknameDTO dto) {
+    public User updateNickname(User user, ModifyNicknameDTO dto) {
         cacheEvictUtil.evictCachingUser(user);
         userDomainService.updateNickname(user, dto.getNewNickname());
-        userJpaPort.saveAndFlush(user);
 
-        return userMapper.toResponseUserDTO(user);
+        return userJpaPort.saveAndFlush(user);
     }
 
     @Override

@@ -23,6 +23,18 @@ public class ApplicationTagSearchService implements TagSearchUseCase {
     private final SaveTagSuggestListRedisUseCase saveTagSuggestListRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
+    @Override
+    public List<String> getAutoTagList(String keyword) {
+        if(saveTagSuggestListRedisUseCase.hasKey(keyword)){
+            return saveTagSuggestListRedisUseCase.getSuggestList(keyword);
+        }
+        if(keyword == null || keyword.length() < 2) return List.of();
+
+        NativeQuery query = setQuery(keyword);
+
+        return getSuggestList(query, keyword);
+    }
+
     public NativeQuery setQuery(String keyword){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
         String trimmed = keyword.trim();
@@ -69,23 +81,16 @@ public class ApplicationTagSearchService implements TagSearchUseCase {
         return query;
     }
 
-    @Override
-    public List<String> getAutoTagList(String keyword) {
-        if(saveTagSuggestListRedisUseCase.hasKey(keyword)){
-            return saveTagSuggestListRedisUseCase.getSuggestList(keyword);
-        }
-        if(keyword == null || keyword.length() < 2) return List.of();
-
-        NativeQuery query = setQuery(keyword);
+    public List<String> getSuggestList(NativeQuery query, String keyword){
         SearchHits<TagDocument> hits = elasticsearchTemplate.search(query, TagDocument.class);
-        if (hits.isEmpty()) return List.of();
+        if(hits.isEmpty()) return List.of();
 
-        List<String> tags = hits.stream()
+        List<String> list = hits.stream()
                 .map(hit -> hit.getContent())
                 .map(TagDocument::getName)
                 .toList();
-        saveTagSuggestListRedisUseCase.saveSuggestList(keyword, tags);
+        saveTagSuggestListRedisUseCase.saveSuggestList(keyword, list);
 
-        return tags;
+        return list;
     }
 }

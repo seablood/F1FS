@@ -31,16 +31,8 @@ public class ApplicationSuggestKeywordSearchService implements SuggestKeywordSea
         if(keyword == null || keyword.length() < 2) return List.of();
 
         NativeQuery query = setSuggestQuery(keyword);
-        SearchHits<SuggestKeywordDocument> hits = elasticsearchTemplate.search(query, SuggestKeywordDocument.class);
-        if(hits.isEmpty()) return List.of();
 
-        List<String> keywords = hits.stream()
-                .map(hit -> hit.getContent())
-                .map(SuggestKeywordDocument::getSuggest)
-                .toList();
-        saveSuggestListRedisUseCase.saveSuggestList(keyword, keywords);
-
-        return keywords;
+        return getSuggestList(query, keyword);
     }
 
     public NativeQuery setSuggestQuery(String keyword) {
@@ -83,9 +75,23 @@ public class ApplicationSuggestKeywordSearchService implements SuggestKeywordSea
                             return b;
                         }))
                 .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
+                .withSort(s -> s.field(f -> f.field("searchCount").order(SortOrder.Desc)))
                 .withMaxResults(7)
                 .build();
 
         return query;
+    }
+
+    public List<String> getSuggestList(NativeQuery query, String keyword){
+        SearchHits<SuggestKeywordDocument> hits = elasticsearchTemplate.search(query, SuggestKeywordDocument.class);
+        if(hits.isEmpty()) return List.of();
+
+        List<String> list = hits.stream()
+                .map(hit -> hit.getContent())
+                .map(SuggestKeywordDocument::getSuggest)
+                .toList();
+        saveSuggestListRedisUseCase.saveSuggestList(keyword, list);
+
+        return list;
     }
 }

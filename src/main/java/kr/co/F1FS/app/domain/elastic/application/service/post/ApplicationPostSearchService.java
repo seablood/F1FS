@@ -21,7 +21,6 @@ import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,47 +34,95 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
-    public NativeQuery setQueryTitle(String keyword){
+    public NativeQuery setQueryTitle(String keyword, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .multiMatch(mm -> mm
                                 .query(keyword)
-                                .fields("title.kor", "title.eng")
+                                .fields("title.kor", "title.eng", "title.ngram")
                                 .operator(Operator.Or)))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .build();
 
         return query;
     }
 
-    public NativeQuery setQueryContent(String keyword){
+    public NativeQuery setQueryContent(String keyword, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .multiMatch(mm -> mm
                                 .query(keyword)
-                                .fields("content.kor", "content.eng")
+                                .fields("content.kor", "content.eng", "content.ngram")
                                 .operator(Operator.Or)))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .build();
 
         return query;
     }
 
-    public NativeQuery setQueryTitleOrContent(String keyword){
+    public NativeQuery setQueryTitleOrContent(String keyword, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
                                 .must(m -> m.multiMatch(mm -> {
                                     mm.query(keyword)
-                                            .fields("title.kor^3", "title.eng^3", "content.kor", "content.eng")
+                                            .fields("title.kor^3", "title.eng^3", "title.ngram^2", "content.kor", "content.eng")
                                             .operator(Operator.Or);
                                     return mm;
                                 }))))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
                 .build();
 
         return query;
     }
 
-    public NativeQuery setQueryAuthor(String keyword){
+    public NativeQuery setQueryAuthor(String keyword, Pageable pageable, String condition){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
         String trimmed = keyword.trim();
 
@@ -114,13 +161,29 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
 
                             return b;
                         }))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
                 .build();
 
         return query;
     }
 
-    public NativeQuery setQueryTags(String keyword){
+    public NativeQuery setQueryTags(String keyword, Pageable pageable, String condition){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
         String trimmed = keyword.trim();
 
@@ -159,13 +222,29 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
 
                             return b;
                         }))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .withSort(s -> s.score(sc -> sc.order(SortOrder.Desc)))
                 .build();
 
         return query;
     }
 
-    public NativeQuery setQueryTagsFilter(List<String> tags){
+    public NativeQuery setQueryTagsFilter(List<String> tags, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
@@ -177,6 +256,22 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                                                                 .map(FieldValue::of)
                                                                 .toList()
                                                 ))))))
+                .withPageable(pageable)
+                .withSort(s -> {
+                    switch (condition){
+                        case "new" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Desc));
+                            return s;
+                        case "older" :
+                            s.field(f -> f.field("createdAt").order(SortOrder.Asc));
+                            return s;
+                        case "like" :
+                            s.field(f -> f.field("likeNum").order(SortOrder.Desc));
+                            return s;
+                        default:
+                            throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
+                    }
+                })
                 .build();
 
         return query;
@@ -184,24 +279,25 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
 
     @Override
     public Page<ResponsePostDocumentDTO> getPostList(int page, int size, String condition, String option, String keyword){
-        Pageable pageable = switchCondition(page, size, condition);
+        if(keyword == null || keyword.length() < 2) return new PageImpl<>(List.of());
+        Pageable pageable = PageRequest.of(page, size);
 
         switch (option){
             case "title" :
-                NativeQuery query = setQueryTitle(keyword);
+                NativeQuery query = setQueryTitle(keyword, pageable, condition);
                 return getPageImpl(query, pageable, keyword);
             case "content" :
-                NativeQuery query2 = setQueryContent(keyword);
+                NativeQuery query2 = setQueryContent(keyword, pageable, condition);
                 return getPageImpl(query2, pageable, keyword);
             case "titleOrContent" :
-                NativeQuery query3 = setQueryTitleOrContent(keyword);
+                NativeQuery query3 = setQueryTitleOrContent(keyword, pageable, condition);
                 return getPageImpl(query3, pageable, keyword);
             case "author" :
                 if (keyword.length() < 3) return new PageImpl<>(List.of());
-                NativeQuery query4 = setQueryAuthor(keyword);
+                NativeQuery query4 = setQueryAuthor(keyword, pageable, condition);
                 return getPageImpl(query4, pageable, keyword);
             case "tags" :
-                NativeQuery query5 = setQueryTags(keyword);
+                NativeQuery query5 = setQueryTags(keyword, pageable, condition);
                 return getPageImpl(query5, pageable, keyword);
             default:
                 throw new PostException(PostExceptionType.SEARCH_ERROR_POST);
@@ -210,63 +306,20 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
 
     @Override
     public Page<ResponsePostDocumentDTO> getPostListByTags(int page, int size, String condition, TagListRequestDTO dto) {
-        Pageable pageable = switchCondition(page, size, condition);
-        NativeQuery query = setQueryTagsFilter(dto.getTags());
+        Pageable pageable = PageRequest.of(page, size);
+        NativeQuery query = setQueryTagsFilter(dto.getTags(), pageable, condition);
 
         return getPageImpl(query, pageable, null);
     }
 
-    public Pageable switchCondition(int page, int size, String condition){
-        switch (condition){
-            case "new" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-            case "older" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "createdAt"));
-            case "like" :
-                return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "likeNum"));
-            default:
-                throw new PostException(PostExceptionType.CONDITION_ERROR_POST);
-        }
-    }
-
-    public Comparator<PostDocument> getComparatorFromPageable(Pageable pageable){
-        if(pageable.getSort().isEmpty()){
-            return Comparator.comparing(PostDocument::getCreatedAt); // 기본값
-        }
-
-        Sort.Order order = pageable.getSort().iterator().next(); // 첫 번째 정렬 방식 사용
-        String property = order.getProperty(); // 정렬 필드
-        boolean ascending = order.getDirection().isAscending(); // 정렬 오름차순 여부
-
-        return switch (property) {
-            case "createdAt" -> ascending
-                    ? Comparator.comparing(PostDocument::getCreatedAt)
-                    : Comparator.comparing(PostDocument::getCreatedAt).reversed();
-            case "likeNum" -> ascending
-                    ? Comparator.comparing(PostDocument::getLikeNum)
-                    : Comparator.comparing(PostDocument::getLikeNum).reversed();
-            default -> Comparator.comparing(PostDocument::getCreatedAt); // fallback
-        };
-    }
-
     public PageImpl getPageImpl(NativeQuery query, Pageable pageable, String keyword){
         SearchHits<PostDocument> hits = elasticsearchTemplate.search(query, PostDocument.class);
-        List<PostDocument> list = hits.stream()
-                .map(hit -> hit.getContent())
-                .toList();
-
-        Comparator<PostDocument> comparator = getComparatorFromPageable(pageable);
-        List<ResponsePostDocumentDTO> sorted = list.stream()
-                .sorted(comparator)
-                .map(postDocument -> documentMapper.toResponsePostDocumentDTO(postDocument))
+        List<ResponsePostDocumentDTO> list = hits.stream()
+                .map(hit -> documentMapper.toResponsePostDocumentDTO(hit.getContent()))
                 .toList();
 
         if (keyword != null) saveSuggestKeywordSearchRedisUseCase.increaseSearchCount(keyword.trim());
 
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), sorted.size());
-        List<ResponsePostDocumentDTO> paged = sorted.subList(start, end);
-
-        return new PageImpl<>(paged, pageable, sorted.size());
+        return new PageImpl<>(list, pageable, hits.getTotalHits());
     }
 }

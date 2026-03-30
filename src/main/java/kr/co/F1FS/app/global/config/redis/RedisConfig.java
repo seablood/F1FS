@@ -9,6 +9,7 @@ import kr.co.F1FS.app.domain.follow.presentation.dto.constructor.ResponseFollowC
 import kr.co.F1FS.app.domain.follow.presentation.dto.driver.ResponseFollowDriverDTO;
 import kr.co.F1FS.app.domain.notification.domain.NotificationRedis;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
+import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDocumentDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -121,6 +122,29 @@ public class RedisConfig {
 
         Jackson2JsonRedisSerializer<CDSearchSuggestionDTO> serializer =
                 new Jackson2JsonRedisSerializer<>(mapper, CDSearchSuggestionDTO.class);
+
+        // 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(serializer);
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(serializer);
+
+        template.afterPropertiesSet();
+        return template;
+    }
+
+    @Bean
+    public RedisTemplate<String, ResponseUserDocumentDTO> userSuggestListRedisTemplate() {
+        RedisTemplate<String, ResponseUserDocumentDTO> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactory());
+
+        ObjectMapper mapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+        Jackson2JsonRedisSerializer<ResponseUserDocumentDTO> serializer =
+                new Jackson2JsonRedisSerializer<>(mapper, ResponseUserDocumentDTO.class);
 
         // 직렬화 설정
         template.setKeySerializer(new StringRedisSerializer());

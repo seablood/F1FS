@@ -22,12 +22,12 @@ public class CreateUserService implements CreateUserUseCase {
     private final UserMapper userMapper;
 
     @Override
-    public ResponseUserDTO createUser(CreateUserCommand command) {
+    public User createUser(CreateUserCommand command) {
         User user = userDomainService.createEntity(command);
         validationService.checkValid(user);
         userDomainService.updateLastLoginDate(user);
 
-        return userMapper.toResponseUserDTO(userJpaPort.save(user));
+        return userJpaPort.save(user);
     }
 
     @Override
