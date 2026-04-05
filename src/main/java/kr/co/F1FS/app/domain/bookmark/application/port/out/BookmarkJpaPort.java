@@ -8,7 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BookmarkJpaPort {
-    void save(Bookmark bookmark);
+    Bookmark save(Bookmark bookmark);
     Page<ResponseBookmarkListDTO> findBookmarkList(Long userId, Pageable pageable);
     Bookmark findByPostAndUser(Post post, User user);
     void delete(Bookmark bookmark);

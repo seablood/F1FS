@@ -7,6 +7,7 @@ import kr.co.F1FS.app.global.util.BaseException;
 import kr.co.F1FS.app.global.util.ErrorMessages;
 import kr.co.F1FS.app.global.util.ExceptionType;
 import kr.co.F1FS.app.global.util.exception.authentication.*;
+import kr.co.F1FS.app.global.util.exception.bookmark.BookmarkException;
 import kr.co.F1FS.app.global.util.exception.cdSearch.CDSearchException;
 import kr.co.F1FS.app.global.util.exception.chat.ChatRoomException;
 import kr.co.F1FS.app.global.util.exception.chat.StompException;
@@ -14,11 +15,13 @@ import kr.co.F1FS.app.global.util.exception.circuit.CircuitException;
 import kr.co.F1FS.app.global.util.exception.constructor.ConstructorException;
 import kr.co.F1FS.app.global.util.exception.driver.DriverException;
 import kr.co.F1FS.app.global.util.exception.email.EmailException;
+import kr.co.F1FS.app.global.util.exception.file.UploadFileException;
 import kr.co.F1FS.app.global.util.exception.grandprix.GrandPrixException;
 import kr.co.F1FS.app.global.util.exception.note.NoteException;
 import kr.co.F1FS.app.global.util.exception.notification.NotificationException;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.redis.RedisException;
+import kr.co.F1FS.app.global.util.exception.reply.ReplyCommentException;
 import kr.co.F1FS.app.global.util.exception.reply.ReplyException;
 import kr.co.F1FS.app.global.util.exception.session.SessionException;
 import kr.co.F1FS.app.global.util.exception.suggest.SuggestException;
@@ -99,7 +102,10 @@ public class GlobalExceptionHandler {
                         GrandPrixException.class,
                         NoteException.class,
                         SessionException.class,
-                        VerifyException.class})
+                        VerifyException.class,
+                        BookmarkException.class,
+                        UploadFileException.class,
+                        ReplyCommentException.class})
     public ResponseEntity<String> handleCustomException(BaseException ex){
         ExceptionType exceptionType = ex.getExceptionType();
         log.error(exceptionType.getMessage());

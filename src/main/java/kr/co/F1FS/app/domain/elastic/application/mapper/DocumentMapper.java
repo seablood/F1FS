@@ -1,13 +1,16 @@
 package kr.co.F1FS.app.domain.elastic.application.mapper;
 
+import kr.co.F1FS.app.domain.bookmark.domain.Bookmark;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
 import kr.co.F1FS.app.domain.elastic.domain.*;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
+import kr.co.F1FS.app.domain.elastic.presentation.dto.ModifyBookmarkSearchDTO;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.tag.domain.Tag;
 import kr.co.F1FS.app.domain.user.domain.User;
+import kr.co.F1FS.app.global.presentation.dto.bookmark.ResponseBookmarkDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
@@ -56,6 +59,12 @@ public class DocumentMapper {
     public UserDocument toUserDocument(User user){
         return UserDocument.builder()
                 .user(user)
+                .build();
+    }
+
+    public BookmarkDocument toBookmarkDocument(Bookmark bookmark){
+        return BookmarkDocument.builder()
+                .bookmark(bookmark)
                 .build();
     }
 
@@ -123,6 +132,22 @@ public class DocumentMapper {
                 .username(userDocument.getUsername())
                 .nickname(userDocument.getNickname())
                 .followerNum(userDocument.getFollowerNum())
+                .build();
+    }
+
+    public ResponseBookmarkDocumentDTO toResponseBookmarkDocumentDTO(BookmarkDocument bookmarkDocument){
+        return ResponseBookmarkDocumentDTO.builder()
+                .postId(bookmarkDocument.getPostId())
+                .title(bookmarkDocument.getTitle())
+                .author(bookmarkDocument.getAuthor())
+                .markingTime(TimeUtil.formatPostTime(bookmarkDocument.getMarkingTime()))
+                .build();
+    }
+
+    public ModifyBookmarkSearchDTO toModifyBookmarkSearchDTO(Long postId, String title){
+        return ModifyBookmarkSearchDTO.builder()
+                .postId(postId)
+                .title(title)
                 .build();
     }
 }

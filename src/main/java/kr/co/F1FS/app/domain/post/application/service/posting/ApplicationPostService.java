@@ -4,6 +4,7 @@ import kr.co.F1FS.app.domain.elastic.application.port.in.post.CreatePostSearchUs
 import kr.co.F1FS.app.domain.elastic.application.port.in.post.DeletePostSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.post.QueryPostSearchUseCase;
 import kr.co.F1FS.app.domain.elastic.application.port.in.post.UpdatePostSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.service.bookmark.ModifyBookmarkSearchAsyncService;
 import kr.co.F1FS.app.domain.elastic.domain.PostDocument;
 import kr.co.F1FS.app.domain.file.application.port.in.DeleteUploadFileUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCase;
@@ -53,6 +54,7 @@ public class ApplicationPostService implements PostUseCase {
     private final CreateTagUseCase createTagUseCase;
     private final QueryTagUseCase queryTagUseCase;
     private final DeleteUploadFileUseCase deleteUploadFileUseCase;
+    private final ModifyBookmarkSearchAsyncService modifyBookmarkSearchAsyncService;
     private final FCMLiveUseCase fcmLiveUseCase;
     private final PostMapper postMapper;
 
@@ -122,6 +124,7 @@ public class ApplicationPostService implements PostUseCase {
 
         updatePostUseCase.modify(requestDTO, post, user);
         updatePostSearchUseCase.modify(document, post, addTags, deleteTags);
+        modifyBookmarkSearchAsyncService.addDTO(post.getId(), post.getTitle());
 
         registerAfterCommit(() -> deleteUploadFileUseCase.deleteFile(deleteTargets));
 

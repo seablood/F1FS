@@ -17,10 +17,10 @@ public class CreateBookmarkService implements CreateBookmarkUseCase {
     private final ValidationService validationService;
 
     @Override
-    public void save(Post post, User user) {
+    public Bookmark save(Post post, User user) {
         Bookmark bookmark = bookmarkDomainService.createEntity(post, user);
         validationService.checkValid(bookmark);
 
-        bookmarkJpaPort.save(bookmark);
+        return bookmarkJpaPort.save(bookmark);
     }
 }

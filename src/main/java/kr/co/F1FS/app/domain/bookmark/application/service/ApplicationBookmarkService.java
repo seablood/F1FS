@@ -6,6 +6,10 @@ import kr.co.F1FS.app.domain.bookmark.application.port.in.DeleteBookmarkUseCase;
 import kr.co.F1FS.app.domain.bookmark.application.port.in.QueryBookmarkUseCase;
 import kr.co.F1FS.app.domain.bookmark.domain.Bookmark;
 import kr.co.F1FS.app.domain.bookmark.presentation.dto.ResponseBookmarkListDTO;
+import kr.co.F1FS.app.domain.elastic.application.port.in.bookmark.CreateBookmarkSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.bookmark.DeleteBookmarkSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.application.port.in.bookmark.QueryBookmarkSearchUseCase;
+import kr.co.F1FS.app.domain.elastic.domain.BookmarkDocument;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.QueryPostUseCase;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -25,14 +29,18 @@ public class ApplicationBookmarkService implements BookmarkUseCase {
     private final CreateBookmarkUseCase createBookmarkUseCase;
     private final DeleteBookmarkUseCase deleteBookmarkUseCase;
     private final QueryBookmarkUseCase queryBookmarkUseCase;
+    private final CreateBookmarkSearchUseCase createBookmarkSearchUseCase;
+    private final DeleteBookmarkSearchUseCase deleteBookmarkSearchUseCase;
+    private final QueryBookmarkSearchUseCase queryBookmarkSearchUseCase;
     private final QueryPostUseCase queryPostUseCase;
 
     @Override
     @Transactional
     public void save(Long postId, User user) {
         Post post = queryPostUseCase.findPostById(postId);
+        Bookmark bookmark = createBookmarkUseCase.save(post, user);
 
-        createBookmarkUseCase.save(post, user);
+        createBookmarkSearchUseCase.save(bookmark);
     }
 
     @Override
@@ -48,8 +56,10 @@ public class ApplicationBookmarkService implements BookmarkUseCase {
     public void delete(Long postId, User user) {
         Post post = queryPostUseCase.findById(postId);
         Bookmark bookmark = queryBookmarkUseCase.findByPostAndUser(post, user);
+        BookmarkDocument bookmarkDocument = queryBookmarkSearchUseCase.findById(bookmark.getId());
 
         deleteBookmarkUseCase.delete(bookmark);
+        deleteBookmarkSearchUseCase.delete(bookmarkDocument);
     }
 
     public Pageable switchCondition(int page, int size, String condition){

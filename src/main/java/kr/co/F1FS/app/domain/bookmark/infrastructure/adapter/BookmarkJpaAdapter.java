@@ -21,8 +21,8 @@ public class BookmarkJpaAdapter implements BookmarkJpaPort {
     private final BookmarkDSLRepository bookmarkDSLRepository;
 
     @Override
-    public void save(Bookmark bookmark) {
-        bookmarkRepository.save(bookmark);
+    public Bookmark save(Bookmark bookmark) {
+        return bookmarkRepository.save(bookmark);
     }
 
     @Override

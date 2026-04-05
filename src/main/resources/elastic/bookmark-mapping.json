@@ -1,0 +1,60 @@
+{
+  "properties": {
+    "postId": {
+      "type": "long"
+    },
+    "title": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        }
+      }
+    },
+    "author": {
+      "type": "text",
+      "fields": {
+        "kor": {
+          "type": "text",
+          "analyzer": "kor_autocomplete_analyzer",
+          "search_analyzer": "nori_search"
+        },
+        "eng": {
+          "type": "text",
+          "analyzer": "eng_autocomplete_analyzer",
+          "search_analyzer": "standard"
+        },
+        "ngram": {
+          "type": "text",
+          "analyzer": "ngram_analyzer",
+          "search_analyzer": "ngram_analyzer"
+        },
+        "keyword": {
+          "type": "keyword"
+        },
+        "normalized": {
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm||yyyy-MM-dd"
+    },
+    "markingTime": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd'T'HH:mm||yyyy-MM-dd"
+    }
+  }
+}
