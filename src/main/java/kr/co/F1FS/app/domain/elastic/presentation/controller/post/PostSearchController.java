@@ -20,24 +20,26 @@ import java.util.List;
 public class PostSearchController {
     private final PostSearchUseCase postSearchUseCase;
 
-    @GetMapping("/page-search")
+    @GetMapping("/page-search/{roomId}")
     @Operation(summary = "게시글 검색", description = "제목, 내용, 작성자를 통해 게시 검색")
     public ResponseEntity<List<ResponsePostDocumentDTO>> pageSearch(@RequestParam(value = "page", defaultValue = "0") int page,
                                                                     @RequestParam(value = "size", defaultValue = "10") int size,
                                                                     @RequestParam(value = "condition", defaultValue = "new") String condition,
                                                                     @RequestParam(value = "option", defaultValue = "title") String option,
-                                                                    @RequestParam(value = "search") String search){
+                                                                    @RequestParam(value = "search") String search,
+                                                                    @PathVariable Long roomId){
         return ResponseEntity.status(HttpStatus.OK).body(postSearchUseCase.getPostList(
-                page, size, condition, option, search).getContent());
+                page, size, condition, option, search, roomId).getContent());
     }
 
-    @PostMapping("/page-search/tags")
+    @PostMapping("/page-search/tags/{roomId}")
     @Operation(summary = "게시글 검색(태그)", description = "여러 태그에 대한 게시글 검색")
     public ResponseEntity<List<ResponsePostDocumentDTO>> getPostListByTags(@RequestBody TagListRequestDTO dto,
                                                                            @RequestParam(value = "page", defaultValue = "0") int page,
                                                                            @RequestParam(value = "size", defaultValue = "10") int size,
-                                                                           @RequestParam(value = "condition", defaultValue = "new") String condition){
-        Page<ResponsePostDocumentDTO> newPage = postSearchUseCase.getPostListByTags(page, size, condition, dto);
+                                                                           @RequestParam(value = "condition", defaultValue = "new") String condition,
+                                                                           @PathVariable Long roomId){
+        Page<ResponsePostDocumentDTO> newPage = postSearchUseCase.getPostListByTags(page, size, condition, dto, roomId);
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 }

@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.post.application.service.posting;
 import kr.co.F1FS.app.domain.post.application.mapper.posting.PostMapper;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.post.domain.PostBlock;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.util.AuthorCertification;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,8 @@ import java.util.List;
 public class PostDomainService {
     private final PostMapper postMapper;
 
-    public Post createEntity(String title, User author){
-        return postMapper.toPost(title, author);
+    public Post createEntity(String title, User author, PostRoom postRoom){
+        return postMapper.toPost(title, author, postRoom);
     }
 
     public void modify(String title, List<PostBlock> newBlock, Post post){

@@ -29,7 +29,7 @@ public class EmailSendService {
 
     private final JavaMailSender javaMailSender;
     private static final BlockingQueue<EmailQueueMemory> QUEUE = new LinkedBlockingQueue<>();
-    private static final int MAX = 10;
+    private static final int MAX = 30;
 
     @Async
     public void addEmail(String to, String subject, String content, EmailType emailType) throws MessagingException{

@@ -3,6 +3,7 @@ package kr.co.F1FS.app.domain.post.domain;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.*;
 import org.hibernate.annotations.*;
@@ -30,6 +31,9 @@ public class Post {
     @JoinColumn(name = "author_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User author;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_room_id")
+    private PostRoom postRoom;
     @CreationTimestamp
     @Column(name = "created_time")
     private Timestamp createdAt;
@@ -63,9 +67,10 @@ public class Post {
     }
 
     @Builder
-    public Post(String title, User author){
+    public Post(String title, User author, PostRoom postRoom){
         this.title = title;
         this.author = author;
+        this.postRoom = postRoom;
         this.likeNum = 0;
     }
 }

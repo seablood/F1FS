@@ -12,6 +12,10 @@ import kr.co.F1FS.app.domain.post.application.mapper.posting.PostMapper;
 import kr.co.F1FS.app.domain.post.application.port.in.posting.*;
 import kr.co.F1FS.app.domain.post.domain.PostBlock;
 import kr.co.F1FS.app.domain.post.presentation.dto.*;
+import kr.co.F1FS.app.domain.postRoom.application.port.in.QueryPostRoomUseCase;
+import kr.co.F1FS.app.domain.postRoom.application.port.in.UpdatePostRoomUseCase;
+import kr.co.F1FS.app.domain.postRoom.application.port.in.VerifyPostRoomUseCase;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.tag.application.port.in.tag.CreateTagUseCase;
 import kr.co.F1FS.app.domain.tag.application.port.in.tag.QueryTagUseCase;
 import kr.co.F1FS.app.domain.tag.domain.Tag;
@@ -21,6 +25,8 @@ import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.util.PostBlockType;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
+import kr.co.F1FS.app.global.util.exception.user.UserException;
+import kr.co.F1FS.app.global.util.exception.user.UserExceptionType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,6 +53,9 @@ public class ApplicationPostService implements PostUseCase {
     private final UpdatePostUseCase updatePostUseCase;
     private final DeletePostUseCase deletePostUseCase;
     private final QueryPostUseCase queryPostUseCase;
+    private final UpdatePostRoomUseCase updatePostRoomUseCase;
+    private final QueryPostRoomUseCase queryPostRoomUseCase;
+    private final VerifyPostRoomUseCase verifyPostRoomUseCase;
     private final CreatePostSearchUseCase createPostSearchUseCase;
     private final UpdatePostSearchUseCase updatePostSearchUseCase;
     private final DeletePostSearchUseCase deletePostSearchUseCase;
@@ -60,8 +69,9 @@ public class ApplicationPostService implements PostUseCase {
 
     @Override
     @Transactional
-    public ResponsePostDTO save(CreatePostBlockRequestDTO requestDTO, User author) {
-        Post post = createPostUseCase.save(requestDTO, author);
+    public ResponsePostDTO save(CreatePostBlockRequestDTO requestDTO, User author, Long roomId) {
+        PostRoom postRoom = queryPostRoomUseCase.findById(roomId);
+        Post post = createPostUseCase.save(requestDTO, author, postRoom);
         List<String> tags = requestDTO.getTags();
         if(!tags.isEmpty()) {
             List<Tag> tagList = queryTagUseCase.saveTagList(tags);
@@ -69,10 +79,34 @@ public class ApplicationPostService implements PostUseCase {
         }
 
         createPostSearchUseCase.save(post, tags);
+        updatePostRoomUseCase.increasePostCount(postRoom);
 
         fcmLiveUseCase.sendPushAfterPosting(post, author);
 
         return postMapper.toResponsePostDTO(post, tags);
+    }
+
+    @Override
+    @Transactional
+    public ResponsePostDTO savePrivatePostRoom(CreatePostBlockRequestDTO requestDTO, User author, Long roomId, String token) {
+        if(!verifyPostRoomUseCase.validateToken(roomId, token)){
+            throw new UserException(UserExceptionType.TOKEN_VALIDATE_ERROR);
+        }else {
+            PostRoom postRoom = queryPostRoomUseCase.findById(roomId);
+            Post post = createPostUseCase.save(requestDTO, author, postRoom);
+            List<String> tags = requestDTO.getTags();
+            if(!tags.isEmpty()) {
+                List<Tag> tagList = queryTagUseCase.saveTagList(tags);
+                createTagUseCase.save(post, tagList);
+            }
+
+            createPostSearchUseCase.save(post, tags);
+            updatePostRoomUseCase.increasePostCount(postRoom);
+
+            fcmLiveUseCase.sendPushAfterPosting(post, author);
+
+            return postMapper.toResponsePostDTO(post, tags);
+        }
     }
 
     @Override
@@ -89,6 +123,14 @@ public class ApplicationPostService implements PostUseCase {
         Pageable pageable = conditionSwitch(page, size, condition);
 
         return queryPostUseCase.findAllByAuthorForDTO(user.getId(), pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ResponsePostListDTO> getPostListByPostRoom(int page, int size, String condition, Long postRoomId) {
+        Pageable pageable = conditionSwitch(page, size, condition);
+
+        return queryPostUseCase.findAllByPostRoomForDTO(postRoomId, pageable);
     }
 
     @Override
@@ -134,11 +176,23 @@ public class ApplicationPostService implements PostUseCase {
     @Override
     @Transactional
     public void delete(Long id, User user){
-        Post post = queryPostUseCase.findById(id);
+        Post post = queryPostUseCase.findByIdWithJoin(id);
         PostDocument document = queryPostSearchUseCase.findById(id);
 
         deletePostUseCase.delete(post, user);
         deletePostSearchUseCase.delete(document);
+        updatePostRoomUseCase.decreasePostCount(post.getPostRoom());
+    }
+
+    @Override
+    @Transactional
+    public void deleteByPostRoomMasterUser(Long id, User user) {
+        Post post = queryPostUseCase.findByIdWithJoin(id);
+        PostDocument document = queryPostSearchUseCase.findById(id);
+
+        deletePostUseCase.deleteByPostRoomMasterUser(post, user);
+        deletePostSearchUseCase.delete(document);
+        updatePostRoomUseCase.decreasePostCount(post.getPostRoom());
     }
 
     public Pageable conditionSwitch(int page, int size, String condition){

@@ -3,6 +3,8 @@ package kr.co.F1FS.app.domain.notification.application.service.push;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
+import kr.co.F1FS.app.domain.form.domain.PostRoomDeleteForm;
+import kr.co.F1FS.app.domain.form.domain.PostRoomForm;
 import kr.co.F1FS.app.domain.notification.application.mapper.notice.NotificationMapper;
 import kr.co.F1FS.app.domain.notification.application.port.in.redis.SaveNotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.application.port.in.notice.CreateNotificationUseCase;
@@ -10,6 +12,8 @@ import kr.co.F1FS.app.domain.notification.application.port.in.push.FCMLiveUseCas
 import kr.co.F1FS.app.domain.notification.application.port.in.redis.SubscribeNotificationRedisUseCase;
 import kr.co.F1FS.app.domain.notification.domain.FCMToken;
 import kr.co.F1FS.app.domain.post.domain.Post;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
+import kr.co.F1FS.app.domain.postRoomSuspension.domain.PostRoomSuspension;
 import kr.co.F1FS.app.domain.reply.domain.Reply;
 import kr.co.F1FS.app.domain.reply.domain.ReplyComment;
 import kr.co.F1FS.app.domain.user.domain.User;
@@ -137,6 +141,7 @@ public class FCMLiveService implements FCMLiveUseCase {
                 FCMPushDTO pushDTO = fcmUtil.sendPushForLike(user);
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);
+                log.info("작성자 푸시 알림 전송 완료");
             }
         }
     }
@@ -148,6 +153,7 @@ public class FCMLiveService implements FCMLiveUseCase {
                 FCMPushDTO pushDTO = fcmUtil.sendPushForReply(user, reply.getContent());
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);
+                log.info("작성자 푸시 알림 전송 완료");
             }
         }
     }
@@ -159,7 +165,65 @@ public class FCMLiveService implements FCMLiveUseCase {
                 FCMPushDTO pushDTO = fcmUtil.sendPushForReply(user, replyComment.getContent());
                 FCMToken token = fcmUtil.getAuthorToken(post.getAuthor());
                 sendPushForAuthor(pushDTO, token, post.getAuthor(), id);
+                log.info("작성자 푸시 알림 전송 완료");
             }
         }
+    }
+
+    @Override
+    public void sendPushAfterPostRoomSave(User user, PostRoomForm postRoomForm, Long id) {
+        if(AuthorCertification.certification(user.getUsername(), postRoomForm.getUser().getUsername())){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomFormSave(user, postRoomForm);
+            FCMToken token = fcmUtil.getAuthorToken(user);
+            sendPushForAuthor(pushDTO, token, user, id);
+            log.info("신청자 푸시 알림 전송 완료");
+        }
+    }
+
+    @Override
+    public void sendPushAfterPostRoomDeleteFormSave(User user, PostRoomDeleteForm deleteForm, Long id) {
+        if(AuthorCertification.certification(user.getUsername(), deleteForm.getUser().getUsername())){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomDeleteFormSave(user, deleteForm);
+            FCMToken token = fcmUtil.getAuthorToken(user);
+            sendPushForAuthor(pushDTO, token, user, id);
+            log.info("신청자 푸시 알림 전송 완료");
+        }
+    }
+
+    @Override
+    public void sendPushAfterPostRoomConfirmed(User user, PostRoomForm postRoomForm, Long id) {
+        if(AuthorCertification.certification(user.getUsername(), postRoomForm.getUser().getUsername())){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomFormConfirmed(user, postRoomForm);
+            FCMToken token = fcmUtil.getAuthorToken(user);
+            sendPushForAuthor(pushDTO, token, user, id);
+            log.info("신청자 푸시 알림 전송 완료");
+        }
+    }
+
+    @Override
+    public void sendPushAfterPostRoomDeleteConfirmed(User user, PostRoomDeleteForm deleteForm, Long id) {
+        if(AuthorCertification.certification(user.getUsername(), deleteForm.getUser().getUsername())){
+            FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomDeleteFormConfirmed(user, deleteForm);
+            FCMToken token = fcmUtil.getAuthorToken(user);
+            sendPushForAuthor(pushDTO, token, user, id);
+            log.info("신청자 푸시 알림 전송 완료");
+        }
+    }
+
+    @Override
+    public void sendPushAfterPostRoomSuspensionSave(PostRoomSuspension postRoomSuspension, Long roomId) {
+        User user = postRoomSuspension.getSuspendUser();
+        FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomSuspensionSave(postRoomSuspension);
+        FCMToken token = fcmUtil.getAuthorToken(user);
+        sendPushForAuthor(pushDTO, token, user, roomId);
+        log.info("차단 유저 푸시 알림 전송 완료");
+    }
+
+    @Override
+    public void sendPushAfterPostRoomSuspensionDelete(User suspensUser, PostRoom postRoom,  Long roomId) {
+        FCMPushDTO pushDTO = fcmUtil.sendPushForPostRoomSuspensionDelete(suspensUser, postRoom);
+        FCMToken token = fcmUtil.getAuthorToken(suspensUser);
+        sendPushForAuthor(pushDTO, token, suspensUser, roomId);
+        log.info("차단 해제 유저 푸시 알림 전송 완료");
     }
 }

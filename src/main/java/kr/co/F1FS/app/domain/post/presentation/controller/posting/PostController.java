@@ -23,11 +23,21 @@ import java.util.List;
 public class PostController {
     private final PostUseCase postUseCase;
 
-    @PostMapping("/save")
+    @PostMapping("/save/{roomId}")
     @Operation(summary = "게시글(Post) 등록", description = "게시글(Post)을 작성하고 등록")
     public ResponseEntity<ResponsePostDTO> save(@Valid @RequestBody CreatePostBlockRequestDTO dto,
-                                     @AuthenticationPrincipal PrincipalDetails details){
-        return ResponseEntity.status(HttpStatus.CREATED).body(postUseCase.save(dto, details.getUser()));
+                                                @AuthenticationPrincipal PrincipalDetails details,
+                                                @PathVariable Long roomId){
+        return ResponseEntity.status(HttpStatus.CREATED).body(postUseCase.save(dto, details.getUser(), roomId));
+    }
+
+    @PostMapping("/save/private-post-room/{roomId}")
+    @Operation(summary = "게시글(Post) 등록(비공개 게시판)", description = "비공개 게시판에 게시글(Post)을 작성하고 등록")
+    public ResponseEntity<ResponsePostDTO> savePrivatePostRoom(@Valid @RequestBody CreatePostBlockRequestDTO dto,
+                                                               @AuthenticationPrincipal PrincipalDetails details,
+                                                               @PathVariable Long roomId,
+                                                               @RequestHeader(value = "X-Post-Token", required = false) String token){
+        return ResponseEntity.status(HttpStatus.CREATED).body(postUseCase.savePrivatePostRoom(dto, details.getUser(), roomId, token));
     }
 
     @GetMapping("/find-all")
@@ -49,6 +59,16 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
     }
 
+    @GetMapping("/find-all/postRoom/{postRoomId}")
+    @Operation(summary = "게시글 리스트(게시판)", description = "특정 게시판의 게시글 리스트 반환")
+    public ResponseEntity<List<ResponsePostListDTO>> getPostListByPostRoom(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                           @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                           @RequestParam(value = "condition", defaultValue = "new") String condition,
+                                                                           @PathVariable Long postRoomId){
+        Page<ResponsePostListDTO> newPage = postUseCase.getPostListByPostRoom(page, size, condition, postRoomId);
+        return ResponseEntity.status(HttpStatus.OK).body(newPage.getContent());
+    }
+
     @GetMapping("/find/{id}")
     @Operation(summary = "게시글 상세 페이지(ID)", description = "특정 ID의 게시글을 반환")
     public ResponseEntity<ResponsePostDTO> getPostById(@PathVariable Long id){
@@ -66,6 +86,13 @@ public class PostController {
     @Operation(summary = "게시글 삭제", description = "특정 ID의 게시글 삭제")
     public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails details){
         postUseCase.delete(id, details.getUser());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/delete/room-master-user/{id}")
+    @Operation(summary = "게시글 삭제(게시판 관리자)", description = "게시판 관리자가 특정 ID의 게시글 삭제")
+    public ResponseEntity<Void> deleteByPostRoomMasterUser(@PathVariable Long id, @AuthenticationPrincipal PrincipalDetails principalDetails){
+        postUseCase.deleteByPostRoomMasterUser(id, principalDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

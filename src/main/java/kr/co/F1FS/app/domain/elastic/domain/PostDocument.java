@@ -25,24 +25,20 @@ import java.util.stream.Collectors;
 public class PostDocument {
     @Id
     private Long id;
-
     @Field(type = FieldType.Text)
     private String title;
-
     @Field(type = FieldType.Text)
     private String content;
-
     @Field(type = FieldType.Text)
     private String author;
-
     private List<String> tags;
-
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
-
     @Field(type = FieldType.Integer)
     private int likeNum;
+    @Field(type = FieldType.Long)
+    private Long roomId;
 
     public void modify(Post post, List<String> tags){
         this.title = post.getTitle();
@@ -73,5 +69,6 @@ public class PostDocument {
         this.tags = tags;
         this.createdAt = TimeUtil.convertToKoreanTime(post.getCreatedAt());
         this.likeNum = post.getLikeNum();
+        this.roomId = post.getPostRoom().getId();
     }
 }

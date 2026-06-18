@@ -6,5 +6,6 @@ public enum Topic {
     POST,
     LIKE,
     REPLY,
-    NOTE
+    NOTE,
+    POST_ROOM
 }

@@ -7,11 +7,14 @@ import kr.co.F1FS.app.domain.post.application.port.in.posting.QueryPostUseCase;
 import kr.co.F1FS.app.domain.post.application.port.out.posting.PostJpaPort;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.post.presentation.dto.ResponsePostListDTO;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +54,15 @@ public class QueryPostService implements QueryPostUseCase {
     @Override
     public Page<ResponsePostListDTO> findAllByAuthorForDTO(Long authorId, Pageable pageable) {
         return postJpaPort.findAllByAuthor(authorId, pageable);
+    }
+
+    @Override
+    public Page<ResponsePostListDTO> findAllByPostRoomForDTO(Long postRoomId, Pageable pageable) {
+        return postJpaPort.findAllByPostRoom(postRoomId, pageable);
+    }
+
+    @Override
+    public List<Post> findAllByPostRoom(PostRoom postRoom) {
+        return postJpaPort.findAllByPostRoom(postRoom);
     }
 }

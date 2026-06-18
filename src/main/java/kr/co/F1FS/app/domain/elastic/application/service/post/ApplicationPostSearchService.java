@@ -34,13 +34,20 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     private final SaveSuggestKeywordSearchRedisUseCase saveSuggestKeywordSearchRedisUseCase;
     private final ElasticsearchTemplate elasticsearchTemplate;
 
-    public NativeQuery setQueryTitle(String keyword, Pageable pageable, String condition){
+    public NativeQuery setQueryTitle(String keyword, Long roomId, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .multiMatch(mm -> mm
-                                .query(keyword)
-                                .fields("title.kor", "title.eng", "title.ngram")
-                                .operator(Operator.Or)))
+                        .bool(b -> b
+                                .must(m -> m
+                                        .multiMatch(mm -> mm
+                                                .query(keyword)
+                                                .fields("title.kor", "title.eng", "title.ngram")
+                                                .operator(Operator.Or)))
+                                .filter(f -> f
+                                        .term(t -> t
+                                                .field("roomId")
+                                                .value(roomId)))
+                        ))
                 .withPageable(pageable)
                 .withSort(s -> {
                     switch (condition){
@@ -62,13 +69,20 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         return query;
     }
 
-    public NativeQuery setQueryContent(String keyword, Pageable pageable, String condition){
+    public NativeQuery setQueryContent(String keyword, Long roomId, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
-                        .multiMatch(mm -> mm
-                                .query(keyword)
-                                .fields("content.kor", "content.eng", "content.ngram")
-                                .operator(Operator.Or)))
+                        .bool(b -> b
+                                .must(m -> m
+                                        .multiMatch(mm -> mm
+                                                .query(keyword)
+                                                .fields("content.kor", "content.eng", "content.ngram")
+                                                .operator(Operator.Or)))
+                                .filter(f -> f
+                                        .term(t -> t
+                                                .field("roomId")
+                                                .value(roomId)))
+                        ))
                 .withPageable(pageable)
                 .withSort(s -> {
                     switch (condition){
@@ -90,7 +104,7 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         return query;
     }
 
-    public NativeQuery setQueryTitleOrContent(String keyword, Pageable pageable, String condition){
+    public NativeQuery setQueryTitleOrContent(String keyword, Long roomId, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
@@ -99,7 +113,12 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                                             .fields("title.kor^3", "title.eng^3", "title.ngram^2", "content.kor", "content.eng")
                                             .operator(Operator.Or);
                                     return mm;
-                                }))))
+                                }))
+                                .filter(f -> f
+                                        .term(t -> t
+                                                .field("roomId")
+                                                .value(roomId)))
+                        ))
                 .withPageable(pageable)
                 .withSort(s -> {
                     switch (condition){
@@ -122,7 +141,7 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         return query;
     }
 
-    public NativeQuery setQueryAuthor(String keyword, Pageable pageable, String condition){
+    public NativeQuery setQueryAuthor(String keyword, Long roomId, Pageable pageable, String condition){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
         String trimmed = keyword.trim();
 
@@ -158,6 +177,11 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                                         .boost(1.5f);
                                 return m;
                             }));
+                            b.filter(f -> f.term(t -> {
+                                t.field("roomId")
+                                        .value(roomId);
+                                return t;
+                            }));
 
                             return b;
                         }))
@@ -183,7 +207,7 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         return query;
     }
 
-    public NativeQuery setQueryTags(String keyword, Pageable pageable, String condition){
+    public NativeQuery setQueryTags(String keyword, Long roomId, Pageable pageable, String condition){
         String normalized = keyword.trim().toLowerCase(Locale.ENGLISH);
         String trimmed = keyword.trim();
 
@@ -219,6 +243,11 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                                         .boost(1.5f);
                                 return m;
                             }));
+                            b.filter(f -> f.term(t -> {
+                                t.field("roomId")
+                                        .value(roomId);
+                                return t;
+                            }));
 
                             return b;
                         }))
@@ -244,7 +273,7 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
         return query;
     }
 
-    public NativeQuery setQueryTagsFilter(List<String> tags, Pageable pageable, String condition){
+    public NativeQuery setQueryTagsFilter(List<String> tags, Long roomId, Pageable pageable, String condition){
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q
                         .bool(b -> b
@@ -255,7 +284,12 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
                                                         tags.stream()
                                                                 .map(FieldValue::of)
                                                                 .toList()
-                                                ))))))
+                                                ))))
+                                .filter(f -> f
+                                        .term(t -> t
+                                                .field("roomId")
+                                                .value(roomId)))
+                        ))
                 .withPageable(pageable)
                 .withSort(s -> {
                     switch (condition){
@@ -278,26 +312,26 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     }
 
     @Override
-    public Page<ResponsePostDocumentDTO> getPostList(int page, int size, String condition, String option, String keyword){
+    public Page<ResponsePostDocumentDTO> getPostList(int page, int size, String condition, String option, String keyword, Long roomId){
         if(keyword == null || keyword.length() < 2) return new PageImpl<>(List.of());
         Pageable pageable = PageRequest.of(page, size);
 
         switch (option){
             case "title" :
-                NativeQuery query = setQueryTitle(keyword, pageable, condition);
+                NativeQuery query = setQueryTitle(keyword, roomId, pageable, condition);
                 return getPageImpl(query, pageable, keyword);
             case "content" :
-                NativeQuery query2 = setQueryContent(keyword, pageable, condition);
+                NativeQuery query2 = setQueryContent(keyword, roomId, pageable, condition);
                 return getPageImpl(query2, pageable, keyword);
             case "titleOrContent" :
-                NativeQuery query3 = setQueryTitleOrContent(keyword, pageable, condition);
+                NativeQuery query3 = setQueryTitleOrContent(keyword, roomId, pageable, condition);
                 return getPageImpl(query3, pageable, keyword);
             case "author" :
                 if (keyword.length() < 3) return new PageImpl<>(List.of());
-                NativeQuery query4 = setQueryAuthor(keyword, pageable, condition);
+                NativeQuery query4 = setQueryAuthor(keyword, roomId, pageable, condition);
                 return getPageImpl(query4, pageable, keyword);
             case "tags" :
-                NativeQuery query5 = setQueryTags(keyword, pageable, condition);
+                NativeQuery query5 = setQueryTags(keyword, roomId, pageable, condition);
                 return getPageImpl(query5, pageable, keyword);
             default:
                 throw new PostException(PostExceptionType.SEARCH_ERROR_POST);
@@ -305,9 +339,9 @@ public class ApplicationPostSearchService implements PostSearchUseCase {
     }
 
     @Override
-    public Page<ResponsePostDocumentDTO> getPostListByTags(int page, int size, String condition, TagListRequestDTO dto) {
+    public Page<ResponsePostDocumentDTO> getPostListByTags(int page, int size, String condition, TagListRequestDTO dto, Long roomId) {
         Pageable pageable = PageRequest.of(page, size);
-        NativeQuery query = setQueryTagsFilter(dto.getTags(), pageable, condition);
+        NativeQuery query = setQueryTagsFilter(dto.getTags(), roomId, pageable, condition);
 
         return getPageImpl(query, pageable, null);
     }

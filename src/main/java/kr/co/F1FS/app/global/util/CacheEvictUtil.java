@@ -7,6 +7,8 @@ import kr.co.F1FS.app.domain.complain.reply.domain.ReplyComplain;
 import kr.co.F1FS.app.domain.complain.user.domain.UserComplain;
 import kr.co.F1FS.app.domain.constructor.domain.Constructor;
 import kr.co.F1FS.app.domain.driver.domain.rdb.Driver;
+import kr.co.F1FS.app.domain.form.domain.PostRoomDeleteForm;
+import kr.co.F1FS.app.domain.form.domain.PostRoomForm;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.note.domain.Note;
 import kr.co.F1FS.app.domain.notification.domain.Notification;
@@ -107,4 +109,16 @@ public class CacheEvictUtil {
             @CacheEvict(value = "NoteComplainDTO", key = "#noteComplain.id", cacheManager = "redisLongCacheManager")
     })
     public void evictCachingNoteComplain(NoteComplain noteComplain){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "PostRoomFormDTO", key = "#postRoomForm.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "PostRoomFormDTOForAdmin", key = "#postRoomForm.id", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingPostRoomForm(PostRoomForm postRoomForm){}
+
+    @Caching(evict = {
+            @CacheEvict(value = "PostRoomDeleteFormDTO", key = "#deleteForm.id", cacheManager = "redisLongCacheManager"),
+            @CacheEvict(value = "PostRoomDeleteFormDTOForAdmin", key = "#deleteForm.id", cacheManager = "redisLongCacheManager")
+    })
+    public void evictCachingPostRoomDeleteForm(PostRoomDeleteForm deleteForm){}
 }

@@ -6,6 +6,7 @@ import kr.co.F1FS.app.domain.post.application.port.out.posting.PostJpaPort;
 import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.post.domain.PostBlock;
 import kr.co.F1FS.app.domain.post.presentation.dto.CreatePostBlockRequestDTO;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.application.service.ValidationService;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class CreatePostService implements CreatePostUseCase {
     private final PostBlockMapper postBlockMapper;
 
     @Override
-    public Post save(CreatePostBlockRequestDTO requestDTO, User author) {
-        Post post = postDomainService.createEntity(requestDTO.getTitle(), author);
+    public Post save(CreatePostBlockRequestDTO requestDTO, User author, PostRoom postRoom) {
+        Post post = postDomainService.createEntity(requestDTO.getTitle(), author, postRoom);
 
         for (CreatePostBlockRequestDTO.BlockRequest blockReq : requestDTO.getBlocks()){
             PostBlock block = postBlockMapper.toPostBlock(blockReq.getContent(), blockReq.getType());

@@ -11,4 +11,5 @@ public interface PostDSLRepository {
     Optional<Post> findById(Long id);
     Page<ResponsePostListDTO> findPostList(Pageable pageable);
     Page<ResponsePostListDTO> findAllByAuthor(Long authorId, Pageable pageable);
+    Page<ResponsePostListDTO> findAllByPostRoom(Long postRoomId, Pageable pageable);
 }

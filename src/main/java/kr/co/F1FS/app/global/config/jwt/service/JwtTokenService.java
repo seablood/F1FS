@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.F1FS.app.domain.auth.application.port.in.blackList.CheckBlackListUseCase;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.user.domain.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,9 @@ public class JwtTokenService {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
+    @Value("${jwt.postRoom.header}")
+    private String postRoomHeader;
+
     private final CheckBlackListUseCase checkBlackListUseCase;
     private final static String TOKEN_PREFIX = "Bearer ";
 
@@ -56,6 +60,24 @@ public class JwtTokenService {
                 .compact();
     }
 
+    // 비공개 게시판 글 작성 Token 생성
+    public String createToken(PostRoom postRoom, User user, Duration tokenValidTerm){
+        Date now = new Date();
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
+                .setSubject(postRoom.getRoomTitle() + ":" + user.getNickname())
+                .setIssuer(issuer)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + tokenValidTerm.toMillis()))
+                .claim("postRoomId", postRoom.getId())
+                .claim("userId", user.getId())
+                .claim("postRoomTitle", postRoom.getRoomTitle())
+                .claim("userNickname", user.getNickname())
+                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .compact();
+    }
+
 
     // Token을 response 해더에 추가
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken){
@@ -64,6 +86,14 @@ public class JwtTokenService {
         response.setHeader(accessHeader, TOKEN_PREFIX + accessToken);
         response.setHeader(refreshHeader, TOKEN_PREFIX + refreshToken);
         log.info("Access Token, Refresh Token 헤더 설정 완료");
+    }
+
+    // 비공개 게시판 글 작성 Token 해더에 추가
+    public void sendPrivatePostToken(HttpServletResponse response, String privatePostToken){
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        response.setHeader(postRoomHeader, TOKEN_PREFIX + privatePostToken);
+        log.info("Private Post Token 헤더 설정 완료");
     }
 
     // AccessToken 추출
@@ -93,10 +123,23 @@ public class JwtTokenService {
         return Optional.ofNullable(getClaims(token).get("nickname", String.class));
     }
 
+    public Optional<Long> getPostRoomId(String token) {
+        return Optional.ofNullable(getClaims(token).get("postRoomId", Long.class));
+    }
+
     // 토큰 유효성 검사
     public boolean validateToken(String token) {
         try {
             return (!getClaims(token).getExpiration().before(new Date())) && !checkBlackListUseCase.isBlacklisted(token);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // PostRoom 토큰 유효성 검사
+    public boolean validatePostRoomToken(String token, Long postRoomId) {
+        try {
+            return (!getClaims(token).getExpiration().before(new Date())) && getPostRoomId(token).get().equals(postRoomId);
         } catch (Exception e) {
             return false;
         }

@@ -5,12 +5,15 @@ import kr.co.F1FS.app.domain.post.domain.Post;
 import kr.co.F1FS.app.domain.post.infrastructure.repository.PostRepository;
 import kr.co.F1FS.app.domain.post.infrastructure.repository.dsl.PostDSLRepository;
 import kr.co.F1FS.app.domain.post.presentation.dto.ResponsePostListDTO;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
 import kr.co.F1FS.app.global.util.exception.post.PostExceptionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -36,6 +39,16 @@ public class PostJpaAdapter implements PostJpaPort {
     @Override
     public Page<ResponsePostListDTO> findAllByAuthor(Long authorId, Pageable pageable) {
         return postDSLRepository.findAllByAuthor(authorId, pageable);
+    }
+
+    @Override
+    public Page<ResponsePostListDTO> findAllByPostRoom(Long postRoomId, Pageable pageable) {
+        return postDSLRepository.findAllByPostRoom(postRoomId, pageable);
+    }
+
+    @Override
+    public List<Post> findAllByPostRoom(PostRoom postRoom) {
+        return postRepository.findAllByPostRoom(postRoom);
     }
 
     @Override

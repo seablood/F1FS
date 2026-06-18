@@ -69,7 +69,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.cors((cors) -> cors.configurationSource(corsConfigurationSource()));
+        //http.cors((cors) -> cors.configurationSource(corsConfigurationSource()));
         http.formLogin((formLogin) -> formLogin.disable());
         http.httpBasic((httpBasic) -> httpBasic.disable());
         http.csrf((csrf) -> csrf.disable()); // dev 시, 비활성화

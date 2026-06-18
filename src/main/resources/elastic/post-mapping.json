@@ -96,6 +96,9 @@
     },
     "likeNum": {
       "type": "integer"
+    },
+    "roomId": {
+      "type": "long"
     }
   }
 }

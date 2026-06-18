@@ -8,6 +8,7 @@ import kr.co.F1FS.app.domain.elastic.presentation.dto.CDSearchSuggestionDTO;
 import kr.co.F1FS.app.domain.elastic.presentation.dto.ModifyBookmarkSearchDTO;
 import kr.co.F1FS.app.domain.grandprix.domain.GrandPrix;
 import kr.co.F1FS.app.domain.post.domain.Post;
+import kr.co.F1FS.app.domain.postRoom.domain.PostRoom;
 import kr.co.F1FS.app.domain.tag.domain.Tag;
 import kr.co.F1FS.app.domain.user.domain.User;
 import kr.co.F1FS.app.global.presentation.dto.bookmark.ResponseBookmarkDocumentDTO;
@@ -15,6 +16,7 @@ import kr.co.F1FS.app.global.presentation.dto.chat.ResponseChatRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.grandprix.ResponseSuggestGrandPrixSearchDTO;
 import kr.co.F1FS.app.global.presentation.dto.post.ResponsePostDocumentDTO;
+import kr.co.F1FS.app.global.presentation.dto.postRoom.ResponsePostRoomDocumentDTO;
 import kr.co.F1FS.app.global.presentation.dto.user.ResponseUserDocumentDTO;
 import kr.co.F1FS.app.global.util.TimeUtil;
 import org.springframework.stereotype.Component;
@@ -65,6 +67,12 @@ public class DocumentMapper {
     public BookmarkDocument toBookmarkDocument(Bookmark bookmark){
         return BookmarkDocument.builder()
                 .bookmark(bookmark)
+                .build();
+    }
+
+    public PostRoomDocument toPostRoomDocument(PostRoom postRoom){
+        return PostRoomDocument.builder()
+                .postRoom(postRoom)
                 .build();
     }
 
@@ -148,6 +156,15 @@ public class DocumentMapper {
         return ModifyBookmarkSearchDTO.builder()
                 .postId(postId)
                 .title(title)
+                .build();
+    }
+
+    public ResponsePostRoomDocumentDTO toResponsePostRoomDocumentDTO(PostRoomDocument postRoomDocument){
+        return ResponsePostRoomDocumentDTO.builder()
+                .id(postRoomDocument.getId())
+                .roomTitle(postRoomDocument.getRoomTitle())
+                .description(postRoomDocument.getDescription())
+                .isPublic(postRoomDocument.isPublic())
                 .build();
     }
 }

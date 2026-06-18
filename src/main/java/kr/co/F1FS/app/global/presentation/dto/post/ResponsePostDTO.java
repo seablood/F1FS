@@ -18,6 +18,7 @@ public class ResponsePostDTO {
     private String title;
     private List<BlockContent> blocks;
     private String author;
+    private String roomTitle;
     private List<String> tags;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
     private Timestamp createdAt;

@@ -5,5 +5,6 @@ import kr.co.F1FS.app.domain.user.domain.User;
 
 public interface DeletePostUseCase {
     void delete(Post post, User user);
+    void deleteByPostRoomMasterUser(Post post, User user);
     void delete(Post post);
 }

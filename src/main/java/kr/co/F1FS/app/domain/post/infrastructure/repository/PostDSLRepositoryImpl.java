@@ -9,6 +9,7 @@ import kr.co.F1FS.app.domain.post.domain.QPostBlock;
 import kr.co.F1FS.app.domain.post.infrastructure.repository.dsl.PostDSLRepository;
 import kr.co.F1FS.app.domain.post.presentation.dto.QResponsePostListDTO;
 import kr.co.F1FS.app.domain.post.presentation.dto.ResponsePostListDTO;
+import kr.co.F1FS.app.domain.postRoom.domain.QPostRoom;
 import kr.co.F1FS.app.domain.user.domain.QUser;
 import kr.co.F1FS.app.global.util.SoftDeleteExpressions;
 import kr.co.F1FS.app.global.util.exception.post.PostException;
@@ -31,11 +32,13 @@ public class PostDSLRepositoryImpl implements PostDSLRepository {
     public Optional<Post> findById(Long id) {
         QPost post = QPost.post;
         QUser author = new QUser("author");
+        QPostRoom postRoom = new QPostRoom("postRoom");
         QPostBlock block = new QPostBlock("block");
 
         Post content = queryFactory
                 .selectFrom(post)
                 .join(post.author, author).fetchJoin()
+                .join(post.postRoom, postRoom).fetchJoin()
                 .leftJoin(post.blocks, block).fetchJoin()
                 .where(post.id.eq(id), SoftDeleteExpressions.isNotDeleted(post))
                 .distinct()
@@ -48,17 +51,21 @@ public class PostDSLRepositoryImpl implements PostDSLRepository {
     public Page<ResponsePostListDTO> findPostList(Pageable pageable) {
         QPost post = QPost.post;
         QUser user = QUser.user;
+        QPostRoom postRoom = new QPostRoom("postRoom");
 
         List<ResponsePostListDTO> contents = queryFactory
                 .select(new QResponsePostListDTO(
                         post.id,
                         post.title,
                         user.nickname,
+                        postRoom.roomTitle,
                         post.createdAt,
                         post.likeNum
                 ))
                 .from(post)
                 .join(post.author, user)
+                .join(post.postRoom, postRoom)
+                .where(SoftDeleteExpressions.isNotDeleted(post))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifiers(pageable))
@@ -76,18 +83,21 @@ public class PostDSLRepositoryImpl implements PostDSLRepository {
     public Page<ResponsePostListDTO> findAllByAuthor(Long authorId, Pageable pageable) {
         QPost post = QPost.post;
         QUser user = QUser.user;
+        QPostRoom postRoom = new QPostRoom("postRoom");
 
         List<ResponsePostListDTO> contents = queryFactory
                 .select(new QResponsePostListDTO(
                         post.id,
                         post.title,
                         user.nickname,
+                        postRoom.roomTitle,
                         post.createdAt,
                         post.likeNum
                 ))
                 .from(post)
                 .join(post.author, user)
-                .where(post.author.id.eq(authorId))
+                .join(post.postRoom, postRoom)
+                .where(post.author.id.eq(authorId), SoftDeleteExpressions.isNotDeleted(post))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifiers(pageable))
@@ -97,6 +107,39 @@ public class PostDSLRepositoryImpl implements PostDSLRepository {
                 .select(post.count())
                 .from(post)
                 .where(post.author.id.eq(authorId))
+                .fetchOne();
+
+        return new PageImpl<>(contents, pageable, total);
+    }
+
+    @Override
+    public Page<ResponsePostListDTO> findAllByPostRoom(Long postRoomId, Pageable pageable) {
+        QPost post = QPost.post;
+        QUser user = QUser.user;
+        QPostRoom postRoom = new QPostRoom("postRoom");
+
+        List<ResponsePostListDTO> contents = queryFactory
+                .select(new QResponsePostListDTO(
+                        post.id,
+                        post.title,
+                        user.nickname,
+                        postRoom.roomTitle,
+                        postRoom.createdAt,
+                        post.likeNum
+                ))
+                .from(post)
+                .join(post.author, user)
+                .join(post.postRoom, postRoom)
+                .where(post.postRoom.id.eq(postRoomId), SoftDeleteExpressions.isNotDeleted(post))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifiers(pageable))
+                .fetch();
+
+        Long total = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(post.postRoom.id.eq(postRoomId))
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, total);
